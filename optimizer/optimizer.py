@@ -1,26 +1,28 @@
 import jax
-import matplotlib.pyplot as plt
 import numpy as np
 import torch
-import autograd as ag
 import nlopt
 import time
 
+from filtering.dose_model.config_print import ConfigPrint
 from optimizer import config
 
 
-def optimiser_jaxwell(rho, dose_sim, objective, eval=False):
+def optimiser(rho, objective, filter, projection, loss_hist, mode):
     """
     The optimiser function
     :return:
     """
-    loss_hist = []
+
+    def select_f(mode):
+        if mode == "torch_jax":
+            return f_torch_jax
 
     class fom_em_torch_f(torch.autograd.Function):
         @staticmethod
         def forward(ctx, x):
             grad_em_sim_f = jax.value_and_grad(objective)
-            value_em_sim, grad_em_sim = grad_em_sim_f(x.detach().cpu().numpy().astype(np.float64))
+            value_em_sim, grad_em_sim = grad_em_sim_f(projection(x.detach().cpu().numpy().astype(np.float64)))
             ctx.save_for_backward(torch.tensor(np.array(grad_em_sim), device='cuda', requires_grad=True))
             return torch.tensor(np.array(value_em_sim), device='cuda', requires_grad=True)
 
@@ -29,11 +31,11 @@ def optimiser_jaxwell(rho, dose_sim, objective, eval=False):
             grad_em_sim, = ctx.saved_tensors
             return grad_em_sim
 
-    def f(x, g):
+    def f_torch_jax(x, g):
         start = time.time()
         x = np.reshape(x, rho.shape)
         rho_0 = torch.tensor(x, device='cuda', requires_grad=True)
-        rho_final = dose_sim(rho_0)
+        rho_final = filter(rho_0)
         fom = fom_em_torch_f.apply(rho_final)
         fom.backward(retain_graph=True)
         grad_torch = rho_0.grad
@@ -49,7 +51,31 @@ def optimiser_jaxwell(rho, dose_sim, objective, eval=False):
             g[:] = grad.ravel()
         end = time.time()
         print(f"time: {end - start}")
+        if eval:
+            import matplotlib.pyplot as plt
+            fig, ax = plt.subplots(2, 1, sharex=True)
+            rho_ = rho_0.detach().cpu().numpy()
+            rho_ = np.concatenate((rho_, np.flip(rho_, axis=0)), axis=0)
+            rho_ = np.concatenate((rho_, np.flip(rho_, axis=1)), axis=1)
+            # rho_ = np.concatenate((rho_, np.flip(rho_, axis=2)), axis=2)
+            ax[0].imshow(rho_[rho_.shape[0]//2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+            # ax[0].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
+            ax[0].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
+            rho_f = rho_final.detach().cpu().numpy()
+            rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=0)), axis=0)
+            rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=1)), axis=1)
+            # rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=2)), axis=2)
+            rho_f = projection(rho_f)
+            ax[1].imshow(rho_f[rho_f.shape[0]//2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+            ax[1].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
+            ax[1].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
+            plt.savefig(f"metalens/plots/progression/rho_{config.cur_it:03d}.png")
+            plt.close()
+            if config.cur_it % config.MAXEVAL == 0:
+                config.ind += 1
         return value
+
+    f = select_f(mode)
 
     opt = nlopt.opt(config.OPTIMISER, rho.size)
     opt.set_max_objective(f)

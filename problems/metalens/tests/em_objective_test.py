@@ -18,9 +18,7 @@ def test(seed):
     currents = jnp.ones((ConfigSim.currents_shape[0] * resolution, ConfigSim.currents_shape[1] * resolution, 1),
                         jnp.complex128)
 
-    proj = projection_loader("None")
-
-    objective_em = objective_loader("em_only", proj, currents, resolution, 1)
+    objective_em = objective_loader("em_only", currents, resolution, 1)
     fom = objective_em(rho_0)
     print(fom)
 

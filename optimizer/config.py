@@ -1,6 +1,5 @@
 # Not a class since I don't need to pass it differently according to the problem.
 import nlopt
-import numpy as np
 
 MAXEVAL = 30
 FTOL_ABS = 1e-7
@@ -11,5 +10,3 @@ OPTIMISER = nlopt.LD_MMA   # MMA for lens, LBFGS for cross
 
 cur_it = 0
 ind = 0
-
-betas = [1e3]
