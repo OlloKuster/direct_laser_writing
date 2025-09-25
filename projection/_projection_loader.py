@@ -1,5 +1,5 @@
 from projection.tanh.subpixel_smoothed_projection import ssp_proj_jax_f
-from projection.tanh.tanh_projection import tanh_filter_jax_f
+from projection.SSP.tanh_projection import tanh_filter_jax_f
 
 
 def projection_loader(projection: str, *args):
@@ -16,7 +16,7 @@ def projection_loader(projection: str, *args):
     if projection == "None":
         return lambda x: x
     if projection == "tanh_jax":
-        return tanh_filter_jax_f()
+        return tanh_filter_jax_f(alpha, beta)
     if projection == "ssp_jax":
-        resolution = args[0]
-        return ssp_proj_jax_f(resolution)
+        alpha, beta, resolution = args
+        return ssp_proj_jax_f(alpha, beta, resolution)

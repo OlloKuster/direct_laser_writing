@@ -2,8 +2,8 @@ import jax.numpy as jnp
 import autograd.numpy as anp
 
 
-def tanh_filter_jax_f():
-    def f2bin(rho, alpha=0.5, beta=30):
+def tanh_filter_jax_f(alpha=0.5, beta=30):
+    def f2bin(rho):
         """
         Binarises the values of x with parameters alpha and beta.
         :param rho: Array which will be binarised.
