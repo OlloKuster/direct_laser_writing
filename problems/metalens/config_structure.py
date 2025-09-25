@@ -6,7 +6,7 @@ class ConfigSim:
     """
     Config the 3D lens, defines the required parameters which are used for the simulation.
     """
-    rho_shape = (5, 5, 5)
+    rho_shape = (10, 10, 5)
     buffer_side = 1
     buffer_top = 3
     buffer_bottom = 1
