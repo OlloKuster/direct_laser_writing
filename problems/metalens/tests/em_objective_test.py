@@ -1,13 +1,9 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import jax.numpy as jnp
 import jax
 
-import time
-
-from problems.metalens._objective_loader import objective_loader
-from problems.metalens.config_structure import ConfigSim
-from problems.metalens.simulation import em_simulation
+from problems.metalens.simulation._objective_loader import objective_loader
+from problems.metalens.simulation.config_structure import ConfigSim
 
 
 def test(seed):

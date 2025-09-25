@@ -5,7 +5,7 @@ import jax
 
 import time
 
-from problems.metalens.config_structure import ConfigSim
+from problems.metalens.simulation.config_structure import ConfigSim
 from problems.metalens.simulation import em_simulation
 
 

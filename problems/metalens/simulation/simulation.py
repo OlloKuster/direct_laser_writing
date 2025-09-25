@@ -1,8 +1,7 @@
-import jax
 import jax.numpy as jnp
 import jaxwell
 
-from problems.metalens.config_structure import ConfigSim
+from problems.metalens.simulation.config_structure import ConfigSim
 from utility.helper import f2param, split_int
 
 

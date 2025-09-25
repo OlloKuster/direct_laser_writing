@@ -1,4 +1,4 @@
-from problems.metalens.objective import objective_em_f
+from problems.metalens.simulation.objective import objective_em_f
 
 
 def objective_loader(objective: str, *args):

@@ -1,7 +1,7 @@
 import jax.numpy as jnp
 
-from problems.metalens.config_structure import ConfigSim
-from problems.metalens.simulation import em_simulation
+from problems.metalens.simulation.config_structure import ConfigSim
+from problems.metalens.simulation.simulation import em_simulation
 
 
 def objective_em_f(currents, resolution, init_value):
