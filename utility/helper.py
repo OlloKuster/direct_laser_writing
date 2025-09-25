@@ -7,3 +7,11 @@ def f2param(x, lims):
     """
     (a, b) = lims
     return (b - a) * x + a
+
+def split_int(a):
+    """
+    Splits a into two parts as close as possible to the middle.
+    :param a: Value to be split in the middle.
+    :return: Tuple of both halves of a.
+    """
+    return a // 2, a // 2 + a % 2
