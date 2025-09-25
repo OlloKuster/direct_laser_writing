@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import jax.numpy as jnp
 import jax
 
+import time
+
 from problems.metalens.config_structure import ConfigSim
 from problems.metalens.simulation import em_simulation
 
@@ -18,7 +20,11 @@ def test(seed):
     currents = jnp.ones((ConfigSim.currents_shape[0]*resolution, ConfigSim.currents_shape[1]*resolution, 1),
                        jnp.complex128)
 
+    start = time.time()
+
     E, eps = em_simulation(rho_0, currents, resolution)
+
+    print(time.time() - start)
 
     plt.imshow(eps[eps[0].shape[0]//2].T, origin='lower', cmap='binary',
                extent=(0, ConfigSim.simulation_domain_shape[1], 0, ConfigSim.simulation_domain_shape[2]))
