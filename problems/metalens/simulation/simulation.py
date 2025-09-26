@@ -1,7 +1,9 @@
+import jax
 import jax.numpy as jnp
 import jaxwell
 
 from problems.metalens.simulation.config_structure import ConfigSim
+from tofea.fea3d import FEA3D_T
 from utility.helper import f2param, split_int
 
 
@@ -66,3 +68,29 @@ def em_simulation(rho, currents, resolution):
 
     return E, eps
 
+
+def heat_simulation(rho, resize_factor):
+    rho_n_shape = (rho.shape[0] // resize_factor, rho.shape[1] // resize_factor, rho.shape[2] // resize_factor)
+    rho_n = jax.image.resize(rho, rho_n_shape, 'bicubic', antialias=False)
+
+    heat_sinks_matter = jnp.zeros((rho_n_shape[0] + 1,
+                                   rho_n_shape[1] + 1,
+                                   rho_n_shape[2] + 1), dtype='?')
+    heat_sinks_matter = heat_sinks_matter.at[..., 0].set(True)
+    kappa_r_matter = f2param(rho_n, ConfigSim.kappa)
+    fem_matter = FEA3D_T(heat_sinks_matter)
+    src_matter = jnp.pad(rho_n, [(0, 1), (0, 1), (0, 1)], mode='constant', constant_values=0)
+    T_matter = jnp.sum(fem_matter.temperature(kappa_r_matter, src_matter))
+
+    heat_sinks_void = jnp.zeros_like(heat_sinks_matter)
+    heat_sinks_void = heat_sinks_void.at[0].set(True)
+    heat_sinks_void = heat_sinks_void.at[-1].set(True)
+    heat_sinks_void = heat_sinks_void.at[:, 0].set(True)
+    heat_sinks_void = heat_sinks_void.at[:, -1].set(True)
+    heat_sinks_void = heat_sinks_void.at[..., -1].set(True)
+    kappa_r_void = f2param(1 - rho_n, ConfigSim.kappa)
+    fem_void = FEA3D_T(heat_sinks_void)
+    src_void = jnp.pad(1 - rho_n, [(0, 1), (0, 1), (0, 1)], mode='constant', constant_values=0)
+    T_void = jnp.sum(fem_void.temperature(kappa_r_void, src_void))
+
+    return T_matter, T_void, kappa_r_matter

@@ -8,11 +8,12 @@ from filtering.dose_model.config_print import ConfigPrint
 from optimizer import config
 
 
-def optimiser(rho, objective, filter, projection, loss_hist, mode):
+def optimiser(rho, objective, filter, projection, mode):
     """
     The optimiser function
     :return:
     """
+    loss_hist = []
 
     def select_f(mode):
         if mode == "torch_jax":
@@ -78,7 +79,7 @@ def optimiser(rho, objective, filter, projection, loss_hist, mode):
     f = select_f(mode)
 
     opt = nlopt.opt(config.OPTIMISER, rho.size)
-    opt.set_max_objective(f)
+    opt.set_min_objective(f)
     opt.set_maxeval(config.MAXEVAL)
     # opt.set_ftol_abs(config.FTOL_ABS)
     # opt.set_ftol_rel(config.FTOL_REL)
