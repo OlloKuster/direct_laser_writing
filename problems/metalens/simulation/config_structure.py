@@ -27,5 +27,5 @@ class ConfigSim:
     location_focal_spot = 5
 
     TARGET_EM = 20
-    TARGET_MATERIAL = -1
+    TARGET_MATERIAL = 1.5
     TARGET_VOID = 1.5

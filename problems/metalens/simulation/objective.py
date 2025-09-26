@@ -1,4 +1,5 @@
 import jax.numpy as jnp
+from jax.debug import print as jprint
 
 from problems.metalens.simulation.config_structure import ConfigSim
 from problems.metalens.simulation.simulation import em_simulation, heat_simulation
@@ -39,6 +40,17 @@ def objective_em_heat_f(currents, resolution, init_values):
         n_lens = (ConfigSim.TARGET_EM - v_lens) / ConfigSim.TARGET_EM
         n_heat_m = (v_heat_m - init_values[1]) / init_values[1]
         n_heat_v = (v_heat_v - init_values[2]) / init_values[2]
+
+        logs = {
+            "n_lens": n_lens, "n_heat_m": n_heat_m, "n_heat_v": n_heat_v, "v_lens": v_lens, "v_heat_m": v_heat_m,
+            "v_heat_v": v_heat_v
+        }
+
+        print("====================")
+        for name, log in logs.items():
+            jprint("{name}:", name=name)
+            jprint("    {log}", log=log)
+        print("====================")
 
         objs = jnp.array([n_lens, n_heat_m, n_heat_v])
 
