@@ -24,8 +24,8 @@ class ConfigSim:
     resize_factor = 1
 
     location_currents = dpml + 1
-    location_focal_spot = 5
+    location_focal_spot = 6.5
 
-    TARGET_EM = 20
-    TARGET_MATERIAL = 1.5
-    TARGET_VOID = 1.5
+    TARGET_EM = 10
+    TARGET_MATERIAL = 1.3
+    TARGET_VOID = 1.3

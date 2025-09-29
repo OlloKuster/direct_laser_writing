@@ -81,4 +81,4 @@ def run(resolution, betas):
             f.close()
 
 
-run(14, [16, 32, jnp.inf])
+run(8, [16, 32, jnp.inf])
