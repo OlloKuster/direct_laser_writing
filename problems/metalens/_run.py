@@ -80,5 +80,3 @@ def run(resolution, betas):
             grp.create_dataset("loss", data=loss_hist)
             f.close()
 
-
-run(8, [16, 32, jnp.inf])
