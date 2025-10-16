@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 
+from utility.helper import f2param
 from .config_print import ConfigPrint
 from filtering.dose_model.DoseMSBPM import DoseMSBPMFull3D
 from filtering.dose_model.utils_dose_sim import create_3d_psf_torch
@@ -45,6 +46,6 @@ def dose_filter_f(resolution):
         rho = msbpm(rho_0 * torch.tensor(ConfigPrint.power, device='cuda', requires_grad=True),
                     torch.tensor([[ConfigPrint.lp]], device=ConfigPrint.device, requires_grad=True))
 
-        return rho
+        return rho / torch.max(rho)
 
     return dose_filter
