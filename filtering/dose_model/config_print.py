@@ -14,8 +14,8 @@ class ConfigPrint():
     h = torch.tensor(6.626e-34, device=device, dtype=torch.float64)
     c = torch.tensor(2.99792458e8, device=device, dtype=torch.float64)
 
-    lam = torch.tensor(6.3e-7)
-    NA = torch.tensor(1.4)
+    lam = torch.tensor(7.8e-7) # 6.3
+    NA = torch.tensor(1.4) # 1.2
     t_p = torch.tensor(100e-15)
     r_p = torch.tensor(80e6)
 
@@ -34,9 +34,7 @@ class ConfigPrint():
     x_fwhm = .415995  # um
     y_fwhm = .354342  # um
     z_fwhm = .963721  # um
-    rot_xy = 24.7
-    rot_xz = 10.5
-    rot_yz = 6.3
+
     astigmatism_xy = .142847
     # size_lat = int(np.ceil(9 / 10 * resolution))
     # size_ax = int(np.ceil(17 / 10 * resolution))
@@ -51,5 +49,5 @@ class ConfigPrint():
     correction_factor = 1.
     nonlinearity = 2.0
 
-    lp = 2.0
+    lp = 0.05*0.2  # between 22-25-ish percent  ~0.05W
     rho_th_GT = 0.01

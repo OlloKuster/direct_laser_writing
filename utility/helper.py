@@ -1,4 +1,5 @@
 import jax.numpy as jnp
+import torch
 
 
 def f2param(x, lims):
@@ -30,3 +31,12 @@ def softplus(x, beta=50):
     """
     mask = x * beta > 20
     return jnp.where(mask, x, 1 / beta * jnp.log(1 + jnp.exp(jnp.where(mask, 0, x * beta))))
+
+
+def convert_to(x, package):
+    if package == "torch":
+        return torch.tensor(x, device='cuda')
+    if package == "torch2np":
+        return x.detach().cpu().numpy()
+    else:
+        return x

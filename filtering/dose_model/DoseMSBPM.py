@@ -31,7 +31,12 @@ class DoseMSBPMFull3D(DoseMSBPM):
     def forward(self, obj: torch.Tensor,
                 lp: torch.Tensor = torch.tensor([[0.020]])) -> torch.Tensor:
         conv = torch.nn.functional.conv3d(obj[None, None], self.intensity_nonlinear, padding='same')
-        rho = self.rho_0 * (1 - torch.exp(
+        rho = self.rho_0_GT * (1 - torch.exp(
             - self.factor_in_exp * self.correction_factor * conv * lp[:, :, None, None, None] ** self.nonlinearity))
+
+        # rescale to rho_0_GT, divide by rho_th_GT
+
+        rho = rho / rho_th_GT
+
 
         return rho.squeeze()

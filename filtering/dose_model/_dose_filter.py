@@ -9,8 +9,8 @@ from filtering.dose_model.utils_dose_sim import create_3d_psf_torch
 
 def dose_filter_f(resolution):
 
-    res_lat = 1 / resolution
-    res_ax = 2 / resolution
+    res_lat = 0.2 / resolution # hatching
+    res_ax = 0.3 / resolution # slicing
     size_lat = int(np.ceil(9 / 10 * resolution))
     size_ax = int(np.ceil(17 / 10 * resolution))
     time_exposure = ConfigPrint.w0 / (ConfigPrint.vs / res_lat)
@@ -25,7 +25,7 @@ def dose_filter_f(resolution):
                                  res_lat=torch.tensor(res_lat),
                                  res_ax=torch.tensor(res_ax),
                                  size_ax=size_ax,
-                                 size_lat=size_lat)[None, None]
+                                 size_lat=size_lat)[None, None] # calc_laser_intensity
 
     psf = psf_GT.detach().clone().requires_grad_(True)
 
@@ -46,6 +46,6 @@ def dose_filter_f(resolution):
         rho = msbpm(rho_0 * torch.tensor(ConfigPrint.power, device='cuda', requires_grad=True),
                     torch.tensor([[ConfigPrint.lp]], device=ConfigPrint.device, requires_grad=True))
 
-        return rho / torch.max(rho)
+        return rho
 
     return dose_filter

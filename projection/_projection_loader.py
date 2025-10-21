@@ -16,6 +16,7 @@ def projection_loader(projection: str, *args):
     if projection == "None":
         return lambda x: x
     if projection == "tanh_jax":
+        alpha, beta, _ = args
         return tanh_filter_jax_f(alpha, beta)
     if projection == "ssp_jax":
         alpha, beta, resolution = args

@@ -80,7 +80,7 @@ def heat_simulation(rho, resize_factor):
     kappa_r_matter = f2param(rho_n, ConfigSim.kappa)
     fem_matter = FEA3D_T(heat_sinks_matter)
     src_matter = jnp.pad(rho_n, [(0, 1), (0, 1), (0, 1)], mode='constant', constant_values=0)
-    T_matter = jnp.sum(fem_matter.temperature(kappa_r_matter, src_matter))
+    T_matter = fem_matter.temperature(kappa_r_matter, src_matter)
 
     heat_sinks_void = jnp.zeros_like(heat_sinks_matter)
     heat_sinks_void = heat_sinks_void.at[0].set(True)
@@ -91,6 +91,6 @@ def heat_simulation(rho, resize_factor):
     kappa_r_void = f2param(1 - rho_n, ConfigSim.kappa)
     fem_void = FEA3D_T(heat_sinks_void)
     src_void = jnp.pad(1 - rho_n, [(0, 1), (0, 1), (0, 1)], mode='constant', constant_values=0)
-    T_void = jnp.sum(fem_void.temperature(kappa_r_void, src_void))
+    T_void = fem_void.temperature(kappa_r_void, src_void)
 
-    return T_matter, T_void, kappa_r_matter
+    return jnp.sum(T_matter)/T_matter.size, jnp.sum(T_void)/T_void.size, kappa_r_matter

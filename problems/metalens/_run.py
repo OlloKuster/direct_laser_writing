@@ -12,11 +12,25 @@ from problems.metalens.simulation._objective_loader import objective_loader
 from problems.metalens.simulation.config_structure import ConfigSim
 from problems.metalens.simulation.simulation import em_simulation
 from projection._projection_loader import projection_loader
+from utility.helper import convert_to
 
 
 def run(resolution, betas):
     jax.config.update("jax_enable_x64", True)
     torch.cuda.empty_cache()
+
+    objectives = ["em_heat", "em_heat", "em_heat"]
+
+    filters = ["gauss_jax", "gauss_jax", "dose_conv"]
+    filter_values = [resolution / 2 / np.sqrt(3), resolution / 2 / np.sqrt(3), resolution]
+
+    projections = ["ssp_jax", "ssp_jax", "ssp_jax"]
+    projection_values = [0.5, 0.5, ConfigPrint.rho_th_GT]
+
+    optimizers = ["jax", "jax", "torch_jax"]
+
+    conversions = ["None", "None", "torch"]
+    backconversions = ["None", "None", "torch2np"]
 
     rho_0 = np.ones((ConfigSim.rho_shape[0] * resolution,
                      ConfigSim.rho_shape[1] * resolution,
@@ -30,7 +44,7 @@ def run(resolution, betas):
 
     objective_em = objective_loader("em_only", currents, resolution, 1)
     init_val_em = objective_em(rho_0)
-    objective_heat = objective_loader("heat_only", currents, resolution, 1)
+    objective_heat = objective_loader("heat_only")
     init_T_mat, init_T_void = objective_heat(rho_0)
 
     init_val_mat = init_T_mat / ConfigSim.TARGET_MATERIAL
@@ -38,22 +52,28 @@ def run(resolution, betas):
 
     loss_hist = []
 
-    for beta in betas:
-        objective = objective_loader("em_heat", currents, resolution, init_val_em, init_val_mat, init_val_void)
-        filter = filter_loader("dose_conv", resolution)
-        projection = projection_loader("ssp_jax", ConfigPrint.rho_th_GT, beta, resolution)
+    for i in range(len(betas)):
+        objective = objective_loader(objectives[i], currents, resolution, init_val_em, init_val_mat, init_val_void)
+        if filters[i] == "dose_conv" and filters[i-1] != "dose_conv":
+            proj_temp = projection_loader("tanh_jax", projection_values[i-1], betas[i], resolution)
+            rho_0 = proj_temp(filter(rho_0))
 
-        rho_0, loss = optimiser(rho_0, objective, filter, projection, "torch_jax")
+
+        filter = filter_loader(filters[i], filter_values[i])
+        projection = projection_loader(projections[i], projection_values[i], betas[i], resolution)
+
+        rho_0, loss = optimiser(rho_0, objective, filter, projection, optimizers[i])
 
         loss_hist += loss
 
-        rho_opt_filtered = filter(torch.tensor(rho_0,
-                                               device='cuda'))  # todo: build the conversions into the filter/projection filter themselves
-        rho_opt_proj = projection(jnp.array(rho_opt_filtered.detach().cpu().numpy()))
+        rho_0 = convert_to(rho_0, conversions[i])
+        rho_opt_filtered = filter(rho_0)
+        rho_opt_filtered = convert_to(rho_opt_filtered, backconversions[i])
+        rho_opt_proj = projection(jnp.array(rho_opt_filtered))
         E, eps = em_simulation(jnp.array(rho_opt_proj), currents, resolution)
         plt.plot(loss_hist)
         plt.yscale('log')
-        plt.savefig(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/loss_{beta}.png")
+        plt.savefig(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/loss_{betas[i]}.png")
         plt.close()
         plt.imshow(eps[eps.shape[0] // 2].T, origin='lower', cmap='binary',
                    extent=(0, ConfigSim.simulation_domain_shape[1], 0, ConfigSim.simulation_domain_shape[2]))
@@ -62,21 +82,20 @@ def run(resolution, betas):
         plt.xlabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
         plt.ylabel(r"z ($\mathrm{\mu}$m)", fontsize=12)
         plt.savefig(
-            f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/eps_and_e_{beta}.png")
+            f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/eps_and_e_{betas[i]}.png")
         plt.close()
         plt.imshow(eps[eps.shape[0] // 2].T, origin='lower', cmap='binary',
                    extent=(0, ConfigSim.simulation_domain_shape[1], 0, ConfigSim.simulation_domain_shape[2]))
         plt.xlabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
         plt.ylabel(r"z ($\mathrm{\mu}$m)", fontsize=12)
-        plt.savefig(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/eps_{beta}.png")
+        plt.savefig(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/eps_{betas[i]}.png")
         plt.close()
 
-        with h5py.File("/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data.h5",
+        with h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_{betas[i]}.h5",
                        'w') as f:
             grp = f.create_group("lens_3d")
             grp.create_dataset("E", data=E)
             grp.create_dataset("eps", data=eps)
-            grp.create_dataset("rho", data=rho_0)
+            grp.create_dataset("rho", data=convert_to(rho_0, backconversions[i]))
             grp.create_dataset("loss", data=loss_hist)
             f.close()
-
