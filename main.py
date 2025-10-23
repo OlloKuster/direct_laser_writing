@@ -3,6 +3,7 @@ import torch
 
 from dispenser import Dispenser
 
+
 def main(resolution, betas):
     jax.config.update("jax_enable_x64", True)
     torch.cuda.empty_cache()

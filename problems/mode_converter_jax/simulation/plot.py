@@ -6,8 +6,8 @@ import numpy as np
 from filtering._filter_loader import filter_loader
 from projection._projection_loader import projection_loader
 
-base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_inf.h5", "r")
-grp = base["lens_3d"]
+base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/mode_converter_jax/plots/data_16.h5", "r")
+grp = base["mode_converter"]
 eps = grp["eps"][:]
 rho_0 = grp["rho"][:]
 base.close()

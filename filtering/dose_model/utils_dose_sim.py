@@ -207,9 +207,12 @@ def calc_laser_intensity(lam: torch.Tensor = torch.tensor(780e-9), n: torch.Tens
 
     bessel_j2 = BesselJ.apply
 
-    x = torch.arange(-r_r, r_r + res_lat, res_lat, device=torch_device)
-    y = torch.arange(-r_r, r_r + res_lat, res_lat, device=torch_device)
-    z = torch.arange(-r_z, r_z + res_ax, res_ax, device=torch_device)
+    # x = torch.arange(-r_r, r_r + res_lat, res_lat, device=torch_device)
+    # y = torch.arange(-r_r, r_r + res_lat, res_lat, device=torch_device)
+    # z = torch.arange(-r_z, r_z + res_ax, res_ax, device=torch_device)
+    x = torch.linspace(-r_r, r_r, res_lat, device=torch_device)
+    y = torch.linspace(-r_r, r_r, res_lat, device=torch_device)
+    z = torch.linspace(-r_z, r_z, res_ax, device=torch_device)
 
     theta = torch.linspace(0, theta_max, n_theta, device=torch_device)
 
@@ -542,7 +545,7 @@ tuple[np.ndarray, np.ndarray]:
     if logger_path is not None:
         print('LOGGER')
         logger.info(
-            f"forward_function_args: {forward_function_args}, rho_0: {fm.rho_0}, sig_2_r_exp: {fm.sig_2_r_exp}, sig_2_r_base: {fm.sig_2_r_base}, substrate: {try_substrates[np.argmin(contrast_mean_abs_diff, axis=1)]}, contrast: {contrast_mean_abs_diff.min(axis=1)}")
+            f"forward_function_args: {forward_function_args}, rho_0: {fm.rho_0_GT}, sig_2_r_exp: {fm.sig_2_r_exp}, sig_2_r_base: {fm.sig_2_r_base}, substrate: {try_substrates[np.argmin(contrast_mean_abs_diff, axis=1)]}, contrast: {contrast_mean_abs_diff.min(axis=1)}")
 
     return try_substrates[np.argmin(contrast_mean_abs_diff, axis=1)], contrast_mean_abs_diff.min(axis=1)
 

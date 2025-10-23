@@ -3,7 +3,7 @@ from problems.metalens.simulation.objective import objective_em_f, objective_em_
 
 def objective_loader(objective: str, *args):
     if objective == "em_only":
-        currents, resolution, init_value = args
+        currents, resolution, init_value, _, _ = args
         return objective_em_f(currents, resolution, init_value)
 
     if objective == "heat_only":

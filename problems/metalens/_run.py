@@ -21,11 +21,11 @@ def run(resolution, betas):
 
     objectives = ["em_heat", "em_heat", "em_heat"]
 
-    filters = ["gauss_jax", "gauss_jax", "dose_conv"]
-    filter_values = [resolution / 2 / np.sqrt(3), resolution / 2 / np.sqrt(3), resolution]
+    filters = ["conic_jax", "conic_jax", "dose_conv"]
+    filter_values = [resolution / 4 / np.sqrt(3), resolution / 4 / np.sqrt(3), resolution]
 
     projections = ["ssp_jax", "ssp_jax", "ssp_jax"]
-    projection_values = [0.5, 0.5, ConfigPrint.rho_th_GT]
+    projection_values = [0.5, 0.5, 0.5]
 
     optimizers = ["jax", "jax", "torch_jax"]
 
@@ -42,7 +42,7 @@ def run(resolution, betas):
 
     currents = jnp.ones(size_currents, jnp.complex128)
 
-    objective_em = objective_loader("em_only", currents, resolution, 1)
+    objective_em = objective_loader("em_only", currents, resolution, 1, 1, 1)
     init_val_em = objective_em(rho_0)
     objective_heat = objective_loader("heat_only")
     init_T_mat, init_T_void = objective_heat(rho_0)
