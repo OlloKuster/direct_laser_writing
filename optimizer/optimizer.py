@@ -121,7 +121,7 @@ def optimiser(rho, objective, filter, projection, mode):
 
     opt = nlopt.opt(config.OPTIMISER, rho.size)
     # opt.set_param('tolg', 1e-12)
-    opt.set_max_objective(f)
+    opt.set_min_objective(f)
     opt.set_maxeval(config.MAXEVAL)
     # opt.set_ftol_abs(config.FTOL_ABS)
     # opt.set_ftol_rel(config.FTOL_REL)
