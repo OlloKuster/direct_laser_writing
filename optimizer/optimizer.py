@@ -14,6 +14,7 @@ def optimiser(rho, objective, filter, projection, mode):
     :return:
     """
     loss_hist = []
+    em_hist = []
 
     def select_f(mode):
         if mode == "torch_jax":
@@ -24,8 +25,10 @@ def optimiser(rho, objective, filter, projection, mode):
     class fom_em_torch_f(torch.autograd.Function):
         @staticmethod
         def forward(ctx, x):
-            grad_em_sim_f = jax.value_and_grad(objective)
+            grad_em_sim_f = jax.value_and_grad(objective, has_aux=True)
             value_em_sim, grad_em_sim = grad_em_sim_f(projection(x.detach().cpu().numpy().astype(np.float64)))
+            em_hist.append(value_em_sim[1])
+            value_em_sim = value_em_sim[0]
             ctx.save_for_backward(torch.tensor(np.array(grad_em_sim), device='cuda', requires_grad=True))
             return torch.tensor(np.array(value_em_sim), device='cuda', requires_grad=True)
 
@@ -61,7 +64,7 @@ def optimiser(rho, objective, filter, projection, mode):
             rho_ = np.concatenate((rho_, np.flip(rho_, axis=0)), axis=0)
             rho_ = np.concatenate((rho_, np.flip(rho_, axis=1)), axis=1)
             # rho_ = np.concatenate((rho_, np.flip(rho_, axis=2)), axis=2)
-            ax[0].imshow(rho_[rho_.shape[0]//2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+            ax[0].imshow(rho_[rho_.shape[0]//4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
             # ax[0].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
             ax[0].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
             rho_f = rho_final.detach().cpu().numpy()
@@ -69,7 +72,7 @@ def optimiser(rho, objective, filter, projection, mode):
             rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=1)), axis=1)
             # rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=2)), axis=2)
             rho_f = projection(rho_f)
-            ax[1].imshow(rho_f[rho_f.shape[0]//2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+            ax[1].imshow(rho_f[rho_f.shape[0]//4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
             ax[1].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
             ax[1].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
             plt.savefig(f"problems/metalens/plots/progression/rho_{config.cur_it:03d}.png")
@@ -82,13 +85,15 @@ def optimiser(rho, objective, filter, projection, mode):
         start = time.time()
         rho_0 = np.reshape(x, rho.shape)
         rho_final = filter(rho_0)
-        value, grad = jax.value_and_grad(objective)(rho_final)
-        value = float(value)  # Requires np float and not jax.numpy float
+        value_obj, grad = jax.value_and_grad(objective, has_aux=True)(rho_final)
+        value = float(value_obj[0])  # Requires np float and not jax.numpy float
+        value_em = float(value_obj[1])
         print(f"value: {value}")
         print(f"grad: {np.sum(grad)}")
         print(f"iteration: {config.cur_it}")
         config.cur_it += 1
         loss_hist.append(value)
+        em_hist.append(value_em)
         if g.size > 0:
             g[:] = grad.ravel()
         end = time.time()
@@ -100,7 +105,7 @@ def optimiser(rho, objective, filter, projection, mode):
             rho_ = np.concatenate((rho_, np.flip(rho_, axis=0)), axis=0)
             rho_ = np.concatenate((rho_, np.flip(rho_, axis=1)), axis=1)
             # rho_ = np.concatenate((rho_, np.flip(rho_, axis=2)), axis=2)
-            ax[0].imshow(rho_[rho_.shape[0]//2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+            ax[0].imshow(rho_[rho_.shape[0]//4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
             # ax[0].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
             ax[0].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
             rho_f = rho_final
@@ -108,7 +113,7 @@ def optimiser(rho, objective, filter, projection, mode):
             rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=1)), axis=1)
             # rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=2)), axis=2)
             rho_f = projection(rho_f)
-            ax[1].imshow(rho_f[rho_f.shape[0]//2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+            ax[1].imshow(rho_f[rho_f.shape[0]//4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
             ax[1].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
             ax[1].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
             plt.savefig(f"problems/metalens/plots/progression/rho_{config.cur_it:03d}.png")
@@ -132,5 +137,5 @@ def optimiser(rho, objective, filter, projection, mode):
     rho_opt = opt.optimize(rho.ravel())
     rho_opt = rho_opt.reshape(rho.shape)
 
-    return rho_opt, loss_hist
+    return rho_opt, loss_hist, em_hist
 

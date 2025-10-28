@@ -20,7 +20,7 @@ class ConfigPrint():
     r_p = torch.tensor(80e6)
 
     r_r = 4e-7
-    r_z = 4e-7
+    r_z = 9e-7
 
     w0 = lam / (torch.pi * NA) * torch.sqrt(n_monomer ** 2 - NA ** 2)
 

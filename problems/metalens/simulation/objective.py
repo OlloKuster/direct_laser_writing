@@ -54,6 +54,6 @@ def objective_em_heat_f(currents, resolution, init_values):
 
         objs = jnp.array([n_lens, n_heat_m, n_heat_v])
 
-        return jnp.linalg.norm(softplus(objs))
+        return jnp.linalg.norm(softplus(objs)), v_lens
 
     return objective_softplus

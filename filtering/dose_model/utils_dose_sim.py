@@ -4,7 +4,7 @@ from scipy.special import jv
 from typing import Any
 import logging
 import os
-from torchvision.transforms.functional import rotate
+from scipy.ndimage import rotate
 from scipy.stats import multivariate_normal
 import matplotlib.pyplot as plt
 
@@ -210,9 +210,9 @@ def calc_laser_intensity(lam: torch.Tensor = torch.tensor(780e-9), n: torch.Tens
     # x = torch.arange(-r_r, r_r + res_lat, res_lat, device=torch_device)
     # y = torch.arange(-r_r, r_r + res_lat, res_lat, device=torch_device)
     # z = torch.arange(-r_z, r_z + res_ax, res_ax, device=torch_device)
-    x = torch.linspace(-r_r, r_r, res_lat, device=torch_device)
-    y = torch.linspace(-r_r, r_r, res_lat, device=torch_device)
-    z = torch.linspace(-r_z, r_z, res_ax, device=torch_device)
+    x = torch.linspace(-r_r, r_r, int(torch.round(2 * r_r / res_lat)) + 1, device=torch_device)
+    y = torch.linspace(-r_r, r_r, int(torch.round(2 * r_r / res_lat)) + 1, device=torch_device)
+    z = torch.linspace(-r_z, r_z, int(torch.round(2 * r_z / res_ax)) + 1, device=torch_device)
 
     theta = torch.linspace(0, theta_max, n_theta, device=torch_device)
 
@@ -438,6 +438,7 @@ def msbpm_torch(ri_tensor: torch.Tensor, n_media: torch.Tensor = torch.tensor(1.
     u_in = torch.tile(torch.exp(1j * 2 * np.pi * (0 * xx.to(dtype_c) + 0 * yy.to(dtype_c))), (n_samples, 1, 1))
     fu_current = torch.fft.fft2(u_in)
 
+    # Transmission function
     t_ri = torch.exp(1j * 2 * np.pi * ri_tensor.to(dtype_c) * psz / lambda_val)
 
     for i_layer in range(print_until_layer):
@@ -545,7 +546,7 @@ tuple[np.ndarray, np.ndarray]:
     if logger_path is not None:
         print('LOGGER')
         logger.info(
-            f"forward_function_args: {forward_function_args}, rho_0: {fm.rho_0_GT}, sig_2_r_exp: {fm.sig_2_r_exp}, sig_2_r_base: {fm.sig_2_r_base}, substrate: {try_substrates[np.argmin(contrast_mean_abs_diff, axis=1)]}, contrast: {contrast_mean_abs_diff.min(axis=1)}")
+            f"forward_function_args: {forward_function_args}, rho_0: {fm.rho_0}, sig_2_r_exp: {fm.sig_2_r_exp}, sig_2_r_base: {fm.sig_2_r_base}, substrate: {try_substrates[np.argmin(contrast_mean_abs_diff, axis=1)]}, contrast: {contrast_mean_abs_diff.min(axis=1)}")
 
     return try_substrates[np.argmin(contrast_mean_abs_diff, axis=1)], contrast_mean_abs_diff.min(axis=1)
 
@@ -595,24 +596,24 @@ def create_3d_psf(x_fwhm, y_fwhm, z_fwhm,
             3D PSF volume normalized to max 1.
     """
     # Convert FWHM to standard deviation in µm
-    fwhm_to_sigma = lambda fwhm: fwhm / (2 * torch.sqrt(2 * torch.log(2)))
+    fwhm_to_sigma = lambda fwhm: fwhm / (2 * np.sqrt(2 * np.log(2)))
     sigma_x = fwhm_to_sigma(x_fwhm)
     sigma_y = fwhm_to_sigma(y_fwhm + astigmatism_xy)
     sigma_z = fwhm_to_sigma(z_fwhm)
 
     # Create real-world coordinate grid (µm)
     vx, vy, vz = voxel_size
-    x = torch.linspace(-size_lat // 2 * vx, size_lat // 2 * vx, size_lat)
-    y = torch.linspace(-size_lat // 2 * vy, size_lat // 2 * vy, size_lat)
-    z = torch.linspace(-size_ax // 2 * vz, size_ax // 2 * vz, size_ax)
-    xx, yy, zz = torch.meshgrid(x, y, z, indexing='ij')
+    x = np.linspace(-size_lat // 2 * vx, size_lat // 2 * vx, size_lat)
+    y = np.linspace(-size_lat // 2 * vy, size_lat // 2 * vy, size_lat)
+    z = np.linspace(-size_ax // 2 * vz, size_ax // 2 * vz, size_ax)
+    xx, yy, zz = np.meshgrid(x, y, z, indexing='ij')
 
     # Multivariate Gaussian
     mean = [0, 0, 0]
     cov = [[sigma_x ** 2, 0, 0],
            [0, sigma_y ** 2, 0],
            [0, 0, sigma_z ** 2]]
-    pos = torch.stack((xx, yy, zz), axis=-1)
+    pos = np.stack((xx, yy, zz), axis=-1)
     gaussian = multivariate_normal(mean, cov).pdf(pos)
 
     # Apply rotations
@@ -621,7 +622,7 @@ def create_3d_psf(x_fwhm, y_fwhm, z_fwhm,
     gaussian = rotate(gaussian, angle=rotation_yz, axes=(1, 2), reshape=False, order=1)
 
     # Normalize
-    gaussian /= torch.max(gaussian)
+    gaussian /= np.max(gaussian)
 
     return gaussian
 
@@ -751,7 +752,7 @@ def create_3d_psf_torch(x_fwhm: torch.Tensor,
 
     # Rotation matrices
     def get_rotation_matrix(angle_deg, axis1, axis2):
-        angle = torch.deg2rad(angle_deg)
+        angle = torch.deg2rad(torch.tensor(angle_deg, dtype=dtype, device=device))
         mat = torch.eye(3, device=device, dtype=dtype)
         cos_a = torch.cos(angle)
         sin_a = torch.sin(angle)
@@ -793,3 +794,37 @@ def linear_contrast_adaption(intensity: np.ndarray, alpha: float = 1.0) -> np.nd
         np.ndarray: The contrast-adapted intensity image.
     """
     return alpha * (intensity - intensity.mean()) + intensity.mean()
+
+
+class GeneralizedLogisticODE(torch.nn.Module):
+    """
+    Defines the ODE: f'(t) = k * f(t)^m * (1 - f(t))^n
+    Handles tensor parameters k, m, n that can vary spatially
+    """
+
+    def __init__(self, m: float = 0, n: float = 1, **kwargs):
+        super().__init__()
+        # Store parameters as buffers to ensure they stay on the same device
+        # self.register_buffer('k', torch.as_tensor(k))
+        self.register_buffer('m', torch.as_tensor(m))
+        self.register_buffer('n', torch.as_tensor(n))
+
+    def forward(self, t, f, k):
+        """
+        Args:
+            t: time (scalar)
+            f: function values at time t (tensor of shape matching initial conditions)
+        Returns:
+            df/dt: derivative (same shape as f)
+        """
+        # Ensure f is in valid range [0, 1] to avoid numerical issues
+        f = torch.clamp(f, min=1e-8, max=1 - 1e-8)
+
+        # Compute the derivative - broadcasting handles different tensor shapes
+        # dfdt = self.k * torch.pow(f, self.m) * torch.pow(1 - f, self.n)
+        dfdt = k * torch.pow(f, self.m) * torch.pow(1 - f, self.n)
+
+        return dfdt
+
+
+
