@@ -6,7 +6,7 @@ class ConfigSim:
     """
     Config the 3D lens, defines the required parameters which are used for the simulation.
     """
-    rho_shape = (5, 5, 3)
+    rho_shape = (10, 10, 6)
     buffer_side = 1
     buffer_top = 3
     buffer_bottom = 1
@@ -24,8 +24,8 @@ class ConfigSim:
     resize_factor = 1
 
     location_currents = dpml + 1
-    location_focal_spot = 6.
+    location_focal_spot = 8.
 
-    TARGET_EM = 15
+    TARGET_EM = 20
     TARGET_MATERIAL = 1.3
     TARGET_VOID = 1.3

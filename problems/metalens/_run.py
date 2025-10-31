@@ -4,6 +4,7 @@ import jax.numpy as jnp
 import torch
 import matplotlib.pyplot as plt
 import h5py
+from scipy.ndimage import gaussian_filter
 
 from filtering._filter_loader import filter_loader
 from filtering.dose_model.config_print import ConfigPrint
@@ -43,7 +44,7 @@ def run(resolution, betas):
     currents = jnp.ones(size_currents, jnp.complex128)
 
     objective_em = objective_loader("em_only", currents, resolution, 1, 1, 1)
-    init_val_em = objective_em(rho_0)
+    init_val_em, _ = objective_em(rho_0)
     objective_heat = objective_loader("heat_only")
     init_T_mat, init_T_void = objective_heat(rho_0)
 
