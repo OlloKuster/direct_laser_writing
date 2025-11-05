@@ -12,4 +12,4 @@ def main(resolution, betas):
 
 
 if __name__ == "__main__":
-    main(6, [16, 32, jax.numpy.inf])
+    main(10, [1, 16, jax.numpy.inf])
