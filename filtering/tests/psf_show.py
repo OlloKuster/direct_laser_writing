@@ -39,11 +39,11 @@ def test(seed):
     # p.show()
 
     def gkernel(radius):
-        l = int(2 * radius + 1)
+        l = int(jnp.ceil(4.0 * radius) + 1)
         ax = jnp.linspace(-(l - 1) / 2., (l - 1) / 2., l)
         xx, yy, zz = jnp.meshgrid(ax, ax, ax)
 
-        kernel = jnp.maximum(radius - jnp.sqrt(xx ** 2 + yy ** 2 + zz ** 2), jnp.zeros_like(xx))
+        kernel = jnp.exp(-0.5 * (xx ** 2 + yy ** 2 + zz ** 2) / radius ** 2)
         return kernel / jnp.sum(kernel)
 
     cone = gkernel(resolution / np.sqrt(3))
@@ -54,8 +54,8 @@ def test(seed):
 
 
     fig, axs = plt.subplots(1, 2)
-    axs[0].imshow(cone[cone.shape[0]//2].T, origin='lower', interpolation='spline36')
-    axs[1].imshow(psf[psf.shape[0]//2].T, origin='lower', interpolation='spline36')
+    axs[0].imshow(cone[cone.shape[0]//2].T, origin='lower', interpolation='spline36', extent=(0, cone.shape[1]/resolution, 0, cone.shape[2]/resolution))
+    axs[1].imshow(psf[psf.shape[0]//2].T, origin='lower', interpolation='spline36', extent=(0, psf.shape[1]/resolution, 0, psf.shape[2]/resolution))
     axs[0].set_xlabel(r"y in $\mathregular{\mu}$m")
     axs[1].set_xlabel(r"y in $\mathregular{\mu}$m")
     axs[0].set_ylabel(r"z in $\mathregular{\mu}$m")

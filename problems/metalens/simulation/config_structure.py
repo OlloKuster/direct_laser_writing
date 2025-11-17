@@ -6,9 +6,9 @@ class ConfigSim:
     """
     Config the 3D lens, defines the required parameters which are used for the simulation.
     """
-    rho_shape = (8, 8, 3)
+    rho_shape = (5, 5, 3)
     buffer_side = 1
-    buffer_top = 3
+    buffer_top = 2
     buffer_bottom = 1
     dpml = 0.5
     simulation_domain_shape = (int(jnp.ceil(dpml + buffer_side + 2*rho_shape[0] + buffer_side + dpml)),
@@ -24,8 +24,8 @@ class ConfigSim:
     resize_factor = 1
 
     location_currents = dpml + 1
-    location_focal_spot = 6.
+    location_focal_spot = dpml + buffer_bottom + rho_shape[2] + 0.75
 
-    TARGET_EM = 30
+    TARGET_EM = 10
     TARGET_MATERIAL = 1.3
     TARGET_VOID = 1.3

@@ -6,12 +6,19 @@ import numpy as np
 from filtering._filter_loader import filter_loader
 from projection._projection_loader import projection_loader
 
-base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_16.h5", "r")
+base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_inf.h5", "r")
 grp = base["lens_3d"]
 eps = grp["eps"][:]
 rho_0 = grp["rho"][:]
+E_0 = grp["E"][:]
+loss_inf = grp["em_loss"][:]
 base.close()
 
+# base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_16.h5", "r")
+# grp = base["lens_3d"]
+# loss_16 = grp["em_loss"][:]
+# base.close()
+# print(eps.shape)
 # fig, (ax1, ax2) = plt.subplots(1, 2)
 # import time
 # rho_0 = np.concatenate((rho_0, np.flip(rho_0, axis=0)), axis=0)
@@ -27,8 +34,21 @@ base.close()
 # ax2.imshow(eps[eps.shape[0]//2 + 10].T, origin='lower')
 # plt.show()
 
+# loss = np.concatenate((loss_16, loss_inf))
+# print(loss.shape)
+# plt.plot(loss)
+# plt.xlabel("Iteration", fontsize=14)
+# plt.ylabel(r"$L_\text{EM}$", fontsize=14)
+# plt.show()
+
 p = pv.Plotter()
 data = pv.wrap(np.array(eps))
+data_e = pv.wrap(200*np.clip(np.abs(E_0)[0], 0.005, 1))
 p.add_mesh(data.contour(), cmap='binary')
+p.add_volume(data_e, cmap='magma')
+p.camera_position = 'yz'
+p.camera.elevation = 30
+p.camera.azimuth = - 45
+p.remove_scalar_bar()
+p.camera.zoom(1.3)
 p.show()
-

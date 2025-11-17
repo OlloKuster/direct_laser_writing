@@ -33,7 +33,7 @@ def gaussian_filter_jax_f(sigma):
         :return: Gaussian blurred array.
         """
         def gkernel(sigma):
-            l = int(2 * jnp.ceil(4.0 * sigma) + 1)
+            l = int(jnp.ceil(4.0 * sigma) + 1)
             ax = jnp.linspace(-(l - 1) / 2., (l - 1) / 2., l)
             xx, yy, zz = jnp.meshgrid(ax, ax, ax)
 
