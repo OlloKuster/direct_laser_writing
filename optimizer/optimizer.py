@@ -160,6 +160,9 @@ def optimizer_optax(rho, objective, filter, projection, mode):
     em_hist = []
     grad_hist = []
 
+    rho_opt = rho
+    best_val = 100
+
     class fom_em_torch_f(torch.autograd.Function):
         @staticmethod
         def forward(ctx, x):
@@ -205,15 +208,17 @@ def optimizer_optax(rho, objective, filter, projection, mode):
         print(f"iteration: {config.cur_it}")
         print(f"time: {time.time() - start}")
 
-        rho_p = np.concatenate((projection(rho_final), np.flip(rho, axis=0)), axis=0)
-        rho_p = np.concatenate((rho_p, np.flip(rho_p, axis=1)), axis=1)
-        plt.imshow(rho_p[rho_p.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
-        plt.savefig(f"problems/metalens/plots/progression/rho_{config.cur_it:03d}.png")
-        plt.close()
+        if value < best_val:
+            rho_opt = rho
+        # rho_p = np.concatenate((projection(rho_final), np.flip(rho, axis=0)), axis=0)
+        # rho_p = np.concatenate((rho_p, np.flip(rho_p, axis=1)), axis=1)
+        # plt.imshow(rho_p[rho_p.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+        # plt.savefig(f"problems/metalens/plots/progression/rho_{config.cur_it:03d}.png")
+        # plt.close()
 
         updates, opt_state = optimizer.update(grad, opt_state, rho)
         rho[:] = optax.apply_updates(rho, updates)
 
         np.clip(rho, 0.0, 1.0, out=rho)
 
-    return rho, loss_hist, em_hist, grad_hist
+    return rho_opt, loss_hist, em_hist, grad_hist
