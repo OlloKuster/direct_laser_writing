@@ -79,15 +79,15 @@ def run(resolution, betas, load=None):
         plt.plot(loss_hist)
         plt.yscale('log')
         plt.savefig(
-            f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/loss_{betas[i]}.png")
+            f"problems/metalens/plots/loss_{betas[i]}.png")
         plt.close()
         plt.plot(em_loss_hist)
         plt.savefig(
-            f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/em_loss_{betas[i]}.png")
+            f"metalens/plots/em_loss_{betas[i]}.png")
         plt.close()
         plt.plot(grads)
         plt.savefig(
-            f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/grads_{betas[i]}.png")
+            f"problems/metalens/plots/grads_{betas[i]}.png")
         plt.close()
         plt.imshow(eps[eps.shape[0] // 2].T, origin='lower', cmap='binary',
                    extent=(0, ConfigSim.simulation_domain_shape[1], 0, ConfigSim.simulation_domain_shape[2]))
@@ -96,18 +96,18 @@ def run(resolution, betas, load=None):
         plt.xlabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
         plt.ylabel(r"z ($\mathrm{\mu}$m)", fontsize=12)
         plt.savefig(
-            f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/eps_and_e_{betas[i]}.png")
+            f"problems/metalens/plots/eps_and_e_{betas[i]}.png")
         plt.close()
         plt.imshow(eps[eps.shape[0] // 2].T, origin='lower', cmap='binary',
                    extent=(0, ConfigSim.simulation_domain_shape[1], 0, ConfigSim.simulation_domain_shape[2]))
         plt.xlabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
         plt.ylabel(r"z ($\mathrm{\mu}$m)", fontsize=12)
         plt.savefig(
-            f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/eps_{betas[i]}.png")
+            f"problems/metalens/plots/eps_{betas[i]}.png")
         plt.close()
 
         with h5py.File(
-                f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_{betas[i]}.h5",
+                f"problems/metalens/plots/data_{betas[i]}.h5",
                 'w') as f:
             grp = f.create_group("lens_3d")
             grp.create_dataset("E", data=E)
