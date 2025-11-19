@@ -83,7 +83,7 @@ def run(resolution, betas, load=None):
         plt.close()
         plt.plot(em_loss_hist)
         plt.savefig(
-            f"metalens/plots/em_loss_{betas[i]}.png")
+            f"problems/metalens/plots/em_loss_{betas[i]}.png")
         plt.close()
         plt.plot(grads)
         plt.savefig(
