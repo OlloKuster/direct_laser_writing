@@ -66,7 +66,7 @@ def run(resolution, betas, load=None):
         filter = filter_loader(filters, filter_values)
         projection = projection_loader(projections, projection_values, betas[i], resolution)
 
-        rho_0, loss, em_loss, grads = optimizer_optax(rho_0, objective, filter, projection, optimizers)
+        rho_0, loss, em_loss, grads = optimiser(rho_0, objective, filter, projection, optimizers)
 
         loss_hist += loss
         em_loss_hist += em_loss
@@ -88,6 +88,8 @@ def run(resolution, betas, load=None):
         plt.plot(grads)
         plt.savefig(
             f"problems/metalens/plots/grads_{betas[i]}.png")
+        plt.xlabel("Iteration")
+        plt.ylabel("Gradient")
         plt.close()
         plt.imshow(eps[eps.shape[0] // 2].T, origin='lower', cmap='binary',
                    extent=(0, ConfigSim.simulation_domain_shape[1], 0, ConfigSim.simulation_domain_shape[2]))
