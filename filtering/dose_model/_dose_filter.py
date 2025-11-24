@@ -9,9 +9,8 @@ from filtering.dose_model.utils_dose_sim import create_3d_psf_torch, calc_laser_
 
 
 def dose_filter_f(resolution):
-
-    res_lat = 1 / resolution * 10**(-6) # hatching
-    res_ax = 1 / resolution * 10**(-6) # slicing
+    res_lat = 1 / resolution * 10 ** (-6)  # hatching
+    res_ax = 1 / resolution * 10 ** (-6)  # slicing
     time_exposure = ConfigPrint.w0 / (ConfigPrint.vs / res_lat)
 
     psf_GT = calc_laser_intensity(lam=torch.tensor(ConfigPrint.lam),
@@ -23,7 +22,7 @@ def dose_filter_f(resolution):
                                   res_lat=res_lat,
                                   n_monomer=ConfigPrint.n_monomer,
                                   torch_device='cuda',
-                                  )[None, None] # calc_laser_intensity
+                                  )[None, None]  # calc_laser_intensity
 
     psf = psf_GT.detach().clone().requires_grad_(True)
     print_params = [ConfigPrint.sig_2_r.detach().clone().requires_grad_(True),
@@ -31,11 +30,9 @@ def dose_filter_f(resolution):
                     ConfigPrint.intensity_without_power.detach().clone().requires_grad_(True),
                     torch.tensor(ConfigPrint.correction_factor, requires_grad=True)]
 
-
     msbpm = DoseMSBPMFull3D(
         torch.tensor(ConfigPrint.rho_0_GT, device=ConfigPrint.device, requires_grad=True),
-        torch.tensor(ConfigPrint.rho_th_GT, device=ConfigPrint.device, requires_grad=True),
-        psf / resolution * 10,
+        psf,
         print_params,
         torch.tensor(ConfigPrint.nonlinearity, device=ConfigPrint.device, requires_grad=True),
         device=ConfigPrint.device
