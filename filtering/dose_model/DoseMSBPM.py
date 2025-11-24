@@ -2,7 +2,7 @@ import torch
 
 
 class DoseMSBPM(torch.nn.Module):
-    def __init__(self, rho_0_GT: torch.Tensor, rho_th_GT: torch.tensor, intensity_nonlinear: torch.Tensor,
+    def __init__(self, rho_0_GT: torch.Tensor, intensity_nonlinear: torch.Tensor,
                  print_params: list, nonlinearity: torch.Tensor,
                  device='cpu', dtype=torch.float64):
         """
@@ -17,7 +17,6 @@ class DoseMSBPM(torch.nn.Module):
             dtype: Datatype, recommended torch.float64
         """
         self.rho_0_GT = rho_0_GT.to(device).to(dtype)
-        self.rho_th_GT = rho_th_GT.to(device).to(dtype)
         self.intensity_nonlinear = intensity_nonlinear.to(device).to(dtype)
 
         self.nonlinearity = nonlinearity.to(device).to(dtype)
@@ -35,7 +34,4 @@ class DoseMSBPMFull3D(DoseMSBPM):
         rho = self.rho_0_GT * (1 - torch.exp(
             - self.factor_in_exp * self.correction_factor * conv * lp[:, :, None, None, None] ** self.nonlinearity))
 
-        rho_n = rho / self.rho_th_GT * 0.5
-
-
-        return rho_n.squeeze()
+        return rho
