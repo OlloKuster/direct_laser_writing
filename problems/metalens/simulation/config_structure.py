@@ -26,6 +26,6 @@ class ConfigSim:
     location_currents = dpml + 1
     location_focal_spot = dpml + buffer_bottom + rho_shape[2] + 2
 
-    TARGET_EM = 15
+    TARGET_EM = 25
     TARGET_MATERIAL = 1.3
     TARGET_VOID = 1.3

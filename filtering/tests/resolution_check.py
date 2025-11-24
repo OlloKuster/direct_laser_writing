@@ -42,7 +42,7 @@ def test(seed):
         projection = ssp_proj_jax_f(ConfigPrint.rho_th_GT, np.inf, resolution)
 
         rho_0_0 = np.random.rand(5*resolution, 5*resolution, 5*resolution)
-        rho_0 = np.round(scipy.ndimage.gaussian_filter(rho_0_0, sigma=resolution)) * 1.8*ConfigPrint.rho_th_GT
+        rho_0 = np.round(scipy.ndimage.gaussian_filter(rho_0_0, sigma=resolution / 2)) * ConfigPrint.rho_th_GT
         # rho_0 = np.ones_like(rho_0) * 1.8*ConfigPrint.rho_th_GT
         rho = rho_0
         rho = dose_filter(torch.tensor(rho, device='cuda', requires_grad=True))
