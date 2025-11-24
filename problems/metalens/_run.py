@@ -16,7 +16,7 @@ from projection._projection_loader import projection_loader
 from utility.helper import convert_to
 
 
-def run(resolution, betas, load=None):
+def run(resolution, betas, load=None, eval=False):
     jax.config.update("jax_enable_x64", True)
     torch.cuda.empty_cache()
 
@@ -26,7 +26,7 @@ def run(resolution, betas, load=None):
     filter_values = resolution
 
     projections = "ssp_jax"
-    projection_values = 0.5
+    projection_values = ConfigPrint.rho_th_GT
 
     optimizers = "torch_jax"
 
@@ -35,7 +35,7 @@ def run(resolution, betas, load=None):
 
     rho_0 = np.ones((ConfigSim.rho_shape[0] * resolution,
                      ConfigSim.rho_shape[1] * resolution,
-                     ConfigSim.rho_shape[2] * resolution)) * 0.5
+                     ConfigSim.rho_shape[2] * resolution)) * ConfigPrint.rho_th_GT
 
     size_currents = (ConfigSim.currents_shape[0] * resolution,
                      ConfigSim.currents_shape[1] * resolution,
@@ -44,9 +44,9 @@ def run(resolution, betas, load=None):
     currents = jnp.ones(size_currents, jnp.complex128)
 
     objective_em = objective_loader("em_only", currents, resolution, 1, 1, 1)
-    init_val_em, _ = objective_em(rho_0)
+    init_val_em, _ = objective_em(np.ones_like(rho_0)*0.5)
     objective_heat = objective_loader("heat_only")
-    init_T_mat, init_T_void = objective_heat(rho_0)
+    init_T_mat, init_T_void = objective_heat(np.ones_like(rho_0)*0.5)
 
     init_val_mat = init_T_mat / ConfigSim.TARGET_MATERIAL
     init_val_void = init_T_void / ConfigSim.TARGET_VOID
@@ -66,7 +66,7 @@ def run(resolution, betas, load=None):
         filter = filter_loader(filters, filter_values)
         projection = projection_loader(projections, projection_values, betas[i], resolution)
 
-        rho_0, loss, em_loss, grads = optimiser(rho_0, objective, filter, projection, optimizers)
+        rho_0, loss, em_loss, grads = optimiser(rho_0, objective, filter, projection, optimizers, eval=eval)
 
         loss_hist += loss
         em_loss_hist += em_loss

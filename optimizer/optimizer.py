@@ -10,7 +10,7 @@ from filtering.dose_model.config_print import ConfigPrint
 from optimizer import config
 
 
-def optimiser(rho, objective, filter, projection, mode):
+def optimiser(rho, objective, filter, projection, mode, eval=False):
     """
     The optimiser function
     :return:
@@ -79,6 +79,7 @@ def optimiser(rho, objective, filter, projection, mode):
             ax[1].imshow(rho_f[rho_f.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
             ax[1].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
             ax[1].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
+            # plt.show()
             plt.savefig(f"problems/metalens/plots/progression/rho_{config.cur_it:03d}.png")
             plt.close()
             if config.cur_it % config.MAXEVAL == 0:
@@ -144,7 +145,7 @@ def optimiser(rho, objective, filter, projection, mode):
     return rho_opt, loss_hist, em_hist, grad_hist
 
 
-def optimizer_optax(rho, objective, filter, projection, mode):
+def optimizer_optax(rho, objective, filter, projection, mode, eval=False):
     rho = np.array(rho)
 
     round = (config.cur_it + 1) / config.MAXEVAL
