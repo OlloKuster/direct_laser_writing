@@ -7,10 +7,10 @@ from projection._projection_loader import projection_loader
 
 def test():
     xx = np.linspace(0, 1, 100)
-    projection = projection_loader("tanh_jax", ConfigPrint.rho_0_GT, 16, 10)
+    projection = projection_loader("ssp_jax", 0.5, 100, 10)
 
     proj = projection(xx)
-    print(projection(0.07188))
+    print(projection(np.ones_like(xx)*2))
     plt.plot(proj)
     plt.show()
 
