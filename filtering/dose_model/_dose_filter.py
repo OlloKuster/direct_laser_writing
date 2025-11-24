@@ -42,6 +42,6 @@ def dose_filter_f(resolution):
         rho = msbpm(rho_0 * torch.tensor(ConfigPrint.power, device='cuda', requires_grad=True),
                     torch.tensor([[ConfigPrint.lp]], device=ConfigPrint.device, requires_grad=True))
 
-        return rho
+        return rho.squeeze()
 
     return dose_filter
