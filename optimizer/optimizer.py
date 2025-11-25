@@ -10,7 +10,7 @@ from filtering.dose_model.config_print import ConfigPrint
 from optimizer import config
 
 
-def optimiser(rho, objective, filter, projection, mode, eval=False):
+def optimiser(rho, objective, filter, projection, init_projection, plotter, mode, eval=False):
     """
     The optimiser function
     :return:
@@ -43,6 +43,7 @@ def optimiser(rho, objective, filter, projection, mode, eval=False):
     def f_torch_jax(x, g):
         start = time.time()
         x = np.reshape(x, rho.shape)
+        x = np.array(init_projection(x))
         rho_0 = torch.tensor(x, device='cuda', requires_grad=True)
         rho_final = filter(rho_0)
         fom = fom_em_torch_f.apply(rho_final)
@@ -62,28 +63,7 @@ def optimiser(rho, objective, filter, projection, mode, eval=False):
         end = time.time()
         print(f"time: {end - start}")
         if eval:
-            import matplotlib.pyplot as plt
-            fig, ax = plt.subplots(2, 1, sharex=True)
-            rho_ = rho_0.detach().cpu().numpy()
-            rho_ = np.concatenate((rho_, np.flip(rho_, axis=0)), axis=0)
-            rho_ = np.concatenate((rho_, np.flip(rho_, axis=1)), axis=1)
-            # rho_ = np.concatenate((rho_, np.flip(rho_, axis=2)), axis=2)
-            ax[0].imshow(rho_[rho_.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
-            # ax[0].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
-            ax[0].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
-            rho_f = rho_final.detach().cpu().numpy()
-            rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=0)), axis=0)
-            rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=1)), axis=1)
-            # rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=2)), axis=2)
-            rho_f = projection(rho_f)
-            ax[1].imshow(rho_f[1][rho_f[1].shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
-            ax[1].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
-            ax[1].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
-            # plt.show()
-            plt.savefig(f"problems/metalens/plots/progression/rho_{config.cur_it:03d}.png")
-            plt.close()
-            if config.cur_it % config.MAXEVAL == 0:
-                config.ind += 1
+            plotter(x, rho_final.detach().cpu().numpy(), projection, config.cur_it)
         return value
 
     def f_jax(x, g):
@@ -104,25 +84,7 @@ def optimiser(rho, objective, filter, projection, mode, eval=False):
         end = time.time()
         print(f"time: {end - start}")
         if eval:
-            import matplotlib.pyplot as plt
-            fig, ax = plt.subplots(2, 1, sharex=True)
-            rho_ = rho_0
-            rho_ = np.concatenate((rho_, np.flip(rho_, axis=0)), axis=0)
-            rho_ = np.concatenate((rho_, np.flip(rho_, axis=1)), axis=1)
-            # rho_ = np.concatenate((rho_, np.flip(rho_, axis=2)), axis=2)
-            ax[0].imshow(rho_[rho_.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
-            # ax[0].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
-            ax[0].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
-            rho_f = rho_final
-            rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=0)), axis=0)
-            rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=1)), axis=1)
-            # rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=2)), axis=2)
-            rho_f = projection(rho_f)
-            ax[1].imshow(rho_f[rho_f.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
-            ax[1].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
-            ax[1].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
-            plt.savefig(f"problems/metalens/plots/progression/rho_{config.cur_it:03d}.png")
-            plt.close()
+            plotter(x, rho_final, projection, config.ind)
             if config.cur_it % config.MAXEVAL == 0:
                 config.ind += 1
         return value

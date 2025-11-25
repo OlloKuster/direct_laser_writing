@@ -85,16 +85,17 @@ def objective_robust_em_heat_f(currents, resolution, init_values):
         return jnp.linalg.norm(softplus(objs)), v_lens
 
     def objective_robust_softplus(rhos):
-        power = 10
+        power = 20
         fom_eroded, v_lens_eroded = objective_softplus(rhos[0])
-        fom, v_lens = objective_softplus(rhos[1])
+        fom_normal, v_lens_normal = objective_softplus(rhos[1])
         fom_dilated, v_lens_dilated = objective_softplus(rhos[2])
 
-        fom_max = (fom_eroded ** power + fom ** power + fom_dilated ** power) ** (1 / power)
+        fom_max = (fom_eroded ** power + fom_normal ** power + fom_dilated ** power) ** (1 / power)
 
         logs = {
-            "fom_eroded": fom_eroded, "v_lens_eroded": v_lens_eroded, "fom": fom, "v_lens": v_lens,
-            "fom_dilated": fom_dilated, "v_lens_dilated": v_lens_dilated, "fom_max": fom_max
+            "v_lens_eroded": v_lens_eroded, "v_lens_normal": v_lens_normal, "v_lens_dilated": v_lens_dilated,
+            "fom_eroded": fom_eroded, "fom_normal": fom_normal, "fom_dilated": fom_dilated,
+            "fom_max": fom_max
         }
 
         print("====================")
@@ -103,6 +104,6 @@ def objective_robust_em_heat_f(currents, resolution, init_values):
             jprint("    {log}", log=log)
         print("====================")
 
-        return fom_max, (v_lens_eroded, v_lens, v_lens_dilated)
+        return fom_max, (v_lens_eroded, v_lens_normal, v_lens_dilated)
 
     return objective_robust_softplus

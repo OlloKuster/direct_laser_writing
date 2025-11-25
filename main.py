@@ -3,14 +3,16 @@ import torch
 import numpy as np
 
 from dispenser import Dispenser
+from settings._setting_loader import setting_loader
 
 
-def main(resolution, betas, eval):
+def main(resolution, betas, setting, eval):
     jax.config.update("jax_enable_x64", True)
     torch.cuda.empty_cache()
     run = Dispenser.LENS3D
-    run(resolution, betas, eval=eval)
+    run(resolution, betas, setting, eval=eval)
 
 
 if __name__ == "__main__":
-    main(8, [1, np.inf, np.inf], eval=True)
+    setting = setting_loader("metalens", "dlw_robust")
+    main(10, [1, np.inf, np.inf], setting, eval=True)

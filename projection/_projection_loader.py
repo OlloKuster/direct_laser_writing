@@ -14,6 +14,7 @@ def projection_loader(projection: str, *args):
     :return: The projection function with rho -> p(rho)
     """
     if projection == "None":
+        alpha, beta, _ = args
         return lambda x: x
     if projection == "tanh_jax":
         alpha, beta, _ = args
