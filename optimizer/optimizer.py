@@ -164,7 +164,7 @@ def optimizer_optax(rho, objective, filter, projection, mode, eval=False):
     rho_opt = rho
     best_val = 100
 
-    class fom_em_torch_f(torch.autograd.Function):
+    class FomEmTorchF(torch.autograd.Function):
         @staticmethod
         def forward(ctx, x):
             grad_em_sim_f = jax.value_and_grad(objective, has_aux=True)
@@ -193,7 +193,7 @@ def optimizer_optax(rho, objective, filter, projection, mode, eval=False):
         if mode == "torch_jax":
             rho = torch.tensor(rho, device='cuda', requires_grad=True)
             rho_final = filter(rho)
-            fom = fom_em_torch_f.apply(rho_final)
+            fom = FomEmTorchF.apply(rho_final)
             fom.backward(retain_graph=True)
             grad_torch = rho.grad
             rho = rho.detach().cpu().numpy()
