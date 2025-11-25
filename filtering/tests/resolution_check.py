@@ -36,23 +36,23 @@ def test(seed):
         print(f"Resolution {resolution}")
         dose_filter = dose_filter_f(resolution)
 
-        projection = ssp_proj_jax_f(ConfigPrint.rho_th_GT, np.inf, resolution)
+        projection = ssp_proj_jax_f(ConfigPrint.rho_th_GT, 1, resolution)
 
         rho_0_0 = np.random.rand(5*resolution, 5*resolution, 5*resolution)
         rho_0 = np.round(scipy.ndimage.gaussian_filter(rho_0_0, sigma=resolution / 2)) * ConfigPrint.rho_th_GT
-        # rho_0 = np.ones_like(rho_0) * 1.8*ConfigPrint.rho_th_GT
+        rho_0 = np.ones_like(rho_0) * ConfigPrint.rho_th_GT
         rho = rho_0
         rho = dose_filter(torch.tensor(rho, device='cuda', requires_grad=True))
         #
         rho = rho.detach().cpu().numpy().squeeze()
         rho_proj = projection(rho)
-        f, ax = plt.subplots(1, 3)
-        ax[0].imshow(rho_0_0[rho_proj.shape[0]//2])
-        ax[1].imshow(rho_0[rho_proj.shape[0]//2])
-        ax[2].imshow(rho_proj[rho_proj.shape[0]//2])
-        plt.show()
-        max.append(np.max(rho))
-        print(f"Resolution {resolution}; Max {np.max(rho)}")
+        # f, ax = plt.subplots(1, 3)
+        # ax[0].imshow(rho_0_0[rho_proj.shape[0]//2])
+        # ax[1].imshow(rho_0[rho_proj.shape[0]//2])
+        # ax[2].imshow(rho_proj[rho_proj.shape[0]//2])
+        # plt.show()
+        max.append(np.max(rho_proj))
+        print(f"Resolution {resolution}; Max {np.max(rho_proj)}")
 
     plt.plot(resolutions, max)
     plt.ylim(0, 1)

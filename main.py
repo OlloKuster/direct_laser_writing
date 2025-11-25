@@ -13,4 +13,4 @@ def main(resolution, betas, eval):
 
 
 if __name__ == "__main__":
-    main(8, [np.inf], eval=True)
+    main(8, [1, np.inf, np.inf], eval=True)

@@ -21,3 +21,6 @@ def projection_loader(projection: str, *args):
     if projection == "ssp_jax":
         alpha, beta, resolution = args
         return ssp_proj_jax_f(alpha, beta, resolution)
+    if projection == "robust_ssp_jax":
+        alpha, beta, resolution = args
+        return ssp_proj_jax_f(alpha, beta, resolution)

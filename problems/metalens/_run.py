@@ -36,11 +36,6 @@ def run(resolution, betas, load=None, eval=False):
     rho_0 = np.ones((ConfigSim.rho_shape[0] * resolution,
                      ConfigSim.rho_shape[1] * resolution,
                      ConfigSim.rho_shape[2] * resolution)) * ConfigPrint.rho_th_GT
-    import scipy
-    rho_0_0 = np.random.rand(ConfigSim.rho_shape[0] * resolution,
-                     ConfigSim.rho_shape[1] * resolution,
-                     ConfigSim.rho_shape[2] * resolution)
-    rho_0 = np.round(scipy.ndimage.gaussian_filter(rho_0_0, sigma=resolution / 2)) * 2*ConfigPrint.rho_th_GT
 
     size_currents = (ConfigSim.currents_shape[0] * resolution,
                      ConfigSim.currents_shape[1] * resolution,
@@ -86,7 +81,10 @@ def run(resolution, betas, load=None, eval=False):
         plt.savefig(
             f"problems/metalens/plots/loss_{betas[i]}.png")
         plt.close()
-        plt.plot(em_loss_hist)
+        plt.plot(em_loss_hist[0], legend='eroded')
+        plt.plot(em_loss_hist[1], legend='normal')
+        plt.plot(em_loss_hist[2], legend='dilated')
+        plt.legend()
         plt.savefig(
             f"problems/metalens/plots/em_loss_{betas[i]}.png")
         plt.close()
