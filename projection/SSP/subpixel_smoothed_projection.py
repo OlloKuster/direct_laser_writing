@@ -3,10 +3,10 @@ import jax.numpy as jnp
 from projection.tanh.tanh_projection import tanh_filter_jax_f
 
 
-def ssp_proj_jax_f(beta, resolution):
+def ssp_proj_jax_f(alpha, beta, resolution):
+    f2bin = tanh_filter_jax_f(alpha, beta)
 
-    def f2bin_smooth(rho, alpha):
-        f2bin = tanh_filter_jax_f(alpha, beta)
+    def f2bin_smooth(rho):
         dx = dy = 1 / resolution
         R_smoothing = 0.55 * dx
         rho_proj = f2bin(rho)
