@@ -20,13 +20,13 @@ def run(resolution, betas, load=None, eval=False):
     jax.config.update("jax_enable_x64", True)
     torch.cuda.empty_cache()
 
-    objectives = "em_heat"
+    objectives = "robust_em_heat"
 
     filters = "dose_conv"
     filter_values = resolution
 
-    projections = "ssp_jax"
-    projection_values = ConfigPrint.rho_th_GT
+    projections = "robust_ssp_jax"
+    projection_values = [0.9*ConfigPrint.rho_th_GT, ConfigPrint.rho_th_GT, 1.1*ConfigPrint.rho_th_GT]
 
     optimizers = "torch_jax"
 

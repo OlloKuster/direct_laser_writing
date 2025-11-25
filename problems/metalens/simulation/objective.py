@@ -9,7 +9,8 @@ from utility.helper import softplus
 def objective_em_f(currents, resolution, init_value):
     def objective_em(rho):
         E, eps = em_simulation(rho, currents, resolution)
-        focal_spot = E[0][E[0].shape[0] // 2, E[0].shape[1] // 2, int(jnp.ceil(ConfigSim.location_focal_spot * resolution))]
+        focal_spot = E[0][
+            E[0].shape[0] // 2, E[0].shape[1] // 2, int(jnp.ceil(ConfigSim.location_focal_spot * resolution))]
         return jnp.abs(focal_spot) / init_value, 0
 
     return objective_em
@@ -26,7 +27,8 @@ def objective_heat_f():
 def objective_em_heat_f(currents, resolution, init_values):
     def objective_em(rho):
         E, eps = em_simulation(rho, currents, resolution)
-        focal_spot = E[0][E[0].shape[0] // 2, E[0].shape[1] // 2, int(jnp.ceil(ConfigSim.location_focal_spot * resolution))]
+        focal_spot = E[0][
+            E[0].shape[0] // 2, E[0].shape[1] // 2, int(jnp.ceil(ConfigSim.location_focal_spot * resolution))]
         return jnp.abs(focal_spot) / init_values[0]
 
     def objective_heat(rho):
@@ -57,10 +59,13 @@ def objective_em_heat_f(currents, resolution, init_values):
         return jnp.linalg.norm(softplus(objs)), v_lens
 
     return objective_softplus
+
+
 def objective_robust_em_heat_f(currents, resolution, init_values):
     def objective_em(rho):
         E, eps = em_simulation(rho, currents, resolution)
-        focal_spot = E[0][E[0].shape[0] // 2, E[0].shape[1] // 2, int(jnp.ceil(ConfigSim.location_focal_spot * resolution))]
+        focal_spot = E[0][
+            E[0].shape[0] // 2, E[0].shape[1] // 2, int(jnp.ceil(ConfigSim.location_focal_spot * resolution))]
         return jnp.abs(focal_spot) / init_values[0]
 
     def objective_heat(rho):
@@ -85,7 +90,7 @@ def objective_robust_em_heat_f(currents, resolution, init_values):
         fom, v_lens = objective_softplus(rhos[1])
         fom_dilated, v_lens_dilated = objective_softplus(rhos[2])
 
-        fom_max = (fom_eroded**power + fom**power + fom_dilated**power)**(1/power)
+        fom_max = (fom_eroded ** power + fom ** power + fom_dilated ** power) ** (1 / power)
 
         logs = {
             "fom_eroded": fom_eroded, "v_lens_eroded": v_lens_eroded, "fom": fom, "v_lens": v_lens,

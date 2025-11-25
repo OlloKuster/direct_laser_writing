@@ -76,7 +76,7 @@ def optimiser(rho, objective, filter, projection, mode, eval=False):
             rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=1)), axis=1)
             # rho_f = np.concatenate((rho_f, np.flip(rho_f, axis=2)), axis=2)
             rho_f = projection(rho_f)
-            ax[1].imshow(rho_f[rho_f.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+            ax[1].imshow(rho_f[1][rho_f[1].shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
             ax[1].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
             ax[1].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
             # plt.show()
