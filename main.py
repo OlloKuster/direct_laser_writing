@@ -1,5 +1,6 @@
 import jax
 import torch
+import numpy as np
 
 from dispenser import Dispenser
 
@@ -12,4 +13,4 @@ def main(resolution, betas, eval):
 
 
 if __name__ == "__main__":
-    main(16, [1, 8, 16, 32, jax.numpy.inf], eval=True)
+    main(8, [np.inf], eval=True)

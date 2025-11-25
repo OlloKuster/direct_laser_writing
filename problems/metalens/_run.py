@@ -36,6 +36,11 @@ def run(resolution, betas, load=None, eval=False):
     rho_0 = np.ones((ConfigSim.rho_shape[0] * resolution,
                      ConfigSim.rho_shape[1] * resolution,
                      ConfigSim.rho_shape[2] * resolution)) * ConfigPrint.rho_th_GT
+    import scipy
+    rho_0_0 = np.random.rand(ConfigSim.rho_shape[0] * resolution,
+                     ConfigSim.rho_shape[1] * resolution,
+                     ConfigSim.rho_shape[2] * resolution)
+    rho_0 = np.round(scipy.ndimage.gaussian_filter(rho_0_0, sigma=resolution / 2)) * 2*ConfigPrint.rho_th_GT
 
     size_currents = (ConfigSim.currents_shape[0] * resolution,
                      ConfigSim.currents_shape[1] * resolution,
@@ -77,7 +82,7 @@ def run(resolution, betas, load=None, eval=False):
         rho_opt_proj = projection(jnp.array(rho_opt_filtered))
         E, eps = em_simulation(jnp.array(rho_opt_proj), currents, resolution)
         plt.plot(loss_hist)
-        plt.yscale('log')
+        # plt.yscale('log')
         plt.savefig(
             f"problems/metalens/plots/loss_{betas[i]}.png")
         plt.close()
