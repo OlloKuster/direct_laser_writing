@@ -1,15 +1,12 @@
 import numpy as np
 import scipy.ndimage
 import torch
-from scipy.ndimage import gaussian_filter
 import matplotlib.pyplot as plt
 import scipy
 
-from filtering._filter_loader import filter_loader
 from filtering.dose_model._dose_filter import dose_filter_f
 from filtering.dose_model.config_print import ConfigPrint
-from filtering.dose_model.utils_dose_sim import calc_laser_intensity
-from projection.tanh.subpixel_smoothed_projection import ssp_proj_jax_f
+from projection.SSP.subpixel_smoothed_projection import ssp_proj_jax_f
 
 
 def test(seed):

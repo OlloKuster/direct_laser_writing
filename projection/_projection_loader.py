@@ -1,5 +1,5 @@
-from projection.tanh.subpixel_smoothed_projection import ssp_proj_jax_f
-from projection.SSP.tanh_projection import tanh_filter_jax_f
+from projection.SSP.subpixel_smoothed_projection import ssp_proj_jax_f
+from projection.tanh.tanh_projection import tanh_filter_jax_f
 
 
 def projection_loader(projection: str, *args):
