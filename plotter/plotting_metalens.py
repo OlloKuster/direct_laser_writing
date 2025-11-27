@@ -124,19 +124,24 @@ def metalens_robust_final_plot():
                 save=False):
 
         if loss_hist is not None:
-            plt.plot(loss_hist[0], label='eroded')
-            plt.plot(loss_hist[1], label='normal')
-            plt.plot(loss_hist[2], label='dilated')
+            plt.plot(loss_hist, label='eroded')
             plt.legend()
             # plt.yscale('log')
             plt.savefig(
                 f"problems/metalens/plots/loss_{beta}.png")
             plt.close()
 
-        if beta is not None:
-            plt.plot(em_loss_hist[0], label='eroded')
-            plt.plot(em_loss_hist[1], label='normal')
-            plt.plot(em_loss_hist[2], label='dilated')
+        if em_loss_hist is not None:
+            em_ero = []
+            em_norm = []
+            em_dil = []
+            for i in range(len(em_loss_hist)):
+                em_ero.append(em_loss_hist[i][0])
+                em_norm.append(em_loss_hist[i][1])
+                em_dil.append(em_loss_hist[i][2])
+            plt.plot(em_ero, label='eroded')
+            plt.plot(em_norm, label='normal')
+            plt.plot(em_dil, label='dilated')
             plt.legend()
             plt.savefig(
                 f"problems/metalens/plots/em_loss_{beta}.png")

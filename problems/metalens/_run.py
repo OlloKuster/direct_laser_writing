@@ -8,7 +8,7 @@ from scipy.ndimage import gaussian_filter
 
 from filtering._filter_loader import filter_loader
 from filtering.dose_model.config_print import ConfigPrint
-from optimizer.optimizer import optimiser, optimizer_optax
+from optimizer.optimizer import optimizer_nlopt, optimizer_optax
 from plotter._plot_loader import plot_loader
 from problems.metalens.simulation._objective_loader import objective_loader
 from problems.metalens.simulation.config_structure import ConfigSim
@@ -48,7 +48,7 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
     currents = jnp.ones(size_currents, jnp.complex128)
 
     objective_em = objective_loader(setting["init_em"], currents, resolution, 1, 1, 1)
-    init_val_em, _ = objective_em(np.ones_like(rho_0) * 0.5)
+    init_val_em, _ = objective_em(jnp.ones_like(rho_0) * 0.5)
     objective_heat = objective_loader(setting["init_heat"])
     init_T_mat, init_T_void = objective_heat(np.ones_like(rho_0) * 0.5)
 
@@ -70,8 +70,8 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
         filter = filter_loader(filters, filter_values)
         projection = projection_loader(projections, projection_values, betas[i], resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
-        rho_0, loss, em_loss, grads = optimiser(rho_0, objective, filter, projection, init_projection, plotter_eval, optimizers,
-                                                eval=eval)
+        rho_0, loss, em_loss, grads = optimizer_nlopt(rho_0, objective, filter, projection, init_projection, plotter_eval, optimizers,
+                                                      eval=eval)
 
         loss_hist += loss
         em_loss_hist += em_loss

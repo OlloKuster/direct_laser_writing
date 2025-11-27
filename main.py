@@ -14,5 +14,5 @@ def main(resolution, betas, setting, eval):
 
 
 if __name__ == "__main__":
-    setting = setting_loader("metalens", "dlw_robust")
-    main(10, [1, np.inf, np.inf], setting, eval=True)
+    setting = setting_loader("metalens", "dlw_regular")
+    main(8, [16, 32, np.inf], setting, eval=True)

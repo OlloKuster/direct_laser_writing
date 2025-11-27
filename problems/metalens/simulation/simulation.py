@@ -8,6 +8,7 @@ from utility.helper import f2param, split_int
 
 
 def em_simulation(rho, currents, resolution):
+    rho = rho.at[:, :, :resolution].set(1)
     simulation_domain = (ConfigSim.simulation_domain_shape[0] * resolution,
                          ConfigSim.simulation_domain_shape[1] * resolution,
                          ConfigSim.simulation_domain_shape[2] * resolution)

@@ -10,7 +10,7 @@ from filtering.dose_model.config_print import ConfigPrint
 from optimizer import config
 
 
-def optimiser(rho, objective, filter, projection, init_projection, plotter, mode, eval=False):
+def optimizer_nlopt(rho, objective, filter, projection, init_projection, plotter, mode, eval=False):
     """
     The optimiser function
     :return:
@@ -107,7 +107,7 @@ def optimiser(rho, objective, filter, projection, init_projection, plotter, mode
     return rho_opt, loss_hist, em_hist, grad_hist
 
 
-def optimizer_optax(rho, objective, filter, projection, mode, eval=False):
+def optimizer_optax(rho, objective, filter, projection, init_projection, plotter, mode, eval=False):
     rho = np.array(rho)
 
     round = (config.cur_it + 1) / config.MAXEVAL
@@ -143,8 +143,9 @@ def optimizer_optax(rho, objective, filter, projection, mode, eval=False):
 
     for i in range(config.MAXEVAL):
         start = time.time()
+        rho_init = np.array(init_projection(rho))
         if mode == "jax":
-            rho_final = filter(rho)
+            rho_final = filter(rho_init)
             value_obj, grad = jax.value_and_grad(objective, has_aux=True)(rho_final)
             value = float(value_obj[0])  # Requires np float and not jax.numpy float
             value_em = float(value_obj[1])
@@ -153,13 +154,12 @@ def optimizer_optax(rho, objective, filter, projection, mode, eval=False):
             em_hist.append(value_em)
 
         if mode == "torch_jax":
-            rho = torch.tensor(rho, device='cuda', requires_grad=True)
+            rho = torch.tensor(rho_init, device='cuda', requires_grad=True)
             rho_final = filter(rho)
             fom = FomEmTorchF.apply(rho_final)
             fom.backward(retain_graph=True)
             grad_torch = rho.grad
             rho = rho.detach().cpu().numpy()
-            rho_final = rho_final.detach().cpu().numpy()
             value = fom.detach().cpu().numpy()
             grad = grad_torch.detach().cpu().numpy()
             value = float(value)  # Requires np float and not jax.numpy float
@@ -174,11 +174,7 @@ def optimizer_optax(rho, objective, filter, projection, mode, eval=False):
         if value < best_val:
             rho_opt = rho
         if eval:
-            rho_p = np.concatenate((projection(rho_final), np.flip(rho, axis=0)), axis=0)
-            rho_p = np.concatenate((rho_p, np.flip(rho_p, axis=1)), axis=1)
-            plt.imshow(rho_p[rho_p.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
-            plt.savefig(f"problems/metalens/plots/progression/rho_{config.cur_it:03d}.png")
-            plt.close()
+            plotter(rho_init, rho_final.detach().cpu().numpy(), projection, config.cur_it)
 
         updates, opt_state = optimizer.update(grad, opt_state, rho)
         rho[:] = optax.apply_updates(rho, updates)

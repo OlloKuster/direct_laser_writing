@@ -85,14 +85,14 @@ class FEA3D(ABC):
         return x[keep], indices
 
     def solve(self, x: Array, b: Array) -> Array:
-        print("assemble matrix...", end=" ")
+        # print("assemble matrix...", end=" ")
         t0 = time()
         data, indices = self.global_mat(x)
-        print(f"done: {time() - t0:.3f}s")
-        print("gpu solve...", end=" ")
+        # print(f"done: {time() - t0:.3f}s")
+        # print("gpu solve...", end=" ")
         t0 = time()
         u_nz = solve_cupy(data, indices, b.ravel()[self.freedofs])
-        print(f"done: {time() - t0:.3f}s")
+        # print(f"done: {time() - t0:.3f}s")
         z = jnp.zeros(self.fixdofs.size)
         u = jnp.concatenate([u_nz, z])[self.index_map]
         return u
