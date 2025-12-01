@@ -41,6 +41,13 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
                      ConfigSim.rho_shape[1] * resolution,
                      ConfigSim.rho_shape[2] * resolution)) * 0.5
 
+    mask = np.ones_like(rho_0)
+    mask[:int(ConfigSim.buffer_side * resolution)] = 0
+    mask[:, :int(ConfigSim.buffer_side * resolution)] = 0
+    mask[:, :, -int(ConfigSim.buffer_top * resolution):] = 0
+
+
+
     size_currents = (ConfigSim.currents_shape[0] * resolution,
                      ConfigSim.currents_shape[1] * resolution,
                      1)
@@ -70,7 +77,8 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
         filter = filter_loader(filters, filter_values)
         projection = projection_loader(projections, projection_values, betas[i], resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
-        rho_0, loss, em_loss, grads = optimizer_nlopt(rho_0, objective, filter, projection, init_projection, plotter_eval, optimizers,
+        rho_0, loss, em_loss, grads = optimizer_optax(rho_0, objective, mask, filter, projection, init_projection,
+                                                      plotter_eval, optimizers,
                                                       eval=eval)
 
         loss_hist += loss

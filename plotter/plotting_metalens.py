@@ -18,7 +18,7 @@ def metalens_regular_intermediate_plot():
         ax[1].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
         ax[1].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
         plt.savefig(f"problems/metalens/plots/progression/rho_{i:03d}.png")
-        plt.show()
+        plt.close()
 
     return plotter
 

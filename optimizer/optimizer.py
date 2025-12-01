@@ -10,7 +10,7 @@ from filtering.dose_model.config_print import ConfigPrint
 from optimizer import config
 
 
-def optimizer_nlopt(rho, objective, filter, projection, init_projection, plotter, mode, eval=False):
+def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, plotter, mode, eval=False):
     """
     The optimiser function
     :return:
@@ -43,7 +43,7 @@ def optimizer_nlopt(rho, objective, filter, projection, init_projection, plotter
     def f_torch_jax(x, g):
         start = time.time()
         x = np.reshape(x, rho.shape)
-        x = np.array(init_projection(x))
+        x = np.array(init_projection(x) * mask)
         rho_0 = torch.tensor(x, device='cuda', requires_grad=True)
         rho_final = filter(rho_0)
         fom = fom_em_torch_f.apply(rho_final)
@@ -107,7 +107,7 @@ def optimizer_nlopt(rho, objective, filter, projection, init_projection, plotter
     return rho_opt, loss_hist, em_hist, grad_hist
 
 
-def optimizer_optax(rho, objective, filter, projection, init_projection, plotter, mode, eval=False):
+def optimizer_optax(rho, objective, mask, filter, projection, init_projection, plotter, mode, eval=False):
     rho = np.array(rho)
 
     round = (config.cur_it + 1) / config.MAXEVAL
@@ -143,7 +143,7 @@ def optimizer_optax(rho, objective, filter, projection, init_projection, plotter
 
     for i in range(config.MAXEVAL):
         start = time.time()
-        rho_init = np.array(init_projection(rho))
+        rho_init = np.array(init_projection(rho) * mask)
         if mode == "jax":
             rho_final = filter(rho_init)
             value_obj, grad = jax.value_and_grad(objective, has_aux=True)(rho_final)

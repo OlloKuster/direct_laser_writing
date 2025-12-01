@@ -26,16 +26,15 @@ def em_simulation(rho, currents, resolution):
     eps = jnp.pad(eps,
                   [split_int(simulation_domain[0] - size_rho[0])] +
                   [split_int(simulation_domain[1] - size_rho[1])] +
-                  [(0, int(jnp.ceil((ConfigSim.buffer_top+ConfigSim.dpml)*resolution)))], mode='constant',
+                  [(0, int(jnp.ceil((ConfigSim.space_top + ConfigSim.dpml) * resolution)))], mode='constant',
                   constant_values=ConfigSim.epsilon[0])
 
-
-
     eps = jnp.pad(eps,
-                  [(0, 0)] * 2 + [(int(jnp.ceil((ConfigSim.buffer_bottom+ConfigSim.dpml)*resolution)), 0)],
+                  [(0, 0)] * 2 + [(int(jnp.ceil((ConfigSim.buffer_bottom + ConfigSim.dpml) * resolution)), 0)],
                   mode='constant',
                   constant_values=ConfigSim.epsilon[1])
 
+    eps = eps.at[:, :, :int(ConfigSim.buffer_top*resolution)].set(ConfigSim.epsilon[1])
 
     size_currents = (ConfigSim.currents_shape[0] * resolution,
                      ConfigSim.currents_shape[1] * resolution,
@@ -94,4 +93,4 @@ def heat_simulation(rho, resize_factor):
     src_void = jnp.pad(1 - rho_n, [(0, 1), (0, 1), (0, 1)], mode='constant', constant_values=0)
     T_void = fem_void.temperature(kappa_r_void, src_void)
 
-    return jnp.sum(T_matter)/T_matter.size, jnp.sum(T_void)/T_void.size, kappa_r_matter
+    return jnp.sum(T_matter) / T_matter.size, jnp.sum(T_void) / T_void.size, kappa_r_matter
