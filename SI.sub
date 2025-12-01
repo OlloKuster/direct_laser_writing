@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 #SBATCH --partition="accelerated"
 #SBATCH --job-name="DLW_Metalens"
-#SBATCH --time=48:00:00
+#SBATCH --time=01:00:00
 #SBATCH --gres=gpu:1
 #SBATCH --err=std.err
 #SBATCH --output=std.out
@@ -14,14 +14,14 @@ cd $SLURM_SUBMIT_DIR
 export SLURM_NTASKS=${SLURM_NTASKS:=76}
 
 # >>> mamba initialize >>>
-# !! Contents within this block are managed by 'mamba init' !!
-export MAMBA_EXE='/hkfs/home/project/hk-project-bit2blo2/fy4301/.local/bin/micromamba';
-export MAMBA_ROOT_PREFIX='/hkfs/home/project/hk-project-bit2blo2/fy4301/micromamba';
+# !! Contents within this block are managed by 'micromamba shell init' !!
+export MAMBA_EXE='/hkfs/home/project/hk-project-bit2blo2_3/fy4301/.local/bin/micromamba';
+export MAMBA_ROOT_PREFIX='/hkfs/home/project/hk-project-bit2blo2_3/fy4301/micromamba';
 __mamba_setup="$("$MAMBA_EXE" shell hook --shell bash --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__mamba_setup"
 else
-    alias micromamba="$MAMBA_EXE"  # Fallback on help from mamba activate
+    alias micromamba="$MAMBA_EXE"  # Fallback on help from micromamba activate
 fi
 unset __mamba_setup
 # <<< mamba initialize <<<
@@ -30,4 +30,4 @@ micromamba activate dlw_horeka
 
 time python main.py > output.log
 
-cd .. 
+cd ..
