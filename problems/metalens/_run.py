@@ -23,7 +23,7 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
 
     objectives = setting["objectives"]
     filters = setting["filters"]
-    filter_values = resolution
+    filter_values = setting["filter_factor"] * resolution
     projections = setting["projection"]
     init_projections = setting["init_projection"]
     projection_values = setting["projection_values"]
@@ -39,7 +39,7 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
 
     rho_0 = np.ones((ConfigSim.rho_shape[0] * resolution,
                      ConfigSim.rho_shape[1] * resolution,
-                     ConfigSim.rho_shape[2] * resolution)) * ConfigPrint.rho_th_GT
+                     ConfigSim.rho_shape[2] * resolution)) * 0.5
 
     size_currents = (ConfigSim.currents_shape[0] * resolution,
                      ConfigSim.currents_shape[1] * resolution,

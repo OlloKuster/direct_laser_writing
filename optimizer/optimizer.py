@@ -84,7 +84,7 @@ def optimizer_nlopt(rho, objective, filter, projection, init_projection, plotter
         end = time.time()
         print(f"time: {end - start}")
         if eval:
-            plotter(x, rho_final, projection, config.ind)
+            plotter(rho_0, rho_final, projection, config.ind)
             if config.cur_it % config.MAXEVAL == 0:
                 config.ind += 1
         return value
