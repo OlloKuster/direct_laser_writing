@@ -4,11 +4,11 @@ from projection.tanh.tanh_projection import tanh_filter_jax_f
 
 
 def f2bin_smooth(rho, alpha, resolution, f2bin):
-    dx = dy = 1 / resolution
+    dx = dy = dz = 1 / resolution
     R_smoothing = 0.55 * dx
     rho_proj = f2bin(rho)
     rho_grad = jnp.gradient(rho)
-    rho_grad_norm2 = (rho_grad[0] / dx) ** 2 + (rho_grad[1] / dy) ** 2
+    rho_grad_norm2 = (rho_grad[0] / dx) ** 2 + (rho_grad[1] / dy) ** 2 + rho_grad[1] / dz
     nonzero_norm = jnp.abs(rho_grad_norm2) > 0
     rho_grad_norm = jnp.sqrt(jnp.where(nonzero_norm,
                                        rho_grad_norm2, 1))
