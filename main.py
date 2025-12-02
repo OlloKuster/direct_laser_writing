@@ -14,5 +14,5 @@ def main(resolution, betas, setting, eval):
 
 
 if __name__ == "__main__":
-    setting = setting_loader("metalens", "dlw_regular")
+    setting = setting_loader("metalens", "normal_gauss")
     main(16, [8, 16, 32, np.inf], setting, eval=False)
