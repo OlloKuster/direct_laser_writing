@@ -1,7 +1,7 @@
 # Not a class since I don't need to pass it differently according to the problem.
 import nlopt
 
-MAXEVAL = 50
+MAXEVAL = 20
 FTOL_ABS = 1e-7
 FTOL_REL = 1e-5
 UPPER_BOUNDS = 1
@@ -12,4 +12,4 @@ cur_it = 0
 ind = 0
 
 
-lr = 1e-2
+lr = 0.6

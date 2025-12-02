@@ -1,6 +1,7 @@
 import numpy as np
 import jax
 import jax.numpy as jnp
+import scipy
 import torch
 import matplotlib.pyplot as plt
 import h5py
@@ -41,6 +42,13 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
                      ConfigSim.rho_shape[1] * resolution,
                      ConfigSim.rho_shape[2] * resolution)) * 0.5
 
+    # rho_0_0 = np.random.rand(ConfigSim.rho_shape[0] * resolution,
+    #                  ConfigSim.rho_shape[1] * resolution,
+    #                  ConfigSim.rho_shape[2] * resolution)
+    # rho_0 = np.round(scipy.ndimage.gaussian_filter(rho_0_0, sigma=0.5*resolution))
+    # plt.imshow(rho_0[rho_0.shape[0]//2])
+    # plt.show()
+
     mask = np.ones_like(rho_0)
     mask[:int(ConfigSim.buffer_side * resolution)] = 0
     mask[:, :int(ConfigSim.buffer_side * resolution)] = 0
@@ -75,9 +83,9 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
         objective = objective_loader(objectives, currents, resolution, init_val_em, init_val_mat, init_val_void)
 
         filter = filter_loader(filters, filter_values)
-        projection = projection_loader(projections, projection_values, betas[i], resolution)
+        projection = projection_loader(projections, projection_values, np.inf, resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
-        rho_0, loss, em_loss, grads = optimizer_optax(rho_0, objective, mask, filter, projection, init_projection,
+        rho_0, loss, em_loss, grads = optimizer_nlopt(rho_0, objective, mask, filter, projection, init_projection,
                                                       plotter_eval, optimizers,
                                                       eval=eval)
 
