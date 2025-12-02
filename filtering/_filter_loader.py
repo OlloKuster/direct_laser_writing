@@ -11,6 +11,7 @@ def filter_loader(filter: str, *args):
                     "None": Returns unity.
                     "dose_conv": Returns the dosage accumulation simulation by 3D convolution.
                     "gauss_jax": Returns a Gaussian filter which uses Jax.
+                    "conic_jax": Returns a cone filter which uses Jax.
     :return: The filter function with rho -> f(rho)
     """
 

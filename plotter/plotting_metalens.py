@@ -5,6 +5,10 @@ import jax.numpy as jnp
 
 
 def metalens_regular_intermediate_plot():
+    """
+    Creates the plotting function used for the intermediate evulation of the structures.
+    :return: Evaluation Plotter function.
+    """
     def plotter(rho_init, rho_final, projection, i):
         fig, ax = plt.subplots(2, 1, sharex=True)
         rho_init = np.concatenate((rho_init, np.flip(rho_init, axis=0)), axis=0)
@@ -24,6 +28,10 @@ def metalens_regular_intermediate_plot():
 
 
 def metalens_regular_final_plot():
+    """
+    Creates the plotting function used for the final evaluation of the structures.
+    :return: Final Plotter function.
+    """
     def plotter(extent, rho_0=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None,
                 save=False):
 
@@ -83,6 +91,10 @@ def metalens_regular_final_plot():
 
 
 def metalens_robust_intermediate_plot():
+    """
+    Creates the plotting function used for the intermediate evaluation of the robust (3) designed structures.
+    :return: Evaluation Plotter function.
+    """
     def plotter(rho_init, rho_final, projection, i):
         fig, ax = plt.subplots(2, 3, sharex=True)
 
@@ -120,6 +132,10 @@ def metalens_robust_intermediate_plot():
 
 
 def metalens_robust_final_plot():
+    """
+    Creates the plotting function used for the final evaluation of the robust (3) designed structures.
+    :return: Final Plotter function.
+    """
     def plotter(extent, rho_0=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None,
                 save=False):
 

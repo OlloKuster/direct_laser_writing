@@ -1,11 +1,8 @@
 import numpy as np
-import scipy.ndimage
 import torch
-from scipy.ndimage import gaussian_filter
 import matplotlib.pyplot as plt
 
 from filtering._filter_loader import filter_loader
-from filtering.dose_model.config_print import ConfigPrint
 
 
 def test(seed):

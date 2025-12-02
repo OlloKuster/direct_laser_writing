@@ -4,17 +4,29 @@ import torch
 import nlopt
 import optax
 import time
-import matplotlib.pyplot as plt
 
-from filtering.dose_model.config_print import ConfigPrint
 from optimizer import config
 
 
 def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, plotter, mode, eval=False):
     """
-    The optimiser function
-    :return:
+    NLOpt based optimizer for non-linear, gradient based optimization.
+    The density is first put through init_projection to give a "precomensated" density. Then it is put
+    through filter and projection to evaluate the performance (objective) of the "printed" structure.
+    :param rho: Input density of the TopOpt problem (to be optmized).
+    :param objective: Objective function of the problem.
+    :param mask: Mask for setting regions to 0. This is done so that there is no hard cutoff at the edge of the design
+                 region.
+    :param filter: Filter function used in this optimization run.
+    :param projection: Projection function used in this optimization run.
+    :param init_projection: Initial projection function used in this optimization run.
+    :param plotter: Plotting functions used.
+    :param mode: Mode of the gradient evaulation, e.g. if a torch wrapper is required.
+    :param eval: If intermediate plots will be plotted.
+    :return: (rho_opt, loss_hist, em_hist, grad_hist) Tuple of the optimized density, history of the loss and the
+             pure electromagnetic loss and history of the gradients.
     """
+
     loss_hist = []
     em_hist = []
     grad_hist = []
@@ -25,7 +37,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         if mode == "jax":
             return f_jax
 
-    class fom_em_torch_f(torch.autograd.Function):
+    class FomEmTorchF(torch.autograd.Function):
         @staticmethod
         def forward(ctx, x):
             grad_em_sim_f = jax.value_and_grad(objective, has_aux=True)
@@ -46,7 +58,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         x = np.array(init_projection(x) * mask)
         rho_0 = torch.tensor(x, device='cuda', requires_grad=True)
         rho_final = filter(rho_0)
-        fom = fom_em_torch_f.apply(rho_final)
+        fom = FomEmTorchF.apply(rho_final)
         fom.backward(retain_graph=True)
         grad_torch = rho_0.grad
         value = fom.detach().cpu().numpy()
@@ -108,14 +120,25 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
 
 
 def optimizer_optax(rho, objective, mask, filter, projection, init_projection, plotter, mode, eval=False):
+    """
+    Optax based optimizer for more machine learning based optimization.
+    The density is first put through init_projection to give a "precomensated" density. Then it is put
+    through filter and projection to evaluate the performance (objective) of the "printed" structure.
+    :param rho: Input density of the TopOpt problem (to be optmized).
+    :param objective: Objective function of the problem.
+    :param mask: Mask for setting regions to 0. This is done so that there is no hard cutoff at the edge of the design
+                 region.
+    :param filter: Filter function used in this optimization run.
+    :param projection: Projection function used in this optimization run.
+    :param init_projection: Initial projection function used in this optimization run.
+    :param plotter: Plotting functions used.
+    :param mode: Mode of the gradient evaulation, e.g. if a torch wrapper is required.
+    :param eval: If intermediate plots will be plotted.
+    :return: (rho_opt, loss_hist, em_hist, grad_hist) Tuple of the optimized density, history of the loss and the
+             pure electromagnetic loss and history of the gradients.
+    """
     rho = np.array(rho)
 
-    round = (config.cur_it + 1) / config.MAXEVAL
-    # print(round)
-    # if round >= 2:
-    #     lr = 1e-2
-    # else:
-    #     lr = config.lr
     optimizer = optax.adam(learning_rate=config.lr)
     opt_state = optimizer.init(rho)
 

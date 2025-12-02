@@ -4,6 +4,15 @@ from projection.tanh.tanh_projection import tanh_filter_jax_f
 
 
 def f2bin_smooth(rho, alpha, resolution, f2bin):
+    """
+    Implements the subpixel-smoothed projection.
+    https://doi.org/10.1364/OE.563512
+    :param rho: Input density (design variable).
+    :param alpha: Threshold value.
+    :param resolution: Resolution of the problem [px/um].
+    :param f2bin: Binarization function.
+    :return: Subpixel-smoothed density.
+    """
     dx = dy = dz = 1 / resolution
     R_smoothing = 0.55 * dx
     rho_proj = f2bin(rho)
@@ -31,12 +40,26 @@ def f2bin_smooth(rho, alpha, resolution, f2bin):
 
 
 def ssp_proj_jax_f(alpha, beta, resolution):
+    """
+    Generates the SSP Projection function.
+    :param alpha: Threshold value.
+    :param beta: Binarization level.
+    :param resolution: Resolution of the problem.
+    :return: SSP Projection function.
+    """
     f2bin = tanh_filter_jax_f(alpha, beta)
 
     return lambda x: f2bin_smooth(x, alpha, resolution, f2bin)
 
 
 def ssp_robust_proj_jax_f(alphas, beta, resolution):
+    """
+    Generates the SSP Projection function for a robust optimization.
+    :param alphas: Tuple of threshold values.
+    :param beta: Binarization level.
+    :param resolution: Resolution of the problem.
+    :return: SSP Projection function.
+    """
     f2bin_eroded = tanh_filter_jax_f(alphas[0], beta)
     f2bin = tanh_filter_jax_f(alphas[1], beta)
     f2bin_dilated = tanh_filter_jax_f(alphas[2], beta)

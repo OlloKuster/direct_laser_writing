@@ -11,6 +11,7 @@ def projection_loader(projection: str, *args):
                         "None": Returns unity.
                         "tanh_jax": Returns the tanh-projection which uses Jax.
                         "ssp_jax": Returns the SSP-projection which uses Jax [https://doi.org/10.1364/OE.563512].
+                        "robust_ssp_jax": Returns the SSP-projection for multiple threshold values.
     :return: The projection function with rho -> p(rho)
     """
     if projection == "None":

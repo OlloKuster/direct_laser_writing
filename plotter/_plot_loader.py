@@ -3,6 +3,17 @@ from plotter.plotting_metalens import metalens_regular_intermediate_plot, metale
 
 
 def plot_loader(plot: str, *args):
+    """
+    Loads the respective plotters as a function.
+    :param plot: Selects which plotter function will be returned.
+                 Modes:
+                  "eval_regular" Intermediate plotting for regular optimization.
+                  "final_regular" Final plotting for regular optimization.
+                  "eval_robust" Intermediate plotting for robust optimization.
+                  "final_robust" Final plotting for robust optimization.
+    :param args:
+    :return:
+    """
     if plot == "eval_regular":
         return metalens_regular_intermediate_plot()
     if plot == "final_regular":

@@ -2,6 +2,9 @@ import torch
 
 
 class DoseMSBPM(torch.nn.Module):
+    """
+    Base class for the dlw model.
+    """
     def __init__(self, rho_0_GT: torch.Tensor, intensity_nonlinear: torch.Tensor,
                  print_params: list, nonlinearity: torch.Tensor,
                  device='cpu', dtype=torch.float64):
@@ -28,8 +31,17 @@ class DoseMSBPM(torch.nn.Module):
 
 
 class DoseMSBPMFull3D(DoseMSBPM):
+    '''
+    Defines the convolution of hte density with the PSF.
+    '''
     def forward(self, obj: torch.Tensor,
                 lp: torch.Tensor = torch.tensor([[0.020]])) -> torch.Tensor:
+        '''
+        Convolution of the density with the PSF. Returns the accumulated power of the structure.
+        :param obj: Input density.
+        :param lp: Laser Power.
+        :return: Accumulated power in the resist as a density.
+        '''
         conv = torch.nn.functional.conv3d(obj[None, None], self.intensity_nonlinear, padding='same')
         rho = self.rho_0_GT * (1 - torch.exp(
             - self.factor_in_exp * self.correction_factor * conv * lp[:, :, None, None, None] ** self.nonlinearity))

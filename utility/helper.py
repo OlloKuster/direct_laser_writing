@@ -34,6 +34,12 @@ def softplus(x, beta=50):
 
 
 def convert_to(x, package):
+    """
+    Conversions of variables during steps (e.g. torch tensor to numpy array).
+    :param x: Input.
+    :param package: Chooses which format x will be converted to.
+    :return:
+    """
     if package == "torch":
         return torch.tensor(x, device='cuda')
     if package == "torch2np":

@@ -8,7 +8,13 @@ from utility.helper import f2param, split_int
 
 
 def em_simulation(rho, currents, resolution):
-    # rho = rho.at[:, :, :resolution].set(1)
+    """
+    Simulates the metalens problem given a density and source currents.
+    :param rho: Input density of the problem (design variable) [0, 1].
+    :param currents: Source currents of the simulation.
+    :param resolution: Resolution of the simulation [px/um].
+    :return: (Electric field, permittivity of the entire simulation).
+    """
     simulation_domain = (ConfigSim.simulation_domain_shape[0] * resolution,
                          ConfigSim.simulation_domain_shape[1] * resolution,
                          ConfigSim.simulation_domain_shape[2] * resolution)
@@ -34,6 +40,8 @@ def em_simulation(rho, currents, resolution):
                   mode='constant',
                   constant_values=ConfigSim.epsilon[1])
 
+    # Add a buffer at the bottom to make is less likely that the structure will "lift off" when the binarization
+    #  increased.
     eps = eps.at[:, :, :int(ConfigSim.buffer_top*resolution)].set(ConfigSim.epsilon[1])
 
     size_currents = (ConfigSim.currents_shape[0] * resolution,
@@ -70,6 +78,13 @@ def em_simulation(rho, currents, resolution):
 
 
 def heat_simulation(rho, resize_factor):
+    """
+    Heat simulation given an input density. Material/void is seen as heat sources. The heat sinks are the
+    points where the material/void should connect to.
+    :param rho: Input density of the problem (design variable) [0, 1].
+    :param resize_factor: Resizes the density in case the FEM-simulation is too big for the memory.
+    :return: (Heat of the material, Heat of the void.
+    """
     rho_n_shape = (rho.shape[0] // resize_factor, rho.shape[1] // resize_factor, rho.shape[2] // resize_factor)
     rho_n = jax.image.resize(rho, rho_n_shape, 'bicubic', antialias=False)
 

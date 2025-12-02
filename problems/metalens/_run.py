@@ -1,14 +1,10 @@
 import numpy as np
 import jax
 import jax.numpy as jnp
-import scipy
 import torch
-import matplotlib.pyplot as plt
 import h5py
-from scipy.ndimage import gaussian_filter
 
 from filtering._filter_loader import filter_loader
-from filtering.dose_model.config_print import ConfigPrint
 from optimizer.optimizer import optimizer_nlopt, optimizer_optax
 from plotter._plot_loader import plot_loader
 from problems.metalens.simulation._objective_loader import objective_loader
@@ -19,6 +15,16 @@ from utility.helper import convert_to
 
 
 def run(resolution, betas, setting: dict, load=None, eval=False):
+    """
+    Runs the optimization process. Lower level "main".
+    :param resolution: Resolution of the problem.
+    :param betas: List of the binarization levels.
+    :param setting: Selects which problem should be optimized.
+    :param load: Load an external rho.
+    :param eval: Activate intermediate evaluation/plotting of rho.
+    :return: None.
+    """
+
     jax.config.update("jax_enable_x64", True)
     torch.cuda.empty_cache()
 
@@ -42,19 +48,10 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
                      ConfigSim.rho_shape[1] * resolution,
                      ConfigSim.rho_shape[2] * resolution)) * 0.5
 
-    # rho_0_0 = np.random.rand(ConfigSim.rho_shape[0] * resolution,
-    #                  ConfigSim.rho_shape[1] * resolution,
-    #                  ConfigSim.rho_shape[2] * resolution)
-    # rho_0 = np.round(scipy.ndimage.gaussian_filter(rho_0_0, sigma=0.5*resolution))
-    # plt.imshow(rho_0[rho_0.shape[0]//2])
-    # plt.show()
-
     mask = np.ones_like(rho_0)
     mask[:int(ConfigSim.buffer_side * resolution)] = 0
     mask[:, :int(ConfigSim.buffer_side * resolution)] = 0
     mask[:, :, -int(ConfigSim.buffer_top * resolution):] = 0
-
-
 
     size_currents = (ConfigSim.currents_shape[0] * resolution,
                      ConfigSim.currents_shape[1] * resolution,

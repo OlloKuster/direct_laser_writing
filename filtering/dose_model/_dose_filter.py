@@ -1,14 +1,16 @@
-import matplotlib
 import torch
-import numpy as np
 
-from utility.helper import f2param
 from .config_print import ConfigPrint
 from filtering.dose_model.DoseMSBPM import DoseMSBPMFull3D
-from filtering.dose_model.utils_dose_sim import create_3d_psf_torch, calc_laser_intensity
+from filtering.dose_model.utils_dose_sim import calc_laser_intensity
 
 
 def dose_filter_f(resolution):
+    """
+    Creases the function for the dlw-model filter, given a resolution.
+    :param resolution: Resolution of the simulation [px/um].
+    :return: Filter function, with density as its input.
+    """
     res_lat = 1 / resolution * 10 ** (-6)  # hatching
     res_ax = 1 / resolution * 10 ** (-6)  # slicing
     time_exposure = ConfigPrint.w0 / (ConfigPrint.vs / res_lat)
@@ -39,6 +41,12 @@ def dose_filter_f(resolution):
     )
 
     def dose_filter(rho_0):
+        """
+        The dose filter function, converts the regular density into a power accumulated density which can be
+        converted into a printed structure using a threshold value.
+        :param rho_0: Regular TopOpt density.
+        :return: Accumulated power as a "density".
+        """
         rho = msbpm(rho_0 * torch.tensor(ConfigPrint.power, device='cuda', requires_grad=True),
                     torch.tensor([[ConfigPrint.lp]], device=ConfigPrint.device, requires_grad=True))
 

@@ -5,6 +5,10 @@ import numpy as np
 
 @dataclass
 class ConfigPrint():
+    """
+    Parameters for the dlw-model. Most of them are based on experimental data.
+    Threhold and initial values for rho are normalized and the inital power is 1.
+    """
     device = 'cuda'
 
     power = 1.
