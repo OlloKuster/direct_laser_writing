@@ -7,7 +7,7 @@ class ConfigSim:
     """
     Config the 3D lens, defines the required parameters which are used for the simulation.
     """
-    rho_shape = (6, 6, 4)
+    rho_shape = (4, 4, 4)
     buffer_side = 1  # Buffer for the mask.
     buffer_top = 1  # Buffer for the mask.
     space_top = 3  # Actual space above the design region.
@@ -27,5 +27,5 @@ class ConfigSim:
     location_focal_spot = dpml + buffer_bottom + rho_shape[2] + 2.5
 
     TARGET_EM = 15  # Target EM Performance. Given in field enhancement at the focal spot
-    TARGET_MATERIAL = 1.3  # Normalizes the target heat for the material. The initial value is 1-TARGET_MATERIAL.
-    TARGET_VOID = 1.3  # Normalizes the target heat for the void. The initial value is 1-TARGET_VOID.
+    TARGET_MATERIAL = 0.1  # Normalizes the target heat for the material. The initial value is 1-TARGET_MATERIAL.
+    TARGET_VOID = 0.1  # Normalizes the target heat for the void. The initial value is 1-TARGET_VOID.

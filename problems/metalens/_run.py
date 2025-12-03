@@ -44,10 +44,13 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
     plotter_eval = plot_loader(plotter_eval_name)
     plotter_final = plot_loader(plotter_final_name)
 
-    rho_0 = np.ones((ConfigSim.rho_shape[0] * resolution,
-                     ConfigSim.rho_shape[1] * resolution,
-                     ConfigSim.rho_shape[2] * resolution)) * 0.5
+    # rho_0 = np.ones((ConfigSim.rho_shape[0] * resolution,
+    #                  ConfigSim.rho_shape[1] * resolution,
+    #                  ConfigSim.rho_shape[2] * resolution)) * 0.3
 
+    rho_0 = np.random.rand(ConfigSim.rho_shape[0] * resolution,
+                           ConfigSim.rho_shape[1] * resolution,
+                           ConfigSim.rho_shape[2] * resolution)
     mask = np.ones_like(rho_0)
     mask[:int(ConfigSim.buffer_side * resolution)] = 0
     mask[:, :int(ConfigSim.buffer_side * resolution)] = 0
@@ -77,7 +80,7 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
     em_loss_hist = []
 
     for i in range(len(betas)):
-        if betas[i] == betas[0]:
+        if betas[i] == -1:  # betas[0]:
             beta_ssp = betas[0]
         else:
             beta_ssp = np.inf
