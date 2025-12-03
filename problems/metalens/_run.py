@@ -77,10 +77,14 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
     em_loss_hist = []
 
     for i in range(len(betas)):
+        if betas[i] == betas[0]:
+            beta_ssp = betas[0]
+        else:
+            beta_ssp = np.inf
         objective = objective_loader(objectives, currents, resolution, init_val_em, init_val_mat, init_val_void)
 
         filter = filter_loader(filters, filter_values)
-        projection = projection_loader(projections, projection_values, np.inf, resolution)
+        projection = projection_loader(projections, projection_values, beta_ssp, resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
         rho_0, loss, em_loss, grads = optimizer_nlopt(rho_0, objective, mask, filter, projection, init_projection,
                                                       plotter_eval, optimizers,
@@ -103,7 +107,7 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
             E, eps = em_simulation(jnp.array(rho_opt_proj), currents, resolution)
 
         plotter_final(extent=(ConfigSim.simulation_domain_shape[1], ConfigSim.simulation_domain_shape[2]),
-                      rho_0=rho_0.detach().cpu().numpy(),
+                      rho_0=convert_to(rho_0, backconversions),
                       loss_hist=loss_hist,
                       beta=betas[i],
                       em_loss_hist=em_loss_hist,
