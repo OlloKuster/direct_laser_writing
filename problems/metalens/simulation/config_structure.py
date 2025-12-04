@@ -24,7 +24,7 @@ class ConfigSim:
     resize_factor = 1  # Scales down the thermal simulation in case the FEM-mesh takes too much memory.
 
     location_currents = dpml + 1
-    location_focal_spot = dpml + buffer_bottom + rho_shape[2] + 2.5
+    location_focal_spot = dpml + buffer_bottom + rho_shape[2] + buffer_top + 1
 
     TARGET_EM = 15  # Target EM Performance. Given in field enhancement at the focal spot
     TARGET_MATERIAL = 0.1  # Normalizes the target heat for the material. The initial value is 1-TARGET_MATERIAL.

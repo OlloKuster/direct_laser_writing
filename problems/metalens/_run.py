@@ -1,10 +1,12 @@
 import numpy as np
 import jax
 import jax.numpy as jnp
+import scipy
 import torch
 import h5py
 
 from filtering._filter_loader import filter_loader
+from filtering.dose_model.config_print import ConfigPrint
 from optimizer.optimizer import optimizer_nlopt, optimizer_optax
 from plotter._plot_loader import plot_loader
 from problems.metalens.simulation._objective_loader import objective_loader
@@ -44,13 +46,14 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
     plotter_eval = plot_loader(plotter_eval_name)
     plotter_final = plot_loader(plotter_final_name)
 
-    # rho_0 = np.ones((ConfigSim.rho_shape[0] * resolution,
-    #                  ConfigSim.rho_shape[1] * resolution,
-    #                  ConfigSim.rho_shape[2] * resolution)) * 0.3
+    rho_0 = np.ones((ConfigSim.rho_shape[0] * resolution,
+                     ConfigSim.rho_shape[1] * resolution,
+                     ConfigSim.rho_shape[2] * resolution)) * ConfigPrint.rho_th_GT
 
-    rho_0 = np.random.rand(ConfigSim.rho_shape[0] * resolution,
-                           ConfigSim.rho_shape[1] * resolution,
-                           ConfigSim.rho_shape[2] * resolution)
+    # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(ConfigSim.rho_shape[0] * resolution,
+    #                        ConfigSim.rho_shape[1] * resolution,
+    #                        ConfigSim.rho_shape[2] * resolution), sigma=0.3*resolution)) * ConfigPrint.rho_th_GT
+
     mask = np.ones_like(rho_0)
     mask[:int(ConfigSim.buffer_side * resolution)] = 0
     mask[:, :int(ConfigSim.buffer_side * resolution)] = 0
@@ -80,7 +83,7 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
     em_loss_hist = []
 
     for i in range(len(betas)):
-        if betas[i] == -1:  # betas[0]:
+        if betas[i] == -1 : # betas[0]:
             beta_ssp = betas[0]
         else:
             beta_ssp = np.inf
