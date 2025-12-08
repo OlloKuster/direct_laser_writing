@@ -49,10 +49,11 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
     rho_0 = np.ones((ConfigSim.rho_shape[0] * resolution,
                      ConfigSim.rho_shape[1] * resolution,
                      ConfigSim.rho_shape[2] * resolution)) * ConfigPrint.rho_th_GT
-
+    # rho_0[:, :, rho_0.shape[2]//2:] = 0
+    #
     # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(ConfigSim.rho_shape[0] * resolution,
     #                        ConfigSim.rho_shape[1] * resolution,
-    #                        ConfigSim.rho_shape[2] * resolution), sigma=0.3*resolution)) * ConfigPrint.rho_th_GT
+    #                        ConfigSim.rho_shape[2] * resolution), sigma=0.3*resolution))
 
     mask = np.ones_like(rho_0)
     mask[:int(ConfigSim.buffer_side * resolution)] = 0
@@ -83,7 +84,7 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
     em_loss_hist = []
 
     for i in range(len(betas)):
-        if betas[i] == -1 : # betas[0]:
+        if betas[i] == betas[0]:
             beta_ssp = betas[0]
         else:
             beta_ssp = np.inf
@@ -92,7 +93,7 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
         filter = filter_loader(filters, filter_values)
         projection = projection_loader(projections, projection_values, beta_ssp, resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
-        rho_0, loss, em_loss, grads = optimizer_nlopt(rho_0, objective, mask, filter, projection, init_projection,
+        rho_0, loss, em_loss, grads = optimizer_optax(rho_0, objective, mask, filter, projection, init_projection,
                                                       plotter_eval, optimizers,
                                                       eval=eval)
 
@@ -124,3 +125,4 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
                       save=True)
 
         rho_0 = convert_to(rho_0, backconversions)
+    return rho_0

@@ -80,9 +80,9 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
 
     def f_jax(x, g):
         start = time.time()
-        rho_0 = np.reshape(x, rho.shape)
+        rho_0 = np.reshape(x, rho.shape) * mask
         rho_final = filter(rho_0)
-        value_obj, grad = jax.value_and_grad(objective, has_aux=True)(rho_final)
+        value_obj, grad = jax.value_and_grad(objective, has_aux=True)(projection(rho_final))
         value = float(value_obj[0])  # Requires np float and not jax.numpy float
         value_em = float(value_obj[1])
         print(f"value: {value}")
@@ -96,9 +96,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         end = time.time()
         print(f"time: {end - start}")
         if eval:
-            plotter(rho_0, rho_final, projection, config.ind)
-            if config.cur_it % config.MAXEVAL == 0:
-                config.ind += 1
+            plotter(rho_0, rho_final, projection, config.cur_it)
         return value
 
     f = select_f(mode)
@@ -169,7 +167,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
         rho_init = np.array(init_projection(rho) * mask)
         if mode == "jax":
             rho_final = filter(rho_init)
-            value_obj, grad = jax.value_and_grad(objective, has_aux=True)(rho_final)
+            value_obj, grad = jax.value_and_grad(objective, has_aux=True)(projection(rho_final))
             value = float(value_obj[0])  # Requires np float and not jax.numpy float
             value_em = float(value_obj[1])
             grad = np.array(grad)
@@ -188,6 +186,8 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
             value = float(value)  # Requires np float and not jax.numpy float
             loss_hist.append(value)
 
+            rho_final = rho_final.detach().cpu().numpy()
+
         config.cur_it += 1
         print(f"value: {value}")
         print(f"grad: {np.sum(grad)}")
@@ -197,7 +197,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
         if value < best_val:
             rho_opt = rho
         if eval:
-            plotter(rho_init, rho_final.detach().cpu().numpy(), projection, config.cur_it)
+            plotter(rho_init, rho_final, projection, config.cur_it)
 
         updates, opt_state = optimizer.update(grad, opt_state, rho)
         rho[:] = optax.apply_updates(rho, updates)

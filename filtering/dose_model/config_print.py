@@ -13,7 +13,7 @@ class ConfigPrint():
 
     power = 1.
 
-    n_monomer = torch.tensor(1.516**2)
+    n_monomer = torch.tensor(1.516)
 
     h = torch.tensor(6.626e-34, device=device, dtype=torch.float64)
     c = torch.tensor(2.99792458e8, device=device, dtype=torch.float64)
@@ -61,5 +61,5 @@ class ConfigPrint():
     correction_factor = 1.
     nonlinearity = 2.0
 
-    lp = 0.05 * 0.52  # between 22-25-ish percent  ~0.05W
+    lp = 0.05 * 0.25 # between 22-25-ish percent  ~0.05W
     rho_th_GT = 1 / 6.2525
