@@ -99,7 +99,8 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
         loss_hist += loss
         em_loss_hist += em_loss
 
-        rho_0 = convert_to(rho_0, conversions)
+        rho_proj_init = init_projection(rho_0) * mask
+        rho_0 = convert_to(rho_proj_init, conversions)
         rho_opt_filtered = filter(rho_0)
         rho_opt_filtered = convert_to(rho_opt_filtered, backconversions)
         rho_opt_proj = projection(jnp.array(rho_opt_filtered))

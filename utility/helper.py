@@ -1,5 +1,6 @@
 import jax.numpy as jnp
 import torch
+import numpy as np
 
 
 def f2param(x, lims):
@@ -41,7 +42,7 @@ def convert_to(x, package):
     :return:
     """
     if package == "torch":
-        return torch.tensor(x, device='cuda')
+        return torch.tensor(np.array(x), device='cuda')
     if package == "torch2np":
         return x.detach().cpu().numpy()
     else:
