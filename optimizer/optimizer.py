@@ -80,8 +80,9 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
 
     def f_jax(x, g):
         start = time.time()
-        rho_0 = np.reshape(x, rho.shape) * mask
-        rho_final = filter(rho_0)
+        x = np.reshape(x, rho.shape)
+        x = np.array(init_projection(x) * mask)
+        rho_final = filter(x)
         value_obj, grad = jax.value_and_grad(objective, has_aux=True)(projection(rho_final))
         value = float(value_obj[0])  # Requires np float and not jax.numpy float
         value_em = float(value_obj[1])
@@ -96,7 +97,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         end = time.time()
         print(f"time: {end - start}")
         if eval:
-            plotter(rho_0, rho_final, projection, config.cur_it)
+            plotter(x, rho_final, projection, config.cur_it)
         return value
 
     f = select_f(mode)
@@ -196,6 +197,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
 
         if value < best_val:
             rho_opt = rho
+            best_val = value
         if eval:
             plotter(rho_init, rho_final, projection, config.cur_it)
 

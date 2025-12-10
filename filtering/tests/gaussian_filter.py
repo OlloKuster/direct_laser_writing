@@ -5,7 +5,7 @@ from filtering._filter_loader import filter_loader
 
 
 def test(seed):
-    sigma = 2
+    sigma = 5
     np.random.seed(seed)
     rho_0 = np.random.random((50, 50, 50))
     gaussian_filter = filter_loader("gauss_jax", sigma)

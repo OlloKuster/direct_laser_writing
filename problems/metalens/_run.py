@@ -16,7 +16,7 @@ from projection._projection_loader import projection_loader
 from utility.helper import convert_to
 
 
-def run(resolution, betas, setting: dict, load=None, eval=False):
+def run(resolution, betas, setting: dict, opt, load=None, eval=False, full_bin=False):
     """
     Runs the optimization process. Lower level "main".
     :param resolution: Resolution of the problem.
@@ -48,7 +48,7 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
 
     rho_0 = np.ones((ConfigSim.rho_shape[0] * resolution,
                      ConfigSim.rho_shape[1] * resolution,
-                     ConfigSim.rho_shape[2] * resolution)) * ConfigPrint.rho_th_GT
+                     ConfigSim.rho_shape[2] * resolution)) * 0.5
     # rho_0[:, :, rho_0.shape[2]//2:] = 0
     #
     # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(ConfigSim.rho_shape[0] * resolution,
@@ -84,8 +84,8 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
     em_loss_hist = []
 
     for i in range(len(betas)):
-        if betas[i] == betas[0]:
-            beta_ssp = betas[0]
+        if not full_bin:
+            beta_ssp = betas[i]
         else:
             beta_ssp = np.inf
         objective = objective_loader(objectives, currents, resolution, init_val_em, init_val_mat, init_val_void)
@@ -93,9 +93,18 @@ def run(resolution, betas, setting: dict, load=None, eval=False):
         filter = filter_loader(filters, filter_values)
         projection = projection_loader(projections, projection_values, beta_ssp, resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
-        rho_0, loss, em_loss, grads = optimizer_optax(rho_0, objective, mask, filter, projection, init_projection,
-                                                      plotter_eval, optimizers,
-                                                      eval=eval)
+
+        if opt == "optax":
+            rho_0, loss, em_loss, grads = optimizer_optax(rho_0, objective, mask, filter, projection, init_projection,
+                                                          plotter_eval, optimizers,
+                                                          eval=eval)
+        elif opt == "nlopt":
+            rho_0, loss, em_loss, grads = optimizer_nlopt(rho_0, objective, mask, filter, projection, init_projection,
+                                                          plotter_eval, optimizers,
+                                                          eval=eval)
+        else:
+            print("no valid optimizer chosen")
+            return
 
         loss_hist += loss
         em_loss_hist += em_loss

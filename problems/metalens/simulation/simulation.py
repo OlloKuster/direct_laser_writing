@@ -15,6 +15,7 @@ def em_simulation(rho, currents, resolution):
     :param resolution: Resolution of the simulation [px/um].
     :return: (Electric field, permittivity of the entire simulation).
     """
+
     simulation_domain = (ConfigSim.simulation_domain_shape[0] * resolution,
                          ConfigSim.simulation_domain_shape[1] * resolution,
                          ConfigSim.simulation_domain_shape[2] * resolution)

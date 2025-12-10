@@ -20,7 +20,7 @@ def setting_loader(system: str, setup: str):
                 "projection": "ssp_jax",  # Projection used for the optimization.
                 "projection_values": ConfigPrint.rho_th_GT,  # Threshold value used in projection.
                 "init_projection": "tanh_jax",  # Initial projection used for the "precompensated" structure.
-                "init_projection_values": ConfigPrint.rho_th_GT,  # Threshold value for the inital projection.
+                "init_projection_values": 0.5,  # Threshold value for the inital projection.
                 "optimizers": "torch_jax",  # Which mode the opimizer runs in.
                 "conversions": "torch",  # Conversion of the variables while they are being reset in between steps.
                 "backconversions": "torch2np",  # Backconversion of the variables while they are being reset in
@@ -57,12 +57,12 @@ def setting_loader(system: str, setup: str):
             setting_dict = {
                 "objectives": "em_heat",
                 "filters": "gauss_jax",
-                "filter_factor": np.sqrt(3) / 2,
+                "filter_factor": 1/(4*np.sqrt(3)),
                 "plotter_eval": "eval_regular",
                 "plotter_final": "final_regular",
                 "projection": "ssp_jax",
                 "projection_values": 0.5,
-                "init_projection": "tanh_jax",
+                "init_projection": "ssp_jax",
                 "init_projection_values": 0.5,
                 "optimizers": "jax",
                 "conversions": "None",
