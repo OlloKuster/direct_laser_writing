@@ -147,6 +147,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
 
     rho_opt = rho
     best_val = 100
+    prev_val = 100
 
     class FomEmTorchF(torch.autograd.Function):
         @staticmethod
@@ -200,6 +201,10 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
             best_val = value
         if eval:
             plotter(rho_init, rho_final, projection, config.cur_it)
+        # if np.abs(prev_val - value) <= 1e-4:
+        #     break
+        # else:
+        #     prev_val = value
 
         updates, opt_state = optimizer.update(grad, opt_state, rho)
         rho[:] = optax.apply_updates(rho, updates)

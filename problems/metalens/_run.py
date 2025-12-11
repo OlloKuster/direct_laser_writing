@@ -16,7 +16,7 @@ from projection._projection_loader import projection_loader
 from utility.helper import convert_to
 
 
-def run(resolution, betas, setting: dict, opt, load=None, eval=False, full_bin=False):
+def run(resolution, betas, setting: dict, loss_hist, em_loss_hist,opt, load=None, eval=False, full_bin=False, run_id=0):
     """
     Runs the optimization process. Lower level "main".
     :param resolution: Resolution of the problem.
@@ -80,9 +80,6 @@ def run(resolution, betas, setting: dict, opt, load=None, eval=False, full_bin=F
         rho_0 = grp["rho"][:]
         f.close()
 
-    loss_hist = []
-    em_loss_hist = []
-
     for i in range(len(betas)):
         if not full_bin:
             beta_ssp = betas[i]
@@ -131,7 +128,8 @@ def run(resolution, betas, setting: dict, opt, load=None, eval=False, full_bin=F
                       grads=grads,
                       eps=eps,
                       E=E,
+                      run_id=run_id,
                       save=True)
 
         rho_0 = convert_to(rho_0, backconversions)
-    return rho_0
+    return loss_hist, em_loss_hist

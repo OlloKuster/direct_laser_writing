@@ -32,26 +32,26 @@ def metalens_regular_final_plot():
     Creates the plotting function used for the final evaluation of the structures.
     :return: Final Plotter function.
     """
-    def plotter(extent, rho_0=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None,
+    def plotter(extent, rho_0=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None, run_id=0,
                 save=False):
 
         if loss_hist is not None:
             plt.plot(loss_hist)
             # plt.yscale('log')
             plt.savefig(
-                f"problems/metalens/plots/loss_{beta}.png")
+                f"problems/metalens/plots/loss_{run_id}_{beta}.png")
             plt.close()
 
         if beta is not None:
             plt.plot(em_loss_hist)
             plt.savefig(
-                f"problems/metalens/plots/em_loss_{beta}.png")
+                f"problems/metalens/plots/em_loss_{run_id}_{beta}.png")
             plt.close()
 
         if grads is not None:
             plt.plot(grads)
             plt.savefig(
-                f"problems/metalens/plots/grads_{beta}.png")
+                f"problems/metalens/plots/grads_{run_id}_{beta}.png")
             plt.xlabel("Iteration")
             plt.ylabel("Gradient")
             plt.close()
@@ -64,7 +64,7 @@ def metalens_regular_final_plot():
             plt.xlabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
             plt.ylabel(r"z ($\mathrm{\mu}$m)", fontsize=12)
             plt.savefig(
-                f"problems/metalens/plots/eps_and_e_{beta}.png")
+                f"problems/metalens/plots/eps_and_e_{run_id}_{beta}.png")
             plt.close()
         if eps is not None:
             plt.imshow(eps[eps.shape[0] // 2].T, origin='lower', cmap='binary',
@@ -72,12 +72,12 @@ def metalens_regular_final_plot():
             plt.xlabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
             plt.ylabel(r"z ($\mathrm{\mu}$m)", fontsize=12)
             plt.savefig(
-                f"problems/metalens/plots/eps_{beta}.png")
+                f"problems/metalens/plots/eps_{run_id}_{beta}.png")
             plt.close()
 
         if save:
             with h5py.File(
-                    f"problems/metalens/plots/data_{beta}.h5",
+                    f"problems/metalens/plots/data_{run_id}_{beta}.h5",
                     'w') as f:
                 grp = f.create_group("lens_3d")
                 grp.create_dataset("E", data=E)
@@ -136,7 +136,7 @@ def metalens_robust_final_plot():
     Creates the plotting function used for the final evaluation of the robust (3) designed structures.
     :return: Final Plotter function.
     """
-    def plotter(extent, rho_0=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None,
+    def plotter(extent, rho_0=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None, run_id=0,
                 save=False):
 
         if loss_hist is not None:
@@ -144,7 +144,7 @@ def metalens_robust_final_plot():
             plt.legend()
             # plt.yscale('log')
             plt.savefig(
-                f"problems/metalens/plots/loss_{beta}.png")
+                f"problems/metalens/plots/loss_{run_id}_{beta}.png")
             plt.close()
 
         if em_loss_hist is not None:
@@ -160,13 +160,13 @@ def metalens_robust_final_plot():
             plt.plot(em_dil, label='dilated')
             plt.legend()
             plt.savefig(
-                f"problems/metalens/plots/em_loss_{beta}.png")
+                f"problems/metalens/plots/em_loss_{run_id}_{beta}.png")
             plt.close()
 
         if grads is not None:
             plt.plot(grads)
             plt.savefig(
-                f"problems/metalens/plots/grads_{beta}.png")
+                f"problems/metalens/plots/grads_{run_id}_{beta}.png")
             plt.xlabel("Iteration")
             plt.ylabel("Gradient")
             plt.close()
@@ -190,7 +190,7 @@ def metalens_robust_final_plot():
                           extent=(0, extent[0], 0, extent[1]))
 
             plt.savefig(
-                f"problems/metalens/plots/eps_and_e_{beta}.png")
+                f"problems/metalens/plots/eps_and_e_{run_id}_{beta}.png")
             plt.close()
 
         if eps is not None:
@@ -205,12 +205,12 @@ def metalens_robust_final_plot():
             axs[2].imshow(eps[2][eps[0].shape[0] // 2].T, origin='lower', cmap='binary',
                           extent=(0, extent[0], 0, extent[1]))
             plt.savefig(
-                f"problems/metalens/plots/eps_{beta}.png")
+                f"problems/metalens/plots/eps_{run_id}_{beta}.png")
             plt.close()
 
         if save:
             with h5py.File(
-                    f"problems/metalens/plots/data_{beta}.h5",
+                    f"problems/metalens/plots/data_{run_id}_{beta}.h5",
                     'w') as f:
                 grp = f.create_group("lens_3d")
                 grp.create_dataset("E_erosion", data=E[0])

@@ -26,6 +26,6 @@ class ConfigSim:
     location_currents = dpml + 1
     location_focal_spot = dpml + buffer_bottom + rho_shape[2] + buffer_top + 2
 
-    TARGET_EM = 15  # Target EM Performance. Given in field enhancement at the focal spot
+    TARGET_EM = 30  # Target EM Performance. Given in field enhancement at the focal spot
     TARGET_MATERIAL = 1.3  # Normalizes the target heat for the material. The initial value is 1-TARGET_MATERIAL.
     TARGET_VOID = 1.3  # Normalizes the target heat for the void. The initial value is 1-TARGET_VOID.
