@@ -104,7 +104,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
 
     opt = nlopt.opt(config.OPTIMISER, rho.size)
     # opt.set_param('tolg', 1e-12)
-    opt.set_min_objective(f)
+    opt.set_max_objective(f)
     opt.set_maxeval(config.MAXEVAL)
     # opt.set_ftol_abs(config.FTOL_ABS)
     # opt.set_ftol_rel(config.FTOL_REL)
@@ -146,7 +146,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
     grad_hist = []
 
     rho_opt = rho
-    best_val = 100
+    best_val = 0
     prev_val = 100
 
     class FomEmTorchF(torch.autograd.Function):
@@ -196,7 +196,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
         print(f"iteration: {config.cur_it}")
         print(f"time: {time.time() - start}")
 
-        if value < best_val:
+        if value > best_val:
             rho_opt = rho
             best_val = value
         if eval:
@@ -206,7 +206,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
         # else:
         #     prev_val = value
 
-        updates, opt_state = optimizer.update(grad, opt_state, rho)
+        updates, opt_state = optimizer.update(-grad, opt_state, rho)
         rho[:] = optax.apply_updates(rho, updates)
 
         np.clip(rho, 0.0, 1.0, out=rho)
