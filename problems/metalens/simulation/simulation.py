@@ -33,7 +33,7 @@ def em_simulation(rho, currents, resolution):
 
     # Add a buffer at the bottom to make is less likely that the structure will "lift off" when the binarization
     #  increased.
-    eps = eps.at[:, :, :int(resolution)].set(ConfigSim.epsilon[1])
+    eps = eps.at[:, :, :int(0.5*resolution)].set(ConfigSim.epsilon[1])
 
     eps = jnp.pad(eps,
                   [split_int(simulation_domain[0] - size_rho[0])] +
