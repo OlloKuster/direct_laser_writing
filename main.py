@@ -16,11 +16,11 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, load=None, ev
 if __name__ == "__main__":
     init_setting = setting_loader("metalens", "normal_gauss")
     setting = setting_loader("metalens", "dlw_regular")
-    eval = False
-    resolution = 16
+    eval = True
+    resolution = 8
     loss_hist = []
     em_loss_hist = []
-    init_beta = [8]
-    betas = [8, np.inf]
-    loss_hist, em_loss_hist = main(resolution, init_beta, init_setting, loss_hist, em_loss_hist, opt="optax", eval=eval, full_bin=False, run_id=0)
-    main(resolution, betas, setting, loss_hist, em_loss_hist, opt="optax", load=f"problems/metalens/plots/data_0_{init_beta[-1]}.h5", eval=eval, full_bin=True, run_id=1)
+    init_beta = [16, 32, 64]
+    betas = [np.inf]
+    loss_hist, em_loss_hist = main(resolution, init_beta, init_setting, loss_hist, em_loss_hist, opt="nlopt", eval=eval, full_bin=False, run_id=0)
+    main(resolution, betas, setting, loss_hist, em_loss_hist, opt="nlopt", load=f"problems/metalens/plots/data_0_{init_beta[-1]}.h5", eval=eval, full_bin=False, run_id=1)
