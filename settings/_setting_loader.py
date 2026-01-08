@@ -57,11 +57,11 @@ def setting_loader(system: str, setup: str):
             setting_dict = {
                 "objectives": "em_heat",
                 "filters": "gauss_jax",
-                "filter_factor": 1/(2*np.sqrt(3)),
+                "filter_factor": 1/(np.sqrt(3)),
                 "plotter_eval": "eval_regular",
                 "plotter_final": "final_regular",
                 "projection": "ssp_jax",
-                "projection_values": 0.5,
+                "projection_values": ConfigPrint.rho_th_GT,
                 "init_projection": "ssp_jax",
                 "init_projection_values": 0.5,
                 "optimizers": "jax",

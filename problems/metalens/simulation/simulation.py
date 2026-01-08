@@ -31,15 +31,16 @@ def em_simulation(rho, currents, resolution):
     eps = jnp.concatenate((eps, jnp.flip(eps, axis=1)), axis=1)
 
 
-    # Add a buffer at the bottom to make is less likely that the structure will "lift off" when the binarization
-    #  increased.
-    eps = eps.at[:, :, :int(0.5*resolution)].set(ConfigSim.epsilon[1])
-
     eps = jnp.pad(eps,
                   [split_int(simulation_domain[0] - size_rho[0])] +
                   [split_int(simulation_domain[1] - size_rho[1])] +
                   [(0, int(jnp.ceil((ConfigSim.space_top + ConfigSim.dpml) * resolution)))], mode='constant',
                   constant_values=ConfigSim.epsilon[0])
+
+
+    # # Add a buffer at the bottom to make is less likely that the structure will "lift off" when the binarization
+    # #  increased.
+    # eps = eps.at[:, :, :int(0.5*resolution)].set(ConfigSim.epsilon[1])
 
     eps = jnp.pad(eps,
                   [(0, 0)] * 2 + [(int(jnp.ceil((ConfigSim.buffer_bottom + ConfigSim.dpml) * resolution)), 0)],
