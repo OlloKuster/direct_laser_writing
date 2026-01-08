@@ -43,7 +43,7 @@ def em_simulation(rho, currents, resolution):
 
     # Add a buffer at the bottom to make is less likely that the structure will "lift off" when the binarization
     #  increased.
-    eps = eps.at[:, :, :int(ConfigSim.buffer_top*resolution)].set(ConfigSim.epsilon[1])
+    eps = eps.at[:, :, :int(2*resolution)].set(ConfigSim.epsilon[1])
 
     size_currents = (ConfigSim.currents_shape[0] * resolution,
                      ConfigSim.currents_shape[1] * resolution,
