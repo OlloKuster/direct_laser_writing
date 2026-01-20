@@ -5,7 +5,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --err=std.err
 #SBATCH --output=std.out
-#SBATCH --account="hk-project-p0026354"
+# #SBATCH --account="hk-project-p0026354"
 
 module load devel/cuda/12.9
 
