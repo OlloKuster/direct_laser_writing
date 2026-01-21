@@ -16,9 +16,9 @@ def em_simulation(rho, currents, resolution):
     :return: (Electric field, permittivity of the entire simulation).
     """
 
-    simulation_domain = (ConfigSim.simulation_domain_shape[0] * resolution,
-                         ConfigSim.simulation_domain_shape[1] * resolution,
-                         ConfigSim.simulation_domain_shape[2] * resolution)
+    simulation_domain = (int(jnp.ceil(ConfigSim.simulation_domain_shape[0] * resolution)),
+                         int(jnp.ceil(ConfigSim.simulation_domain_shape[1] * resolution)),
+                         int(jnp.ceil(ConfigSim.simulation_domain_shape[2] * resolution)))
     size_rho = (int(jnp.ceil(2 * ConfigSim.rho_shape[0] * resolution)),
                 int(jnp.ceil(2 * ConfigSim.rho_shape[1] * resolution)),
                 int(jnp.ceil(ConfigSim.rho_shape[2] * resolution)))
@@ -48,8 +48,8 @@ def em_simulation(rho, currents, resolution):
                   constant_values=ConfigSim.epsilon[1])
 
 
-    size_currents = (ConfigSim.currents_shape[0] * resolution,
-                     ConfigSim.currents_shape[1] * resolution,
+    size_currents = (int(jnp.ceil(ConfigSim.currents_shape[0] * resolution)),
+                     int(jnp.ceil(ConfigSim.currents_shape[1] * resolution)),
                      1)
 
     currents = currents / jnp.linalg.norm(currents)
@@ -58,7 +58,7 @@ def em_simulation(rho, currents, resolution):
                 [split_int(simulation_domain[0] - size_currents[0])] +
                 [split_int(simulation_domain[1] - size_currents[1])] +
                 [(int(jnp.ceil(ConfigSim.location_currents * resolution - 1)),
-                  int(jnp.ceil(simulation_domain[2] - ConfigSim.location_currents * resolution)))])
+                  simulation_domain[2] - int(jnp.ceil(ConfigSim.location_currents * resolution)))])
     b_zero = jnp.zeros(simulation_domain, jnp.complex128)
 
     eps_r = (eps, eps, eps)
