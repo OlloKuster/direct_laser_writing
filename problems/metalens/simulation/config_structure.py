@@ -7,12 +7,12 @@ class ConfigSim:
     """
     Config the 3D lens, defines the required parameters which are used for the simulation.
     """
-    rho_shape = (5, 5, 4)
+    rho_shape = (5, 5, 3)
     buffer_side = 1  # Buffer for the mask.
     buffer_top = 1  # Buffer for the mask.
     space_top = 3  # Actual space above the design region.
     buffer_bottom = 1  # Thickness "substrate"
-    dpml = 0.5  # Thickness PML
+    dpml = 1  # Thickness PML
     simulation_domain_shape = (int(jnp.ceil(dpml + 2 * rho_shape[0] + dpml)),
                                int(jnp.ceil(dpml + 2 * rho_shape[1] + dpml)),
                                int(jnp.ceil(dpml + buffer_bottom + rho_shape[2] + space_top + dpml)))
@@ -24,7 +24,7 @@ class ConfigSim:
     resize_factor = 1  # Scales down the thermal simulation in case the FEM-mesh takes too much memory.
 
     location_currents = dpml + 1
-    location_focal_spot = dpml + buffer_bottom + rho_shape[2] + buffer_top + 1
+    location_focal_spot = dpml + buffer_bottom + rho_shape[2] + buffer_top + 0.5
 
     TARGET_EM = 30  # Target EM Performance. Given in field enhancement at the focal spot
     TARGET_MATERIAL = 1.3  # Normalizes the target heat for the material. The initial value is 1-TARGET_MATERIAL.
