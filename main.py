@@ -23,4 +23,4 @@ if __name__ == "__main__":
     init_beta = [16]
     betas = [16, 32, np.inf]
     loss_hist, em_loss_hist = main(resolution, init_beta, init_setting, loss_hist, em_loss_hist, opt="nlopt", eval=eval, full_bin=False, run_id=0)
-    # main(resolution, betas, setting, loss_hist, em_loss_hist, opt="nlopt", load=f"problems/metalens/plots/data_0_{init_beta[-1]}.h5", eval=eval, full_bin=False, run_id=1)
+    main(resolution, betas, setting, loss_hist, em_loss_hist, opt="nlopt", eval=eval, full_bin=False, run_id=1)

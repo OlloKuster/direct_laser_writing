@@ -12,7 +12,7 @@ class ConfigSim:
     buffer_top = 1  # Buffer for the mask.
     space_top = 3  # Actual space above the design region.
     buffer_bottom = 1  # Thickness "substrate"
-    dpml = 1  # Thickness PML
+    dpml = 0.5  # Thickness PML
     simulation_domain_shape = (int(jnp.ceil(dpml + 2 * rho_shape[0] + dpml)),
                                int(jnp.ceil(dpml + 2 * rho_shape[1] + dpml)),
                                int(jnp.ceil(dpml + buffer_bottom + rho_shape[2] + space_top + dpml)))
