@@ -43,6 +43,9 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist,opt, load=None
     conversions = setting["conversions"]
     backconversions = setting["backconversions"]
 
+    target_material = setting["target_material"]
+    target_void = setting["target_void"]
+
     plotter_eval = plot_loader(plotter_eval_name)
     plotter_final = plot_loader(plotter_final_name)
 
@@ -71,8 +74,8 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist,opt, load=None
     objective_heat = objective_loader(setting["init_heat"])
     init_T_mat, init_T_void = objective_heat(np.ones_like(rho_0) * 0.5)
 
-    init_val_mat = init_T_mat / ConfigSim.TARGET_MATERIAL
-    init_val_void = init_T_void / ConfigSim.TARGET_VOID
+    init_val_mat = init_T_mat / target_material
+    init_val_void = init_T_void / target_void
 
     if load is not None:
         f = h5py.File(load)

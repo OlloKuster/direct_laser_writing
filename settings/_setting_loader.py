@@ -46,6 +46,9 @@ def setting_loader(system: str, setup: str):
                 "optimizers": "torch_jax",
                 "conversions": "torch",
                 "backconversions": "torch2np",
+                
+                "target_material": 1.3,
+                "target_void": 1.3,
 
                 "init_em": "em_only",
                 "init_heat": "heat_only"
@@ -67,6 +70,9 @@ def setting_loader(system: str, setup: str):
                 "optimizers": "jax",
                 "conversions": "None",
                 "backconversions": "None",
+                
+                "target_material": 1.3,
+                "target_void": 1.3,
 
                 "init_em": "em_only",
                 "init_heat": "heat_only"
@@ -87,6 +93,9 @@ def setting_loader(system: str, setup: str):
                 "optimizers": "jax",
                 "conversions": "None",
                 "backconversions": "None",
+                
+                "target_material": 1.3,
+                "target_void": 1.3,
 
                 "init_em": "em_only",
                 "init_heat": "heat_only"
