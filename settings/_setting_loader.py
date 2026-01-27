@@ -57,7 +57,27 @@ def setting_loader(system: str, setup: str):
             setting_dict = {
                 "objectives": "em_heat",
                 "filters": "gauss_jax",
-                "filter_factor": 1 / (np.sqrt(3)),
+                "filter_factor": 1 / (2*np.sqrt(3)),
+                "plotter_eval": "eval_regular",
+                "plotter_final": "final_regular",
+                "projection": "ssp_jax",
+                "projection_values": ConfigPrint.rho_th_GT,
+                "init_projection": "ssp_jax",
+                "init_projection_values": 0.5,
+                "optimizers": "jax",
+                "conversions": "None",
+                "backconversions": "None",
+
+                "init_em": "em_only",
+                "init_heat": "heat_only"
+
+            }
+            return setting_dict
+        if setup == "normal_gauss_2":
+            setting_dict = {
+                "objectives": "em_heat",
+                "filters": "gauss_jax",
+                "filter_factor": 1 / (4*np.sqrt(3)),
                 "plotter_eval": "eval_regular",
                 "plotter_final": "final_regular",
                 "projection": "ssp_jax",
