@@ -27,7 +27,7 @@ def setting_loader(system: str, setup: str):
                 #  between steps.
 
                 "init_em": "em_only",  # Initial EM-objective function.
-                "init_heat": "heat_only"  # Initial heat-objective function.
+                "init_heat": "heat_only"  # Initial heat_eval-objective function.
 
             }
             return setting_dict
@@ -124,7 +124,7 @@ def setting_loader(system: str, setup: str):
                 #  between steps.
 
                 "init_em": "em_only",  # Initial EM-objective function.
-                "init_heat": "heat_only"  # Initial heat-objective function.
+                "init_heat": "heat_only"  # Initial heat_eval-objective function.
 
             }
 

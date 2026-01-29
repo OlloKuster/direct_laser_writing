@@ -8,7 +8,7 @@ def objective_loader(objective: str, *args):
                    and additional parameters as an input.
                    Modes:
                     "em_only": Returns the pure electromagnetic optimization function.
-                    "heat_only": Returns the pure heat optimization function.
+                    "heat_only": Returns the pure heat_eval optimization function.
                     "em_heat": Returns the (softmax) connectivity optimization function.
                     "conic_jax": Returns a cone filter which uses Jax.
                     "robust_em_heat": Returns the (softmax) connectivity optimization function for a robust

@@ -83,7 +83,7 @@ def em_simulation(rho, currents, resolution):
 
 def heat_simulation(rho, resize_factor):
     """
-    Heat simulation given an input density. Material/void is seen as heat sources. The heat sinks are the
+    Heat simulation given an input density. Material/void is seen as heat_eval sources. The heat_eval sinks are the
     points where the material/void should connect to.
     :param rho: Input density of the problem (design variable) [0, 1].
     :param resize_factor: Resizes the density in case the FEM-simulation is too big for the memory.

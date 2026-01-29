@@ -20,7 +20,7 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, load=None, ev
 if __name__ == "__main__":
     init_setting = setting_loader("metalens", "normal_gauss")
     setting = setting_loader("metalens", "dlw_regular")
-    eval = False
+    eval = True
     device_id = 0
     resolution = 10
     loss_hist = []
@@ -29,14 +29,11 @@ if __name__ == "__main__":
     betas = [1, 16, 32, np.inf]
     run_id = 0
 
-    target_material = [0.8, 1., 1.2, 1.4, 1.6]
-    target_void = [0.8, 1., 1.2, 1.4, 1.6]
-    for mat in target_material:
-        for void in target_void:
-            loss_hist = []
-            em_loss_hist = []
-            init_setting["target_material"] = mat
-            init_setting["target_void"] = void
-            main(resolution, init_beta, init_setting, loss_hist, em_loss_hist, opt="nlopt", eval=eval, full_bin=False, run_id=run_id, device_id=0)
-            run_id = run_id + 1
+    feature_size_factor = [1, 0.75, 0.5, 0.4, 0.3, 0.2, 0.1]
+    for fact in feature_size_factor:
+        loss_hist = []
+        em_loss_hist = []
+        init_setting["filter_factor"] = 2 * fact
+        main(resolution, init_beta, init_setting, loss_hist, em_loss_hist, opt="optax", eval=eval, full_bin=False, run_id=run_id, device_id=0)
+        run_id = run_id + 1
     # main(resolution, betas, setting, loss_hist, em_loss_hist, opt="optax", load=f"problems/metalens/plots/data_0_{init_beta[-1]}.h5", eval=eval, full_bin=False, run_id=2, device_id=1)
