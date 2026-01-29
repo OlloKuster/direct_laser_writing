@@ -10,7 +10,7 @@ class Sources:
         source_time=td.GaussianPulse(freq0=ConfigSimMode.freq0, fwidth=ConfigSimMode.fwidth),
         center=ConfigSimMode.pos_source,
         size=ConfigSimMode.size_source,
-        mode_index=0,
+        mode_index=1,
         mode_spec=td.ModeSpec(num_modes=ConfigSimMode.num_modes),
         direction='+'
     )
@@ -41,14 +41,14 @@ class Monitors:
     )
 
     field_monitor_center = td.FieldMonitor(
-        center=(0, 0, -ConfigSimMode.lz / 2 + ConfigSimMode.thickness_substrate + ConfigSimMode.rho_size[2] / 2),
+        center=(0, 0, -ConfigSimMode.lz / 2 + ConfigSimMode.thickness_substrate + ConfigSimMode.wg_height / 2),
         size=(td.inf, td.inf, 0),
         freqs=[ConfigSimMode.freq0],
         name="Field Monitor"
     )
 
     eps_monitor = td.PermittivityMonitor(
-        center=(0, 0, -ConfigSimMode.lz / 2 + ConfigSimMode.thickness_substrate + ConfigSimMode.rho_size[2] / 2),
+        center=(0, 0, -ConfigSimMode.lz / 2 + ConfigSimMode.thickness_substrate + ConfigSimMode.wg_height / 2),
         size=(td.inf, td.inf, 0),
         freqs=[ConfigSimMode.freq0],
         name="PermittivityMonitor"

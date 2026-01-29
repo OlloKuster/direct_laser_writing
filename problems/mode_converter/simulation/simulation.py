@@ -15,9 +15,8 @@ def make_sim_tidy(rho):
     input_waveguide = td.Structure(
         geometry=td.Box(center=(0,
                                 0,
-                                -ConfigSimMode.lz / 2 + ConfigSimMode.thickness_substrate + ConfigSimMode.rho_size[
-                                    2] / 2),
-                        size=(td.inf, ConfigSimMode.wg_width, ConfigSimMode.rho_size[2])),
+                                -ConfigSimMode.lz / 2 + ConfigSimMode.thickness_substrate + ConfigSimMode.wg_height / 2),
+                        size=(td.inf, ConfigSimMode.wg_width, ConfigSimMode.wg_height)),
         medium=td.Medium(permittivity=ConfigSimMode.refr_index[2] ** 2)
     )
     # output_waveguide = td.Structure(

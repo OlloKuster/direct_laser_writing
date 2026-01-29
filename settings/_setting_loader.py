@@ -115,8 +115,8 @@ def setting_loader(system: str, setup: str):
                 "objectives": "em_heat",  # Objective function(s) of the problem.
                 "filters": "dose_conv",  # Filter function for the optimization.
                 "filter_factor": 1,  # Factor for the size of the filter (1 is 1um).
-                "plotter_eval": "eval_regular",  # Which plotting function is used for the evaluation.
-                "plotter_final": "final_regular",  # Which plotting function is used for the final plotting.
+                "plotter_eval": "mc_eval_regular",  # Which plotting function is used for the evaluation.
+                "plotter_final": "mc_final_regular",  # Which plotting function is used for the final plotting.
                 "projection": "ssp_jax",  # Projection used for the optimization.
                 "projection_values": ConfigPrint.rho_th_GT,  # Threshold value used in projection.
                 "init_projection": "tanh_jax",  # Initial projection used for the "precompensated" structure.

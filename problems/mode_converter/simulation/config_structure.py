@@ -12,22 +12,26 @@ class ConfigSimMode:
     fwidth = freq0 / 10
     run_time = 50 / fwidth
 
-    rho_size = (10, 10, 2)
+    rho_size = (6, 6, 3)
     thickness_substrate = 3
     buffer = 1 * wavelength
 
+    buffer_side = 1
+    buffer_top = 1
+
     wg_width = 2
+    wg_height = 1
     wg_length = 2
 
     lx = wg_length + rho_size[0] + wg_length
     ly = buffer + rho_size[1] + buffer
     lz = thickness_substrate + rho_size[2] + buffer
 
-    pos_source = [-lx / 2 + 0.5, 0, -lz / 2 + thickness_substrate + rho_size[2] / 2]
-    size_source = [0, 3*wg_width, 3*rho_size[2]]
+    pos_source = [-lx / 2 + 0.5, 0, -lz / 2 + thickness_substrate + wg_height / 2]
+    size_source = [0, 3*wg_width, 3*wg_height]
 
-    pos_monitor = [lx / 2 - 0.5 , 0, -lz / 2 + thickness_substrate + rho_size[2] / 2]
-    size_monitor = [0, 3*wg_width, 3*rho_size[2]]
+    pos_monitor = [lx / 2 - 0.5, 0, -lz / 2 + thickness_substrate + wg_height / 2]
+    size_monitor = [0, 3*wg_width, 3*wg_height]
 
     num_modes = 4
 
