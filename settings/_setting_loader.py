@@ -26,6 +26,9 @@ def setting_loader(system: str, setup: str):
                 "backconversions": "torch2np",  # Backconversion of the variables while they are being reset in
                 #  between steps.
 
+                "target_material": 1.6,
+                "target_void": 1.6,
+
                 "init_em": "em_only",  # Initial EM-objective function.
                 "init_heat": "heat_only"  # Initial heat_eval-objective function.
 
@@ -71,8 +74,8 @@ def setting_loader(system: str, setup: str):
                 "conversions": "None",
                 "backconversions": "None",
                 
-                "target_material": 1.3,
-                "target_void": 1.3,
+                "target_material": 1.6,
+                "target_void": 1.6,
 
                 "init_em": "em_only",
                 "init_heat": "heat_only"
