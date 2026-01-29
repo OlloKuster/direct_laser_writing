@@ -16,7 +16,8 @@ from projection._projection_loader import projection_loader
 from utility.helper import convert_to
 
 
-def run(resolution, betas, setting: dict, loss_hist, em_loss_hist,opt, load=None, eval=False, full_bin=False, run_id=0):
+def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, load=None, eval=False, full_bin=False,
+        run_id=0):
     """
     Runs the optimization process. Lower level "main".
     :param resolution: Resolution of the problem.
@@ -49,9 +50,9 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist,opt, load=None
     plotter_eval = plot_loader(plotter_eval_name)
     plotter_final = plot_loader(plotter_final_name)
 
-    rho_0 = np.ones((ConfigSim.rho_shape[0] * resolution,
-                     ConfigSim.rho_shape[1] * resolution,
-                     ConfigSim.rho_shape[2] * resolution)) * 0.5
+    rho_0 = np.ones((int(np.ceil(ConfigSim.rho_shape[0] * resolution)),
+                     int(np.ceil(ConfigSim.rho_shape[1] * resolution)),
+                     int(np.ceil(ConfigSim.rho_shape[2] * resolution)))) * 0.5
     # rho_0[:, :, rho_0.shape[2]//2:] = 0
     #
     # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(ConfigSim.rho_shape[0] * resolution,
