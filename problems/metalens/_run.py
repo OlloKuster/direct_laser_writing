@@ -130,6 +130,10 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         else:
             E, eps = em_simulation(jnp.array(rho_opt_proj), currents, resolution)
 
+        if beta_ssp == betas[-1]:
+            save = True
+        else:
+            save = False
         plotter_final(extent=(ConfigSim.simulation_domain_shape[1], ConfigSim.simulation_domain_shape[2]),
                       rho_0=convert_to(rho_0, backconversions),
                       loss_hist=loss_hist,
@@ -139,7 +143,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
                       eps=eps,
                       E=E,
                       run_id=run_id,
-                      save=True)
+                      save=save)
 
         rho_0 = convert_to(rho_0, backconversions)
     return loss_hist, em_loss_hist
