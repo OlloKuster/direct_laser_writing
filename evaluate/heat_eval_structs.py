@@ -15,7 +15,7 @@ loss_matrix = np.zeros_like(em_loss_matrix)
 
 
 for i in inds:
-    with h5py.File(path + f"data_{int(22)}_inf.h5") as f:
+    with h5py.File(path + f"data_{int(i)}_inf.h5") as f:
         grp = f["lens_3d"]
         eps = grp["eps"][:]
 

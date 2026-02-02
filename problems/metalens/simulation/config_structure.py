@@ -9,7 +9,7 @@ class ConfigSim:
     """
     rho_shape = (7.5, 7.5, 3)
     buffer_side = 1  # Buffer for the mask.
-    buffer_top = 1  # Buffer for the mask.
+    buffer_top = 1.5  # Buffer for the mask.
     space_top = 3  # Actual space above the design region.
     buffer_bottom = 1  # Thickness "substrate"
     dpml = 0.5  # Thickness PML

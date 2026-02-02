@@ -21,6 +21,8 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, load=Non
     jax.config.update("jax_enable_x64", True)
     torch.cuda.empty_cache()
 
+    np.random.seed(42)
+
     objectives = setting["objectives"]
     filters = setting["filters"]
     filter_values = setting["filter_factor"] * resolution
@@ -90,21 +92,22 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, load=Non
         loss_hist += loss
         em_loss_hist += em_loss
 
-        rho_proj_init = init_projection(rho_0) * mask
-        rho_0 = convert_to(rho_proj_init, conversions)
-        rho_opt_filtered = filter(rho_0)
-        rho_opt_filtered = convert_to(rho_opt_filtered, backconversions)
-        rho_opt_proj = projection(jnp.array(rho_opt_filtered))
-
-        plotter_final(extent=(ConfigSimMode.lx[0], ConfigSimMode.lx[1]),
-                      rho_0=convert_to(rho_0, backconversions),
-                      loss_hist=loss_hist,
-                      beta=betas[i],
-                      em_loss_hist=em_loss_hist,
-                      grads=grads,
-                      eps=rho_opt_proj,
-                      run_id=run_id,
-                      save=True)
+        # print(loss_hist)
+        #
+        # rho_proj_init = init_projection(rho_0) * mask
+        # rho_0 = convert_to(rho_proj_init, conversions)
+        # rho_opt_filtered = filter(rho_0)
+        # rho_opt_filtered = convert_to(rho_opt_filtered, backconversions)
+        # rho_opt_proj = projection(jnp.array(rho_opt_filtered))
+        #
+        # plotter_final(extent=(ConfigSimMode.lx[0], ConfigSimMode.lx[1]),
+        #               rho_0=convert_to(rho_0, backconversions),
+        #               loss_hist=loss_hist,
+        #               beta=betas[i],
+        #               em_loss_hist=em_loss_hist,
+        #               eps=rho_opt_proj,
+        #               run_id=run_id,
+        #               save=True)
 
         rho_0 = convert_to(rho_0, backconversions)
 

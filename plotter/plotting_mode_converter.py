@@ -27,7 +27,7 @@ def mode_converter_regular_final_plot():
     Creates the plotting function used for the final evaluation of the structures.
     :return: Final Plotter function.
     """
-    def plotter(extent, rho_0=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None, run_id=0,
+    def plotter(extent, rho_0=None, loss_hist=None, beta=None, em_loss_hist=None, eps=None, E=None, run_id=0,
                 save=False):
 
         if loss_hist is not None:

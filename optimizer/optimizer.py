@@ -8,7 +8,7 @@ import time
 from optimizer import config
 
 
-def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, plotter, mode, eval=False):
+def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, plotter, mode, max_evals, eval=False):
     """
     NLOpt based optimizer for non-linear, gradient based optimization.
     The density is first put through init_projection to give a "precomensated" density. Then it is put
@@ -64,9 +64,9 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         value = fom.detach().cpu().numpy()
         grad = grad_torch.detach().cpu().numpy()
         value = float(value)  # Requires np float and not jax.numpy float
-        grad_hist.append(np.sum(grad))
+        grad_hist.append(np.mean(grad))
         print(f"value: {value}")
-        print(f"grad: {np.sum(grad)}")
+        print(f"grad: {np.mean(grad)}")
         print(f"iteration: {config.cur_it}")
         config.cur_it += 1
         loss_hist.append(value)
@@ -87,7 +87,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         value = float(value_obj[0])  # Requires np float and not jax.numpy float
         value_em = float(value_obj[1])
         print(f"value: {value}")
-        print(f"grad: {np.sum(grad)}")
+        print(f"grad: {np.mean(grad)}")
         print(f"iteration: {config.cur_it}")
         config.cur_it += 1
         loss_hist.append(value)
@@ -105,9 +105,9 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
     opt = nlopt.opt(config.OPTIMISER, rho.size)
     # opt.set_param('tolg', 1e-12)
     opt.set_max_objective(f)
-    opt.set_maxeval(config.MAXEVAL)
-    # opt.set_ftol_abs(config.FTOL_ABS)
-    # opt.set_ftol_rel(config.FTOL_REL)
+    opt.set_maxeval(max_evals)
+    opt.set_ftol_abs(config.FTOL_ABS)
+    opt.set_ftol_rel(config.FTOL_REL)
     # opt.set_stopval(1e-4)
     opt.set_upper_bounds(config.UPPER_BOUNDS)
     opt.set_lower_bounds(config.LOWER_BOUNDS)
@@ -118,7 +118,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
     return rho_opt, loss_hist, em_hist, grad_hist
 
 
-def optimizer_optax(rho, objective, mask, filter, projection, init_projection, plotter, mode, eval=False):
+def optimizer_optax(rho, objective, mask, filter, projection, init_projection, plotter, mode, max_evals, eval=False):
     """
     Optax based optimizer for more machine learning based optimization.
     The density is first put through init_projection to give a "precomensated" density. Then it is put
@@ -164,7 +164,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
             grad_em_sim, = ctx.saved_tensors
             return grad_em_sim
 
-    for i in range(config.MAXEVAL):
+    for i in range(max_evals):
         start = time.time()
         rho_init = np.array(init_projection(rho) * mask)
         if mode == "jax":
@@ -192,7 +192,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
 
         config.cur_it += 1
         print(f"value: {value}")
-        print(f"grad: {np.sum(grad)}")
+        print(f"grad: {np.mean(grad)}")
         print(f"iteration: {config.cur_it}")
         print(f"time: {time.time() - start}")
 

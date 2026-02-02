@@ -6,6 +6,7 @@ import torch
 import h5py
 
 from filtering._filter_loader import filter_loader
+from filtering.dose_model._dose_filter import dose_filter_f
 from filtering.dose_model.config_print import ConfigPrint
 from optimizer.optimizer import optimizer_nlopt, optimizer_optax
 from plotter._plot_loader import plot_loader
@@ -14,9 +15,11 @@ from problems.metalens.simulation.config_structure import ConfigSim
 from problems.metalens.simulation.simulation import em_simulation
 from projection._projection_loader import projection_loader
 from utility.helper import convert_to
+from optimizer import config as ConfigOpt
 
 
-def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, load=None, eval=False, full_bin=False,
+def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_evals, load=None, eval=False,
+        full_bin=False,
         run_id=0):
     """
     Runs the optimization process. Lower level "main".
@@ -84,11 +87,14 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, load=Non
         rho_0 = grp["rho"][:]
         f.close()
 
+    uptick = 0
+
     for i in range(len(betas)):
         if not full_bin:
-            beta_ssp = betas[i]
+            beta_ssp = np.round(betas[i], 2)
         else:
             beta_ssp = np.inf
+        print(f"beta: {beta_ssp}")
         objective = objective_loader(objectives, currents, resolution, init_val_em, init_val_mat, init_val_void)
 
         filter = filter_loader(filters, filter_values)
@@ -97,11 +103,11 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, load=Non
 
         if opt == "optax":
             rho_0, loss, em_loss, grads = optimizer_optax(rho_0, objective, mask, filter, projection, init_projection,
-                                                          plotter_eval, optimizers,
+                                                          plotter_eval, optimizers, max_evals,
                                                           eval=eval)
         elif opt == "nlopt":
             rho_0, loss, em_loss, grads = optimizer_nlopt(rho_0, objective, mask, filter, projection, init_projection,
-                                                          plotter_eval, optimizers,
+                                                          plotter_eval, optimizers, max_evals,
                                                           eval=eval)
         else:
             print("no valid optimizer chosen")
@@ -127,7 +133,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, load=Non
         plotter_final(extent=(ConfigSim.simulation_domain_shape[1], ConfigSim.simulation_domain_shape[2]),
                       rho_0=convert_to(rho_0, backconversions),
                       loss_hist=loss_hist,
-                      beta=betas[i],
+                      beta=beta_ssp,
                       em_loss_hist=em_loss_hist,
                       grads=grads,
                       eps=eps,

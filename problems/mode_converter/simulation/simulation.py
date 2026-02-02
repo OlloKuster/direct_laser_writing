@@ -1,6 +1,6 @@
 import jax
 import jax.numpy as jnp
-import jaxwell
+import autograd.numpy as anp
 import tidy3d as td
 from tidy3d.plugins.autograd import make_filter_and_project, rescale
 
