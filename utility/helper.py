@@ -47,3 +47,12 @@ def convert_to(x, package):
         return x.detach().cpu().numpy()
     else:
         return x
+
+
+def draw_circle(rho, x_cen, y_cen, radius):
+    x = np.linspace(0, rho.shape[0], rho.shape[0])
+    y = np.linspace(0, rho.shape[1], rho.shape[0])
+    xx, yy = np.meshgrid(x, y)
+    for x_c, y_c in zip(x_cen, y_cen):
+        rho = rho + np.round(np.exp(-((xx-x_c)**2 + (yy-y_c)**2) / (2 * radius)))
+    return np.exp(-((xx-x_cen)**2 + (yy-y_cen)**2) / (2 * radius))

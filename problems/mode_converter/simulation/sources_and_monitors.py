@@ -10,7 +10,7 @@ class Sources:
         source_time=td.GaussianPulse(freq0=ConfigSimMode.freq0, fwidth=ConfigSimMode.fwidth),
         center=ConfigSimMode.pos_source,
         size=ConfigSimMode.size_source,
-        mode_index=1,
+        mode_index=0,
         mode_spec=td.ModeSpec(num_modes=ConfigSimMode.num_modes),
         direction='+'
     )
@@ -28,7 +28,7 @@ class Monitors:
 
     field_monitor_source = td.FieldMonitor(
         center=(ConfigSimMode.pos_source[0]+0.5,  ConfigSimMode.pos_source[1], ConfigSimMode.pos_source[2]),
-        size=(td.inf, td.inf, 0),
+        size=ConfigSimMode.size_monitor,
         freqs=[ConfigSimMode.freq0],
         name="Source Field Monitor"
     )

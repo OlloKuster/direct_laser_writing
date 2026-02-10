@@ -19,7 +19,7 @@ def setting_loader(system: str, setup: str):
                 "plotter_final": "final_regular",  # Which plotting function is used for the final plotting.
                 "projection": "ssp_jax",  # Projection used for the optimization.
                 "projection_values": ConfigPrint.rho_th_GT,  # Threshold value used in projection.
-                "init_projection": "tanh_jax",  # Initial projection used for the "precompensated" structure.
+                "init_projection": "ssp_jax",  # Initial projection used for the "precompensated" structure.
                 "init_projection_values": 0.5,  # Threshold value for the inital projection.
                 "optimizers": "torch_jax",  # Which mode the opimizer runs in.
                 "conversions": "torch",  # Conversion of the variables while they are being reset in between steps.
@@ -150,6 +150,33 @@ def setting_loader(system: str, setup: str):
 
                 "init_em": "em_only",
                 "init_heat": "heat_only"
+
+            }
+
+            return setting_dict
+
+        else:
+            raise Exception("Setup not found")
+
+    if system == "multiplexer":
+        if setup == "dlw_regular":
+            setting_dict = {
+                "objectives": "em_heat",  # Objective function(s) of the problem.
+                "filters": "dose_conv",  # Filter function for the optimization.
+                "filter_factor": 1,  # Factor for the size of the filter (1 is 1um).
+                "plotter_eval": "muliplex_eval_regular",  # Which plotting function is used for the evaluation.
+                "plotter_final": "muliplex_final_regular",  # Which plotting function is used for the final plotting.
+                "projection": "ssp_jax",  # Projection used for the optimization.
+                "projection_values": ConfigPrint.rho_th_GT,  # Threshold value used in projection.
+                "init_projection": "tanh_jax",  # Initial projection used for the "precompensated" structure.
+                "init_projection_values": 0.5,  # Threshold value for the inital projection.
+                "optimizers": "torch_jax",  # Which mode the opimizer runs in.
+                "conversions": "torch",  # Conversion of the variables while they are being reset in between steps.
+                "backconversions": "torch2np",  # Backconversion of the variables while they are being reset in
+                #  between steps.
+
+                "init_em": "em_only",  # Initial EM-objective function.
+                "init_heat": "heat_only"  # Initial heat_eval-objective function.
 
             }
 

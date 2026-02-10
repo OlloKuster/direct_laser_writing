@@ -10,11 +10,12 @@ def mode_converter_regular_intermediate_plot():
     :return: Evaluation Plotter function.
     """
     def plotter(rho_init, rho_final, projection, i):
+        plt.switch_backend('agg')
         fig, ax = plt.subplots(2, 2, sharex=True)
-        ax[0, 0].imshow(rho_init[:, :, rho_init.shape[2] // 2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+        ax[0, 0].imshow(rho_init[:, :, rho_init.shape[2] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
         ax[0, 1].imshow(rho_init[:, rho_init.shape[1] // 2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
         rho_final = projection(rho_final)
-        ax[1, 0].imshow(rho_final[:, :, rho_init.shape[2] // 2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+        ax[1, 0].imshow(rho_final[:, :, rho_init.shape[2] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
         ax[1, 1].imshow(rho_final[:, rho_init.shape[2] // 2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
         plt.savefig(f"problems/mode_converter/plots/progression/rho_{i:03d}.png")
         plt.close()
@@ -44,9 +45,9 @@ def mode_converter_regular_final_plot():
             plt.close()
 
         if E is not None:
-            plt.imshow(eps[:, :, eps.shape[2] // 2].T, origin='lower', cmap='binary',
+            plt.imshow(eps[:, :, eps.shape[2] // 4].T, origin='lower', cmap='binary',
                        extent=(0, extent[0], 0, extent[1]))
-            plt.imshow(np.abs(E[0][E[0].shape[0] // 2].T), origin='lower', cmap="magma", alpha=0.8,
+            plt.imshow(np.abs(E[0][E[0].shape[0] // 4].T), origin='lower', cmap="magma", alpha=0.8,
                        extent=(0, extent[0], 0, extent[1]))
             plt.xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
             plt.ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
@@ -54,7 +55,7 @@ def mode_converter_regular_final_plot():
                 f"problems/mode_converter/plots/eps_and_e_{run_id}_{beta}.png")
             plt.close()
         if eps is not None:
-            plt.imshow(eps[:, :, eps.shape[2] // 2].T, origin='lower', cmap='binary',
+            plt.imshow(eps[:, :, eps.shape[2] // 4].T, origin='lower', cmap='binary',
                        extent=(0, extent[0], 0, extent[1]))
             plt.xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
             plt.ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
@@ -66,8 +67,7 @@ def mode_converter_regular_final_plot():
             with h5py.File(
                     f"problems/mode_converter/plots/data_{run_id}_{beta}.h5",
                     'w') as f:
-                grp = f.create_group("lens_3d")
-                grp.create_dataset("E", data=E)
+                grp = f.create_group("mode_converter")
                 grp.create_dataset("eps", data=eps)
                 grp.create_dataset("rho", data=rho_0)
                 grp.create_dataset("loss", data=loss_hist)

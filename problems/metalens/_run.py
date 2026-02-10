@@ -56,11 +56,12 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     rho_0 = np.ones((int(np.ceil(ConfigSim.rho_shape[0] * resolution)),
                      int(np.ceil(ConfigSim.rho_shape[1] * resolution)),
                      int(np.ceil(ConfigSim.rho_shape[2] * resolution)))) * 0.5
-    # rho_0[:, :, rho_0.shape[2]//2:] = 0
-    #
-    # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(ConfigSim.rho_shape[0] * resolution,
-    #                        ConfigSim.rho_shape[1] * resolution,
-    #                        ConfigSim.rho_shape[2] * resolution), sigma=0.3*resolution))
+    rho_0[:, :, rho_0.shape[2]//2:] = 0
+
+    rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(int(np.ceil(ConfigSim.rho_shape[0] * resolution)),
+                           int(np.ceil(ConfigSim.rho_shape[1] * resolution)),
+                           1), sigma=0.3*resolution))
+    rho_0 = np.repeat(rho_0, int(np.ceil(ConfigSim.rho_shape[2] * resolution)), axis=2)
 
     mask = np.ones_like(rho_0)
     mask[:int(ConfigSim.buffer_side * resolution)] = 0

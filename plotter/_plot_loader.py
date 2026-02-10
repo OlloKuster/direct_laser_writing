@@ -1,6 +1,7 @@
 from plotter.plotting_metalens import metalens_regular_intermediate_plot, metalens_robust_intermediate_plot, \
     metalens_regular_final_plot, metalens_robust_final_plot
 from plotter.plotting_mode_converter import mode_converter_regular_final_plot, mode_converter_regular_intermediate_plot
+from plotter.plotting_multiplexer import multiplexer_regular_intermediate_plot, multiplexer_regular_final_plot
 
 
 def plot_loader(plot: str, *args):
@@ -29,3 +30,8 @@ def plot_loader(plot: str, *args):
         return mode_converter_regular_intermediate_plot()
     if plot == "mc_final_regular":
         return mode_converter_regular_final_plot()
+
+    if plot == "muliplex_eval_regular":
+        return multiplexer_regular_intermediate_plot()
+    if plot == "muliplex_final_regular":
+        return multiplexer_regular_final_plot()
