@@ -12,7 +12,7 @@ from projection.SSP.subpixel_smoothed_projection import ssp_proj_jax_f
 
 def test(seed):
     np.random.seed(seed)
-    resolution = 20
+    resolution = 10
     for factor in np.linspace(0., 0.01, 101):
         ConfigPrint.lp = factor
         rho_0 = np.zeros((5*resolution, 5*resolution, 5*resolution))
