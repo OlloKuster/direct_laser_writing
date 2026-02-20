@@ -56,12 +56,16 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     rho_0 = np.ones((int(np.ceil(ConfigSim.rho_shape[0] * resolution)),
                      int(np.ceil(ConfigSim.rho_shape[1] * resolution)),
                      int(np.ceil(ConfigSim.rho_shape[2] * resolution)))) * 0.5
-    rho_0[:, :, rho_0.shape[2]//2:] = 0
-
-    rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(int(np.ceil(ConfigSim.rho_shape[0] * resolution)),
-                           int(np.ceil(ConfigSim.rho_shape[1] * resolution)),
-                           1), sigma=0.3*resolution))
-    rho_0 = np.repeat(rho_0, int(np.ceil(ConfigSim.rho_shape[2] * resolution)), axis=2)
+    # # rho_0[:, :, rho_0.shape[2]//2:] = 0
+    # #
+    # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(int(np.ceil(ConfigSim.rho_shape[0] * resolution)),
+    #                        int(np.ceil(ConfigSim.rho_shape[1] * resolution)),
+    #                        1), sigma=0.3*resolution))
+    # rho_0 = np.repeat(rho_0, int(np.ceil(ConfigSim.rho_shape[2] * resolution)), axis=2)
+    # rho_0 = np.random.rand(int(np.ceil(ConfigSim.rho_shape[0] * resolution)),
+    #                        int(np.ceil(ConfigSim.rho_shape[1] * resolution)),
+    #                        1)
+    # rho_0 = np.repeat(rho_0, int(np.ceil(ConfigSim.rho_shape[2] * resolution)), axis=2)
 
     mask = np.ones_like(rho_0)
     mask[:int(ConfigSim.buffer_side * resolution)] = 0
@@ -131,10 +135,10 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         else:
             E, eps = em_simulation(jnp.array(rho_opt_proj), currents, resolution)
 
-        if beta_ssp == betas[-1]:
-            save = True
-        else:
-            save = False
+        # if beta_ssp == betas[-1]:
+        #     save = True
+        # else:
+        #     save = False
         plotter_final(extent=(ConfigSim.simulation_domain_shape[1], ConfigSim.simulation_domain_shape[2]),
                       rho_0=convert_to(rho_0, backconversions),
                       loss_hist=loss_hist,
@@ -144,7 +148,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
                       eps=eps,
                       E=E,
                       run_id=run_id,
-                      save=save)
+                      save=True)
 
         rho_0 = convert_to(rho_0, backconversions)
     return loss_hist, em_loss_hist

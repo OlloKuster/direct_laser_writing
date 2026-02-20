@@ -51,5 +51,5 @@ class Monitors:
         center=(0, 0, -ConfigSimMode.lz / 2 + ConfigSimMode.thickness_substrate + ConfigSimMode.wg_height / 2),
         size=(td.inf, td.inf, 0),
         freqs=[ConfigSimMode.freq0],
-        name="PermittivityMonitor"
+        name="Permittivity Monitor"
     )

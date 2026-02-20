@@ -6,15 +6,12 @@ import numpy as np
 from filtering._filter_loader import filter_loader
 from projection._projection_loader import projection_loader
 
-base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/mode_converter/plots/data_0_1.h5", "r")
+base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/mode_converter/plots/data_0_16.h5", "r")
 grp = base["mode_converter"]
 eps = grp["eps"][:]
 rho_0 = grp["rho"][:]
 loss_inf = grp["em_loss"][:]
 base.close()
-
-rho_0 = np.concatenate((rho_0, np.flip(rho_0, axis=0)), axis=0)
-rho_0 = np.concatenate((rho_0, np.flip(rho_0, axis=1)), axis=1)
 
 
 # base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_16.h5", "r")

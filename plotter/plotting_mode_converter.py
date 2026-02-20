@@ -2,6 +2,10 @@ import h5py
 import matplotlib.pyplot as plt
 import numpy as np
 import jax.numpy as jnp
+import tidy3d as td
+import matplotlib.colors as colors
+
+
 
 
 def mode_converter_regular_intermediate_plot():
@@ -9,6 +13,7 @@ def mode_converter_regular_intermediate_plot():
     Creates the plotting function used for the intermediate evulation of the structures.
     :return: Evaluation Plotter function.
     """
+
     def plotter(rho_init, rho_final, projection, i):
         plt.switch_backend('agg')
         fig, ax = plt.subplots(2, 2, sharex=True)
@@ -20,6 +25,17 @@ def mode_converter_regular_intermediate_plot():
         plt.savefig(f"problems/mode_converter/plots/progression/rho_{i:03d}.png")
         plt.close()
 
+        sim_data = td.SimulationData.from_file("problems/mode_converter/plots/progression/current_simulation.hdf5")
+        fields_x = sim_data["Field Monitor"].Ex
+        fields_y = sim_data["Field Monitor"].Ey
+        fields_z = sim_data["Field Monitor"].Ez
+        fields = (np.abs(fields_x) + np.abs(fields_y) + np.abs(fields_z)).squeeze()
+        eps = sim_data["Permittivity Monitor"].eps_xx.real.squeeze()
+
+        plt.imshow(eps.T, origin='lower', cmap='binary')
+        plt.imshow(np.abs(fields).T, origin='lower', cmap='RdBu_r', norm=colors.CenteredNorm(), alpha=0.9)
+        plt.savefig(f"problems/mode_converter/plots/progression/fields/field_{i:03d}.png")
+        plt.close()
     return plotter
 
 
@@ -28,8 +44,9 @@ def mode_converter_regular_final_plot():
     Creates the plotting function used for the final evaluation of the structures.
     :return: Final Plotter function.
     """
+
     def plotter(extent, rho_0=None, loss_hist=None, beta=None, em_loss_hist=None, eps=None, E=None, run_id=0,
-                save=False):
+                save=True):
 
         if loss_hist is not None:
             plt.plot(loss_hist)
@@ -77,11 +94,12 @@ def mode_converter_regular_final_plot():
     return plotter
 
 
-def metalens_robust_intermediate_plot():
+def mode_converter_robust_intermediate_plot():
     """
     Creates the plotting function used for the intermediate evaluation of the robust (3) designed structures.
     :return: Evaluation Plotter function.
     """
+
     def plotter(rho_init, rho_final, projection, i):
         fig, ax = plt.subplots(2, 3, sharex=True)
 
@@ -91,26 +109,15 @@ def metalens_robust_intermediate_plot():
         rho_f_normal = rho_final[1]
         rho_f_dilated = rho_final[2]
 
-        rho_eroded = np.concatenate((rho_init, np.flip(rho_init, axis=0)), axis=0)
-        rho_eroded = np.concatenate((rho_eroded, np.flip(rho_eroded, axis=1)), axis=1)
-        ax[0, 0].imshow(rho_eroded[rho_eroded.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
-        rho_f_eroded = np.concatenate((rho_f_eroded, np.flip(rho_f_eroded, axis=0)), axis=0)
-        rho_f_eroded = np.concatenate((rho_f_eroded, np.flip(rho_f_eroded, axis=1)), axis=1)
-        ax[1, 0].imshow(rho_f_eroded[rho_f_eroded.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+        ax[0, 0].imshow(rho_init[:, :, rho_init.shape[2] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+        ax[1, 0].imshow(rho_f_eroded[:, :, rho_f_eroded.shape[2] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
 
-        rho_normal = np.concatenate((rho_init, np.flip(rho_init, axis=0)), axis=0)
-        rho_normal = np.concatenate((rho_normal, np.flip(rho_normal, axis=1)), axis=1)
-        ax[0, 1].imshow(rho_normal[rho_normal.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
-        rho_f_normal = np.concatenate((rho_f_normal, np.flip(rho_f_normal, axis=0)), axis=0)
-        rho_f_normal = np.concatenate((rho_f_normal, np.flip(rho_f_normal, axis=1)), axis=1)
-        ax[1, 1].imshow(rho_f_normal[rho_f_normal.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+        ax[0, 1].imshow(rho_init[:, :, rho_init.shape[2] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+        ax[1, 1].imshow(rho_f_normal[:, :, rho_f_normal.shape[2] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
 
-        rho_dilated = np.concatenate((rho_init, np.flip(rho_init, axis=0)), axis=0)
-        rho_dilated = np.concatenate((rho_dilated, np.flip(rho_dilated, axis=1)), axis=1)
-        ax[0, 2].imshow(rho_dilated[rho_dilated.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
-        rho_f_dilated = np.concatenate((rho_f_dilated, np.flip(rho_f_dilated, axis=0)), axis=0)
-        rho_f_dilated = np.concatenate((rho_f_dilated, np.flip(rho_f_dilated, axis=1)), axis=1)
-        ax[1, 2].imshow(rho_f_dilated[rho_f_dilated.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+        ax[0, 2].imshow(rho_init[:, :, rho_init.shape[2] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+        ax[1, 2].imshow(rho_f_dilated[:, :, rho_f_dilated.shape[2] // 4].T, origin='lower', cmap='binary', vmin=0,
+                        vmax=1)
 
         plt.savefig(f"problems/mode_converter/plots/progression/rho_{i:03d}.png")
         plt.close()
@@ -118,12 +125,14 @@ def metalens_robust_intermediate_plot():
     return plotter
 
 
-def metalens_robust_final_plot():
+def mode_converter_robust_final_plot():
     """
     Creates the plotting function used for the final evaluation of the robust (3) designed structures.
     :return: Final Plotter function.
     """
-    def plotter(extent, rho_0=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None, run_id=0,
+
+    def plotter(extent, rho_0=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None,
+                run_id=0,
                 save=False):
 
         if loss_hist is not None:
@@ -158,38 +167,16 @@ def metalens_robust_final_plot():
             plt.ylabel("Gradient")
             plt.close()
 
-        if E is not None:
-            fig, axs = plt.subplots(1, 3)
-
-            axs[0].imshow(eps[0][eps[0].shape[0] // 2].T, origin='lower', cmap='binary',
-                          extent=(0, extent[0], 0, extent[1]))
-            axs[0].imshow(np.abs(E[0][0][E[0][0].shape[0] // 2].T), origin='lower', cmap="magma", alpha=0.8,
-                          extent=(0, extent[0], 0, extent[1]))
-
-            axs[1].imshow(eps[1][eps[0].shape[0] // 2].T, origin='lower', cmap='binary',
-                          extent=(0, extent[0], 0, extent[1]))
-            axs[1].imshow(np.abs(E[1][0][E[0][0].shape[0] // 2].T), origin='lower', cmap="magma", alpha=0.8,
-                          extent=(0, extent[0], 0, extent[1]))
-
-            axs[2].imshow(eps[2][eps[0].shape[0] // 2].T, origin='lower', cmap='binary',
-                          extent=(0, extent[0], 0, extent[1]))
-            axs[2].imshow(np.abs(E[2][0][E[0][0].shape[0] // 2].T), origin='lower', cmap="magma", alpha=0.8,
-                          extent=(0, extent[0], 0, extent[1]))
-
-            plt.savefig(
-                f"problems/mode_converter/plots/eps_and_e_{run_id}_{beta}.png")
-            plt.close()
-
         if eps is not None:
             fig, axs = plt.subplots(1, 3)
 
-            axs[0].imshow(eps[0][eps[0].shape[0] // 2].T, origin='lower', cmap='binary',
+            axs[0].imshow(eps[0][:, :, eps[0].shape[2] // 4].T, origin='lower', cmap='binary',
                           extent=(0, extent[0], 0, extent[1]))
 
-            axs[1].imshow(eps[1][eps[0].shape[0] // 2].T, origin='lower', cmap='binary',
+            axs[1].imshow(eps[1][:, :, eps[0].shape[2] // 4].T, origin='lower', cmap='binary',
                           extent=(0, extent[0], 0, extent[1]))
 
-            axs[2].imshow(eps[2][eps[0].shape[0] // 2].T, origin='lower', cmap='binary',
+            axs[2].imshow(eps[2][:, :, eps[0].shape[2] // 4].T, origin='lower', cmap='binary',
                           extent=(0, extent[0], 0, extent[1]))
             plt.savefig(
                 f"problems/mode_converter/plots/eps_{run_id}_{beta}.png")
@@ -199,10 +186,7 @@ def metalens_robust_final_plot():
             with h5py.File(
                     f"problems/mode_converter/plots/data_{run_id}_{beta}.h5",
                     'w') as f:
-                grp = f.create_group("lens_3d")
-                grp.create_dataset("E_erosion", data=E[0])
-                grp.create_dataset("E_normal", data=E[1])
-                grp.create_dataset("E_dilation", data=E[2])
+                grp = f.create_group("mode_converter")
                 grp.create_dataset("eps_erosion", data=eps[0])
                 grp.create_dataset("eps_normal", data=eps[1])
                 grp.create_dataset("eps_final", data=eps[2])

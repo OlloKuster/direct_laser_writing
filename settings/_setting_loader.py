@@ -44,8 +44,8 @@ def setting_loader(system: str, setup: str):
                 "plotter_final": "final_robust",
                 "projection": "robust_ssp_jax",
                 "projection_values": [0.9 * ConfigPrint.rho_th_GT, ConfigPrint.rho_th_GT, 1.1 * ConfigPrint.rho_th_GT],
-                "init_projection": "tanh_jax",
-                "init_projection_values": ConfigPrint.rho_th_GT,
+                "init_projection": "ssp_jax",
+                "init_projection_values": 0.5,
                 "optimizers": "torch_jax",
                 "conversions": "torch",
                 "backconversions": "torch2np",
@@ -118,7 +118,7 @@ def setting_loader(system: str, setup: str):
                 "plotter_eval": "mc_eval_regular",  # Which plotting function is used for the evaluation.
                 "plotter_final": "mc_final_regular",  # Which plotting function is used for the final plotting.
                 "projection": "ssp_jax",  # Projection used for the optimization.
-                "projection_values": ConfigPrint.rho_th_GT,  # Threshold value used in projection.
+                "projection_values": 0.5,  # Threshold value used in projection.
                 "init_projection": "tanh_jax",  # Initial projection used for the "precompensated" structure.
                 "init_projection_values": 0.5,  # Threshold value for the inital projection.
                 "optimizers": "torch_jax",  # Which mode the opimizer runs in.
@@ -137,12 +137,12 @@ def setting_loader(system: str, setup: str):
             setting_dict = {
                 "objectives": "em_heat",
                 "filters": "gauss_jax",
-                "filter_factor": 1 / (200 * np.sqrt(3)),
+                "filter_factor": 1 / (3 * np.sqrt(3)),
                 "plotter_eval": "eval_regular",
                 "plotter_final": "final_regular",
                 "projection": "ssp_jax",
                 "projection_values": ConfigPrint.rho_th_GT,
-                "init_projection": "ssp_jax",
+                "init_projection": "tanh_jax",
                 "init_projection_values": 0.5,
                 "optimizers": "jax",
                 "conversions": "None",
@@ -153,6 +153,30 @@ def setting_loader(system: str, setup: str):
 
             }
 
+            return setting_dict
+
+        if setup == "dlw_robust":
+            setting_dict = {
+                "objectives": "robust_em_heat",
+                "filters": "dose_conv",
+                "filter_factor": 1,
+                "plotter_eval": "mc_eval_robust",
+                "plotter_final": "mc_final_robust",
+                "projection": "robust_ssp_jax",
+                "projection_values": [0.9 * ConfigPrint.rho_th_GT, ConfigPrint.rho_th_GT, 1.1 * ConfigPrint.rho_th_GT],
+                "init_projection": "tanh_jax",
+                "init_projection_values": 0.5,
+                "optimizers": "torch_jax",
+                "conversions": "torch",
+                "backconversions": "torch2np",
+
+                "target_material": 1.3,
+                "target_void": 1.3,
+
+                "init_em": "em_only",
+                "init_heat": "heat_only"
+
+            }
             return setting_dict
 
         else:
@@ -168,8 +192,8 @@ def setting_loader(system: str, setup: str):
                 "plotter_final": "muliplex_final_regular",  # Which plotting function is used for the final plotting.
                 "projection": "ssp_jax",  # Projection used for the optimization.
                 "projection_values": ConfigPrint.rho_th_GT,  # Threshold value used in projection.
-                "init_projection": "tanh_jax",  # Initial projection used for the "precompensated" structure.
-                "init_projection_values": 0.5,  # Threshold value for the inital projection.
+                "init_projection": "ssp_jax",  # Initial projection used for the "precompensated" structure.
+                "init_projection_values": ConfigPrint.rho_th_GT,  # Threshold value for the inital projection.
                 "optimizers": "torch_jax",  # Which mode the opimizer runs in.
                 "conversions": "torch",  # Conversion of the variables while they are being reset in between steps.
                 "backconversions": "torch2np",  # Backconversion of the variables while they are being reset in

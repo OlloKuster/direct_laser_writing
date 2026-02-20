@@ -6,11 +6,11 @@ FTOL_ABS = 1e-4
 FTOL_REL = 1e-3
 UPPER_BOUNDS = 1
 LOWER_BOUNDS = 0
-OPTIMISER = nlopt.LD_LBFGS  # MMA for lens, LBFGS for cross
+OPTIMISER = nlopt.LD_MMA  # MMA for lens, LBFGS for cross
 
 cur_it = 0
 ind = 0
 
 
-lr = 0.2
+lr = 0.1
 

@@ -18,13 +18,6 @@ class Sources:
 
 @dataclass
 class Monitors:
-    mode_monitor = td.ModeMonitor(
-        center=ConfigSim.pos_monitor,
-        size=ConfigSim.size_monitor,
-        freqs=ConfigSim.eval_freqs,
-        mode_spec=td.ModeSpec(num_modes=ConfigSim.num_modes),
-        name=f'Mode Monitor {ConfigSim.wavelength}'
-    )
 
     field_monitor_source = td.FieldMonitor(
         center=(ConfigSim.pos_source[0]+0.5,  ConfigSim.pos_source[1], ConfigSim.pos_source[2]),
@@ -44,5 +37,5 @@ class Monitors:
         center=(0, 0, -ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.wg_height / 2),
         size=(td.inf, td.inf, 0),
         freqs=[ConfigSim.freq0],
-        name="PermittivityMonitor"
+        name="Permittivity Monitor"
     )

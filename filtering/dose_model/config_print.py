@@ -61,5 +61,5 @@ class ConfigPrint():
     correction_factor = 1.
     nonlinearity = 2.0
 
-    lp = 0.05 * 0.25 # between 22-25-ish percent  ~0.05W
-    rho_th_GT = 1 / 6.2525
+    lp = 2*0.0019 # between 22-25-ish percent  ~0.05W
+    rho_th_GT = 0.5 #1 / 6.2525

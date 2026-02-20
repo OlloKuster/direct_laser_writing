@@ -2,6 +2,10 @@ import h5py
 import matplotlib.pyplot as plt
 import numpy as np
 import jax.numpy as jnp
+import tidy3d as td
+import matplotlib.colors as colors
+
+from problems.multiplexer.simulation.config_structure import ConfigSim
 
 
 def multiplexer_regular_intermediate_plot():
@@ -9,6 +13,7 @@ def multiplexer_regular_intermediate_plot():
     Creates the plotting function used for the intermediate evulation of the structures.
     :return: Evaluation Plotter function.
     """
+
     def plotter(rho_init, rho_final, projection, i):
         plt.switch_backend('agg')
         fig, ax = plt.subplots(2, 2, sharex=True)
@@ -17,7 +22,21 @@ def multiplexer_regular_intermediate_plot():
         rho_final = projection(rho_final)
         ax[1, 0].imshow(rho_final[:, :, rho_init.shape[2] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
         ax[1, 1].imshow(rho_final[:, rho_init.shape[2] // 2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
-        plt.savefig(f"problems/multiplexer/plots/progression/rho_{i:03d}.png")
+        plt.savefig(f"problems/multiplexer/plots/progression/rho/rho_{i:03d}.png")
+        plt.close()
+
+        sim_data = td.SimulationData.from_file("problems/multiplexer/plots/progression/current_simulation.hdf5")
+        fields_x = sim_data["Field Monitor"].Ex
+        fields_y = sim_data["Field Monitor"].Ey
+        fields_z = sim_data["Field Monitor"].Ez
+        fields = (np.abs(fields_x) + np.abs(fields_y) + np.abs(fields_z)).squeeze()
+        eps = sim_data["Permittivity Monitor"].eps_xx.real.squeeze()
+        l = len(ConfigSim.eval_wvls)
+        fig, ax = plt.subplots(1, l)
+        for j in range(l):
+            ax[j].imshow(eps.T, origin='lower', cmap='binary')
+            ax[j].imshow(np.abs(fields)[:, :, j].T, origin='lower', cmap='RdBu_r', norm=colors.CenteredNorm(), alpha=0.9)
+        plt.savefig(f"problems/multiplexer/plots/progression/fields/field_{i:03d}.png")
         plt.close()
 
     return plotter
@@ -28,6 +47,7 @@ def multiplexer_regular_final_plot():
     Creates the plotting function used for the final evaluation of the structures.
     :return: Final Plotter function.
     """
+
     def plotter(extent, rho_0=None, loss_hist=None, beta=None, em_loss_hist=None, eps=None, E=None, run_id=0,
                 save=False):
 
@@ -75,4 +95,3 @@ def multiplexer_regular_final_plot():
                 f.close()
 
     return plotter
-

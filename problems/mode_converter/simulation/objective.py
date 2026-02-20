@@ -17,6 +17,7 @@ def measure_mode_power_ag(rho):
     sim = make_sim_tidy(rho)
     task_name = "mode_converter"
     sim_data = web.run(sim, task_name=task_name, folder_name="mode_converter_dlw", verbose=False)
+    sim_data.to_file(fname='problems/mode_converter/plots/progression/current_simulation.hdf5')
     output_amps = sim_data["Mode Monitor"].amps
     amp = output_amps.sel(direction='+', f=ConfigSimMode.freq0, mode_index=3).values
     return anp.sum(anp.abs(amp) ** 2)
@@ -76,6 +77,50 @@ def objective_em_heat_f(init_values):
 
         objs = jnp.array([n_heat_m, n_heat_v])
 
-        return transmission * (1 - jnp.linalg.norm(softplus(objs))), transmission
+        return -(1-transmission) * (1 - jnp.linalg.norm(softplus(objs))), transmission
 
     return objective_softplus
+
+
+def objective_robust_em_heat_f(init_values):
+    def objective_softplus(rho):
+        transmission = measure_mode_power(rho)
+        v_heat_m, v_heat_v = objective_heat(rho)
+
+        n_heat_m = (v_heat_m - init_values[0]) / init_values[0]
+        n_heat_v = (v_heat_v - init_values[1]) / init_values[1]
+
+        objs = jnp.array([n_heat_m, n_heat_v])
+
+        return transmission * (1 - jnp.linalg.norm(softplus(objs))), transmission
+
+    def objective_robust_softplus(rhos):
+        """
+        Generates the robust objective function. By using the lp-norm (set by power), we approximate the maximum norm.
+        The worst performing of the three input densities is optimized for.
+        :param rhos: Densities (design variable) of the problem 3x[0, 1].
+        :return: robust objective function, values for the EM-performances.
+        """
+        power = 20
+
+        fom_eroded, trans_eroded = objective_softplus(rhos[0])
+        fom_normal, trans_normal = objective_softplus(rhos[1])
+        fom_dilated, trans_dilated = objective_softplus(rhos[2])
+
+        fom_max = (fom_eroded ** power + fom_normal ** power + fom_dilated ** power) ** (1 / power)
+
+        logs = {
+            "trans_eroded": trans_eroded, "trans_normal": trans_normal, "trans_dilated": trans_dilated,
+            "fom_eroded": fom_eroded, "fom_normal": fom_normal, "fom_dilated": fom_dilated,
+            "fom_max": fom_max
+        }
+
+        print("====================")
+        for name, log in logs.items():
+            jprint("{name}:", name=name)
+            jprint("    {log}", log=log)
+        print("====================")
+
+        return fom_max, (trans_eroded, trans_normal, trans_dilated)
+
+    return objective_robust_softplus

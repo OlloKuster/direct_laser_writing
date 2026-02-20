@@ -16,9 +16,11 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 if __name__ == "__main__":
     setting = setting_loader("mode_converter", "dlw_regular")
     eval = True
-    resolution = 10
+    resolution = 8
     loss_hist = []
     em_loss_hist = []
-    betas = np.logspace(0, 2, 15)
+    betas = np.logspace(0, 2, 20)
+    # betas = [1]
     betas = np.append(betas, np.inf)
-    main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=10, opt="optax", eval=eval, full_bin=False, run_id=0)
+    betas = [8, 16, 32, np.inf]
+    main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=25, opt="nlopt", eval=eval, full_bin=False, run_id=0)

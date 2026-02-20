@@ -18,6 +18,7 @@ def measure_mode_power_ag(rho):
     sim = make_sim_tidy(rho)
     task_name = "multiplexer"
     sim_data = web.run(sim, task_name=task_name, folder_name="multiplexer_dlw", verbose=False)
+    sim_data.to_file(fname='problems/multiplexer/plots/progression/current_simulation.hdf5')
     trans_list = []
     trans_obj = []
     wavelengths = ConfigSim.eval_wvls
@@ -26,7 +27,7 @@ def measure_mode_power_ag(rho):
         amp = output_amps.sel(direction='+', mode_index=0).values
         trans = anp.abs(amp[i]) ** 2
         trans_list.append(trans)
-        leaked_trans = anp.sum(anp.abs(amp) ** 2) - anp.abs(amp[i]) ** 2
+        leaked_trans = anp.sum(anp.abs(amp) ** 2) - trans
         avg_leaked_trans = leaked_trans / (len(ConfigSim.eval_wvls) - 1)
         trans_obj.append(trans - avg_leaked_trans)
     trans_obj = np.array(trans_obj)

@@ -4,7 +4,6 @@ import autograd.numpy as anp
 import tidy3d as td
 from tidy3d.plugins.autograd import make_filter_and_project, rescale
 
-from problems.metalens.simulation.config_structure import ConfigSim
 from problems.mode_converter.simulation.config_structure import ConfigSimMode
 from problems.mode_converter.simulation.sources_and_monitors import Sources, Monitors
 from tofea.fea3d import FEA3D_T
@@ -45,12 +44,16 @@ def make_sim_tidy(rho):
         eps_data=eps.reshape(eps.shape[0], eps.shape[1], eps.shape[2]))
 
     design_region_mesh = td.MeshOverrideStructure(
-        geometry=td.Box(size=(ConfigSimMode.rho_size[0], ConfigSimMode.rho_size[1], ConfigSimMode.rho_size[2])),
-        dl=[ConfigSimMode.nx, ConfigSimMode.ny, ConfigSimMode.nz],
+        geometry=custom_structure.geometry,
+        dl=[1 / ConfigSimMode.dl] * 3,
         enforce=True,
     )
 
-    grid_spec = td.GridSpec.uniform(dl=1 / ConfigSimMode.dl)
+    grid_spec = td.GridSpec.auto(
+        wavelength=ConfigSimMode.wavelength,
+        min_steps_per_wvl=ConfigSimMode.min_steps_per_wvl
+    )
+
     sim = td.Simulation(
         size=[ConfigSimMode.lx, ConfigSimMode.ly, ConfigSimMode.lz],
         grid_spec=grid_spec,
@@ -64,7 +67,12 @@ def make_sim_tidy(rho):
 
     )
 
-    return sim
+    grid_spec = sim.grid_spec.updated_copy(
+        override_structures=list(sim.grid_spec.override_structures)
+                            + [design_region_mesh]
+    )
+
+    return sim.updated_copy(grid_spec=grid_spec)
 
 
 def heat_simulation(rho, resize_factor):
@@ -82,7 +90,7 @@ def heat_simulation(rho, resize_factor):
                                    rho_n_shape[1] + 1,
                                    rho_n_shape[2] + 1), dtype='?')
     heat_sinks_matter = heat_sinks_matter.at[..., 0].set(True)
-    kappa_r_matter = f2param(rho_n, ConfigSim.kappa)
+    kappa_r_matter = f2param(rho_n, ConfigSimMode.kappa)
     fem_matter = FEA3D_T(heat_sinks_matter)
     src_matter = jnp.pad(rho_n, [(0, 1), (0, 1), (0, 1)], mode='constant', constant_values=0)
     T_matter = fem_matter.temperature(kappa_r_matter, src_matter)
@@ -93,7 +101,7 @@ def heat_simulation(rho, resize_factor):
     heat_sinks_void = heat_sinks_void.at[:, 0].set(True)
     heat_sinks_void = heat_sinks_void.at[:, -1].set(True)
     heat_sinks_void = heat_sinks_void.at[..., -1].set(True)
-    kappa_r_void = f2param(1 - rho_n, ConfigSim.kappa)
+    kappa_r_void = f2param(1 - rho_n, ConfigSimMode.kappa)
     fem_void = FEA3D_T(heat_sinks_void)
     src_void = jnp.pad(1 - rho_n, [(0, 1), (0, 1), (0, 1)], mode='constant', constant_values=0)
     T_void = fem_void.temperature(kappa_r_void, src_void)

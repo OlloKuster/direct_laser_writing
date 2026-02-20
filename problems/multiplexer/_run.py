@@ -4,6 +4,7 @@ import jax.numpy as jnp
 import scipy
 import torch
 import h5py
+import tidy3d as td
 
 from filtering._filter_loader import filter_loader
 from filtering.dose_model.config_print import ConfigPrint
@@ -42,11 +43,10 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
 
     rho_0 = np.ones((ConfigSim.nx, ConfigSim.ny, ConfigSim.nz)) * 0.5
 
-    # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(ConfigSimMode.rho_size[0] * resolution,
-    #                                                               ConfigSimMode.rho_size[1] * resolution,
-    #                                                               1), sigma=0.5 * resolution))
-    #
-    # rho_0 = np.repeat(rho_0, ConfigSimMode.rho_size[2] * resolution, axis=2)
+    rho_0 = np.random.rand(ConfigSim.nx, ConfigSim.ny,
+                           ConfigSim.nz)
+
+    # rho_0 = np.repeat(rho_0, ConfigSim.nz, axis=2)
     mask = np.ones_like(rho_0)
     mask[:, :int(np.ceil(ConfigSim.buffer_side * ConfigSim.dl))] = 0
     mask[:, -int(np.ceil(ConfigSim.buffer_side * ConfigSim.dl)):] = 0
@@ -90,20 +90,24 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         loss_hist += loss
         em_loss_hist += em_loss
 
-        # print(loss_hist)
-        #
         rho_proj_init = init_projection(rho_0) * mask
         rho_0 = convert_to(rho_proj_init, conversions)
         rho_opt_filtered = filter(rho_0)
         rho_opt_filtered = convert_to(rho_opt_filtered, backconversions)
         rho_opt_proj = projection(jnp.array(rho_opt_filtered))
 
+        sim = make_sim_tidy(np.array(rho_opt_proj))
+        eps = np.abs(sim.epsilon(td.Box(
+            center=(0, 0, 0),
+            size=(ConfigSim.lx, ConfigSim.ly, ConfigSim.lz)
+        )))
+
         plotter_final(extent=(ConfigSim.ly, ConfigSim.lz),
                       rho_0=convert_to(rho_0, backconversions),
                       loss_hist=loss_hist,
                       beta=betas[i],
                       em_loss_hist=em_loss_hist,
-                      eps=rho_opt_proj,
+                      eps=eps,
                       run_id=run_id,
                       save=True)
 

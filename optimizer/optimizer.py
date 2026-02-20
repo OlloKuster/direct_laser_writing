@@ -30,6 +30,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
     loss_hist = []
     em_hist = []
     grad_hist = []
+    field_info = 0
 
     def select_f(mode):
         if mode == "torch_jax":
@@ -106,8 +107,8 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
     # opt.set_param('tolg', 1e-12)
     opt.set_max_objective(f)
     opt.set_maxeval(max_evals)
-    opt.set_ftol_abs(config.FTOL_ABS)
-    opt.set_ftol_rel(config.FTOL_REL)
+    # opt.set_ftol_abs(config.FTOL_ABS)
+    # opt.set_ftol_rel(config.FTOL_REL)
     # opt.set_stopval(1e-4)
     opt.set_upper_bounds(config.UPPER_BOUNDS)
     opt.set_lower_bounds(config.LOWER_BOUNDS)
@@ -145,8 +146,9 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
     em_hist = []
     grad_hist = []
 
-    rho_opt = rho
-    best_val = 0
+    rho_opt = np.array(rho)
+
+    best_val = -1e3
     prev_val = 100
 
     class FomEmTorchF(torch.autograd.Function):
@@ -177,12 +179,12 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
             em_hist.append(value_em)
 
         if mode == "torch_jax":
-            rho = torch.tensor(rho_init, device='cuda', requires_grad=True)
-            rho_final = filter(rho)
+            rho_0 = torch.tensor(rho_init, device='cuda', requires_grad=True)
+            rho_final = filter(rho_0)
             fom = FomEmTorchF.apply(rho_final)
             fom.backward(retain_graph=True)
-            grad_torch = rho.grad
-            rho = rho.detach().cpu().numpy()
+            grad_torch = rho_0.grad
+            rho_0 = rho_0.detach().cpu().numpy()
             value = fom.detach().cpu().numpy()
             grad = grad_torch.detach().cpu().numpy()
             value = float(value)  # Requires np float and not jax.numpy float
@@ -196,19 +198,22 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
         print(f"iteration: {config.cur_it}")
         print(f"time: {time.time() - start}")
 
-        if value > best_val:
-            rho_opt = rho
-            best_val = value
-        if eval:
-            plotter(rho_init, rho_final, projection, config.cur_it)
         # if np.abs(prev_val - value) <= 1e-4:
         #     break
         # else:
         #     prev_val = value
 
-        updates, opt_state = optimizer.update(-grad, opt_state, rho)
-        rho[:] = optax.apply_updates(rho, updates)
+        updates, opt_state = optimizer.update(-grad, opt_state, rho_0)
 
+        rho[:] = optax.apply_updates(rho_0, updates)
         np.clip(rho, 0.0, 1.0, out=rho)
+
+        if value > best_val:
+            rho_opt = rho.copy()
+            best_val = value
+        if eval:
+            plotter(rho_init, rho_final, projection, config.cur_it)
+
+
 
     return rho_opt, loss_hist, em_hist, grad_hist

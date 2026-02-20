@@ -63,7 +63,7 @@ def objective_em_heat_f(currents, resolution, init_values):
         E, eps = em_simulation(rho, currents, resolution)
         focal_spot = E[0][
             E[0].shape[0] // 2, E[0].shape[1] // 2, int(jnp.ceil(ConfigSim.location_focal_spot * resolution))]
-        return jnp.abs(focal_spot) / init_values[0]
+        return jnp.abs(focal_spot) / init_values[0], E[0]
 
     def objective_heat(rho):
         """
@@ -82,7 +82,7 @@ def objective_em_heat_f(currents, resolution, init_values):
         :param rho: Density (design variable) of the problem [0, 1].
         :return: Softplus objective function.
         """
-        v_lens = objective_em(rho)
+        v_lens, E_0 = objective_em(rho)
         v_heat_m, v_heat_v = objective_heat(rho)
 
         n_lens = (ConfigSim.TARGET_EM - v_lens) / ConfigSim.TARGET_EM
@@ -102,7 +102,7 @@ def objective_em_heat_f(currents, resolution, init_values):
 
         objs = jnp.array([n_heat_m, n_heat_v])
 
-        return v_lens * (1 - jnp.linalg.norm(softplus(objs))), v_lens
+        return v_lens * (1 - jnp.linalg.norm(softplus(objs))), (v_lens, E_0)
 
     return objective_softplus
 
@@ -152,9 +152,9 @@ def objective_robust_em_heat_f(currents, resolution, init_values):
         n_heat_m = (v_heat_m - init_values[1]) / init_values[1]
         n_heat_v = (v_heat_v - init_values[2]) / init_values[2]
 
-        objs = jnp.array([n_lens, n_heat_m, n_heat_v])
+        objs = jnp.array([n_heat_m, n_heat_v])
 
-        return jnp.linalg.norm(softplus(objs)), v_lens
+        return v_lens * (1 - jnp.linalg.norm(softplus(objs))), v_lens
 
     def objective_robust_softplus(rhos):
         """
@@ -163,17 +163,17 @@ def objective_robust_em_heat_f(currents, resolution, init_values):
         :param rhos: Densities (design variable) of the problem 3x[0, 1].
         :return: robust objective function, values for the EM-performances.
         """
-        power = 20
+        power = -20
         fom_eroded, v_lens_eroded = objective_softplus(rhos[0])
         fom_normal, v_lens_normal = objective_softplus(rhos[1])
         fom_dilated, v_lens_dilated = objective_softplus(rhos[2])
 
-        fom_max = (fom_eroded ** power + fom_normal ** power + fom_dilated ** power) ** (1 / power)
+        fom_min = (fom_eroded ** power + fom_normal ** power + fom_dilated ** power) ** (1 / power)
 
         logs = {
             "v_lens_eroded": v_lens_eroded, "v_lens_normal": v_lens_normal, "v_lens_dilated": v_lens_dilated,
             "fom_eroded": fom_eroded, "fom_normal": fom_normal, "fom_dilated": fom_dilated,
-            "fom_max": fom_max
+            "fom_min": fom_min
         }
 
         print("====================")
@@ -182,6 +182,6 @@ def objective_robust_em_heat_f(currents, resolution, init_values):
             jprint("    {log}", log=log)
         print("====================")
 
-        return fom_max, (v_lens_eroded, v_lens_normal, v_lens_dilated)
+        return fom_min, (v_lens_eroded, v_lens_normal, v_lens_dilated)
 
     return objective_robust_softplus

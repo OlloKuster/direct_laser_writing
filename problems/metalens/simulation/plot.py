@@ -6,7 +6,7 @@ import numpy as np
 from filtering._filter_loader import filter_loader
 from projection._projection_loader import projection_loader
 
-base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_0_1.0.h5", "r")
+base = h5py.File(f"/scratch/local/okuster/data/dlw/heat_sweep/dlw_params_paper/problems/metalens/plots/data_0_inf.h5", "r")
 grp = base["lens_3d"]
 eps = grp["eps"][:]
 rho_0 = grp["rho"][:]
@@ -46,7 +46,7 @@ plt.ylabel(r"$L_\text{EM}$", fontsize=14)
 plt.show()
 
 p = pv.Plotter(off_screen=False)
-data = pv.wrap(np.array(2.5**2-eps))
+data = pv.wrap(np.array(eps))
 # data_e = pv.wrap(200*np.clip(np.abs(E_0)[0], 0.004, 1))
 p.add_mesh(data.contour(), cmap='binary')
 # p.add_volume(data_e, cmap='magma')
