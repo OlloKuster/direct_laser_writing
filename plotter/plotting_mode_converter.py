@@ -4,7 +4,7 @@ import numpy as np
 import jax.numpy as jnp
 import tidy3d as td
 import matplotlib.colors as colors
-
+import pyvista as pv
 
 
 
@@ -14,7 +14,7 @@ def mode_converter_regular_intermediate_plot():
     :return: Evaluation Plotter function.
     """
 
-    def plotter(rho_init, rho_final, projection, i):
+    def plotter(rho_init, rho_final, _, projection, i):
         plt.switch_backend('agg')
         fig, ax = plt.subplots(2, 2, sharex=True)
         ax[0, 0].imshow(rho_init[:, :, rho_init.shape[2] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
@@ -34,8 +34,22 @@ def mode_converter_regular_intermediate_plot():
 
         plt.imshow(eps.T, origin='lower', cmap='binary')
         plt.imshow(np.abs(fields).T, origin='lower', cmap='RdBu_r', norm=colors.CenteredNorm(), alpha=0.9)
-        plt.savefig(f"problems/mode_converter/plots/progression/fields/field_{i:03d}.png")
+        plt.savefig(f"problems/mode_converter/plots/progression/field_{i:03d}.png")
         plt.close()
+
+        p = pv.Plotter(off_screen=True)
+        data = pv.wrap(np.array(rho_final))
+        p.add_mesh(data.contour(), cmap='binary')
+        p.camera_position = 'yz'
+        p.camera.elevation = 30
+        p.camera.azimuth = - 45
+        p.remove_scalar_bar()
+        p.camera.zoom(1.3)
+        p.show(screenshot=f"problems/mode_converter/plots/progression/eps_{i:03d}.png")
+        p.close()
+
+        pv.plot(np.array(rho_final), off_screen=True, screenshot=f"problems/mode_converter/plots/progression/eps_density_{i:03d}.png", cmap='binary')
+
     return plotter
 
 

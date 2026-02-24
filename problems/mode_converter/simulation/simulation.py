@@ -12,30 +12,26 @@ from utility.helper import f2param, split_int
 
 def make_sim_tidy(rho):
     input_waveguide = td.Structure(
-        geometry=td.Box(center=(0,
+        geometry=td.Box(center=(-(ConfigSimMode.lx - ConfigSimMode.wg_length) / 2 - 1,
                                 0,
                                 -ConfigSimMode.lz / 2 + ConfigSimMode.thickness_substrate + ConfigSimMode.wg_height / 2),
-                        size=(td.inf, ConfigSimMode.wg_width, ConfigSimMode.wg_height)),
+                        size=(ConfigSimMode.wg_length + 4, ConfigSimMode.wg_width, ConfigSimMode.wg_height)),
         medium=td.Medium(permittivity=ConfigSimMode.refr_index[2] ** 2)
     )
-    # output_waveguide = td.Structure(
-    #     geometry=td.Box(center=((ConfigSimMode.lx - ConfigSimMode.wg_length) / 2,
-    #                             0,
-    #                             -ConfigSimMode.lz / 2 + ConfigSimMode.thickness_substrate + ConfigSimMode.rho_size[
-    #                                 2] / 2),
-    #                     size=(ConfigSimMode.wg_length + 0.5, ConfigSimMode.wg_width, ConfigSimMode.rho_size[2])),
-    #     medium=td.Medium(permittivity=ConfigSimMode.refr_index[2] ** 2)
-    # )
+    output_waveguide = td.Structure(
+        geometry=td.Box(center=((ConfigSimMode.lx - ConfigSimMode.wg_length) / 2 + 1,
+                                0,
+                                -ConfigSimMode.lz / 2 + ConfigSimMode.thickness_substrate + ConfigSimMode.wg_height / 2),
+                        size=(ConfigSimMode.wg_length + 4, ConfigSimMode.wg_width, ConfigSimMode.wg_height)),
+        medium=td.Medium(permittivity=ConfigSimMode.refr_index[2] ** 2)
+    )
 
     substrate = td.Structure(
-        geometry=td.Box(center=(0, 0, (-ConfigSimMode.lz + ConfigSimMode.thickness_substrate) / 2 + 0.5),
-                        size=(td.inf, td.inf, ConfigSimMode.thickness_substrate - 1)),
+        geometry=td.Box(center=(0, 0, (-ConfigSimMode.lz + ConfigSimMode.thickness_substrate) / 2 - 1),
+                        size=(td.inf, td.inf, ConfigSimMode.thickness_substrate + 2)),
         medium=td.Medium(permittivity=ConfigSimMode.refr_index[1] ** 2)
     )
-    filter_project = make_filter_and_project(2 * ConfigSimMode.min_feature_size,
-                                             ConfigSimMode.rho_size[2] / ConfigSimMode.lz)
-    rho_filt_proj = filter_project(rho, 1)
-    eps = rescale(rho_filt_proj, ConfigSimMode.refr_index[0] ** 2, ConfigSimMode.refr_index[2] ** 2)
+    eps = rescale(rho, ConfigSimMode.refr_index[0] ** 2, ConfigSimMode.refr_index[2] ** 2)
 
     custom_structure = td.Structure.from_permittivity_array(
         geometry=td.Box(
@@ -43,11 +39,11 @@ def make_sim_tidy(rho):
             size=(ConfigSimMode.rho_size[0], ConfigSimMode.rho_size[1], ConfigSimMode.rho_size[2])),
         eps_data=eps.reshape(eps.shape[0], eps.shape[1], eps.shape[2]))
 
-    design_region_mesh = td.MeshOverrideStructure(
-        geometry=custom_structure.geometry,
-        dl=[1 / ConfigSimMode.dl] * 3,
-        enforce=True,
-    )
+    # design_region_mesh = td.MeshOverrideStructure(
+    #     geometry=custom_structure.geometry,
+    #     dl=[0.2, 0.2, 0.3],
+    #     enforce=True,
+    # )
 
     grid_spec = td.GridSpec.auto(
         wavelength=ConfigSimMode.wavelength,
@@ -57,7 +53,7 @@ def make_sim_tidy(rho):
     sim = td.Simulation(
         size=[ConfigSimMode.lx, ConfigSimMode.ly, ConfigSimMode.lz],
         grid_spec=grid_spec,
-        structures=[input_waveguide, substrate, custom_structure],
+        structures=[custom_structure, input_waveguide, output_waveguide, substrate],
         sources=[Sources.source],
         monitors=[Monitors.mode_monitor, Monitors.field_monitor_source, Monitors.field_monitor_mode,
                   Monitors.field_monitor_center, Monitors.eps_monitor],
@@ -67,12 +63,12 @@ def make_sim_tidy(rho):
 
     )
 
-    grid_spec = sim.grid_spec.updated_copy(
-        override_structures=list(sim.grid_spec.override_structures)
-                            + [design_region_mesh]
-    )
+    # grid_spec = sim.grid_spec.updated_copy(
+    #     override_structures=list(sim.grid_spec.override_structures)
+    #                         + [design_region_mesh]
+    # )
 
-    return sim.updated_copy(grid_spec=grid_spec)
+    return sim
 
 
 def heat_simulation(rho, resize_factor):

@@ -77,7 +77,7 @@ def objective_em_heat_f(init_values):
 
         objs = jnp.array([n_heat_m, n_heat_v])
 
-        return -(1-transmission) * (1 - jnp.linalg.norm(softplus(objs))), transmission
+        return transmission * (1 - jnp.linalg.norm(softplus(objs))), (transmission, 0)
 
     return objective_softplus
 

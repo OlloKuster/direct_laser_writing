@@ -1,3 +1,4 @@
+import matplotlib
 import numpy as np
 import jax
 import jax.numpy as jnp
@@ -55,7 +56,8 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
 
     rho_0 = np.ones((int(np.ceil(ConfigSim.rho_shape[0] * resolution)),
                      int(np.ceil(ConfigSim.rho_shape[1] * resolution)),
-                     int(np.ceil(ConfigSim.rho_shape[2] * resolution)))) * 0.5
+                     int(np.ceil(ConfigSim.rho_shape[2] * resolution)))) * 0.25
+
     # # rho_0[:, :, rho_0.shape[2]//2:] = 0
     # #
     # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(int(np.ceil(ConfigSim.rho_shape[0] * resolution)),
@@ -64,7 +66,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     # rho_0 = np.repeat(rho_0, int(np.ceil(ConfigSim.rho_shape[2] * resolution)), axis=2)
     # rho_0 = np.random.rand(int(np.ceil(ConfigSim.rho_shape[0] * resolution)),
     #                        int(np.ceil(ConfigSim.rho_shape[1] * resolution)),
-    #                        1)
+    #                        int(np.ceil(ConfigSim.rho_shape[2] * resolution)))
     # rho_0 = np.repeat(rho_0, int(np.ceil(ConfigSim.rho_shape[2] * resolution)), axis=2)
 
     mask = np.ones_like(rho_0)
@@ -81,7 +83,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     objective_em = objective_loader(setting["init_em"], currents, resolution, 1, 1, 1)
     init_val_em, _ = objective_em(jnp.ones_like(rho_0) * 0.5)
     objective_heat = objective_loader(setting["init_heat"])
-    init_T_mat, init_T_void = objective_heat(np.ones_like(rho_0) * 0.5)
+    init_T_mat, init_T_void = objective_heat(np.ones_like(rho_0) * 0.5, resolution)
 
     init_val_mat = init_T_mat / target_material
     init_val_void = init_T_void / target_void
@@ -92,18 +94,12 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         rho_0 = grp["rho"][:]
         f.close()
 
-    uptick = 0
-
     for i in range(len(betas)):
-        if not full_bin:
-            beta_ssp = np.round(betas[i], 2)
-        else:
-            beta_ssp = np.inf
-        print(f"beta: {beta_ssp}")
+        print(f"beta: {betas[i]}")
         objective = objective_loader(objectives, currents, resolution, init_val_em, init_val_mat, init_val_void)
 
         filter = filter_loader(filters, filter_values)
-        projection = projection_loader(projections, projection_values, beta_ssp, resolution)
+        projection = projection_loader(projections, projection_values, betas[i], resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
 
         if opt == "optax":
@@ -142,7 +138,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         plotter_final(extent=(ConfigSim.simulation_domain_shape[1], ConfigSim.simulation_domain_shape[2]),
                       rho_0=convert_to(rho_0, backconversions),
                       loss_hist=loss_hist,
-                      beta=beta_ssp,
+                      beta=betas[i],
                       em_loss_hist=em_loss_hist,
                       grads=grads,
                       eps=eps,

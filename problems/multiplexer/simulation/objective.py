@@ -30,7 +30,7 @@ def measure_mode_power_ag(rho):
         leaked_trans = anp.sum(anp.abs(amp) ** 2) - trans
         avg_leaked_trans = leaked_trans / (len(ConfigSim.eval_wvls) - 1)
         trans_obj.append(trans - avg_leaked_trans)
-    trans_obj = np.array(trans_obj)
+    trans_obj = np.array(trans)
 
     return anp.sum(trans_obj**(-ConfigSim.p))**(-1/ConfigSim.p)
 

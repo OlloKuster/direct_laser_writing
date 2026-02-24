@@ -11,7 +11,7 @@ def dose_filter_f(resolution):
     :param resolution: Resolution of the simulation [px/um].
     :return: Filter function, with density as its input.
     """
-    res_lat = 1 / resolution * 10 ** (-6)  # hatching
+    res_lat = 1/resolution * 10 ** (-6)  # hatching
     res_ax = 1 / resolution * 10 ** (-6)  # slicing
     time_exposure = ConfigPrint.w0 / (ConfigPrint.vs / res_lat)
 
@@ -25,6 +25,11 @@ def dose_filter_f(resolution):
                                   n_monomer=ConfigPrint.n_monomer,
                                   torch_device='cuda',
                                   )[None, None]  # calc_laser_intensity
+
+    # import matplotlib.pyplot as plt
+    # psf_plot = psf_GT.detach().cpu().numpy().squeeze()
+    # plt.imshow(psf_plot[psf_plot.shape[0]//2].T, origin='lower')
+    # plt.show()
 
     psf = psf_GT.detach().clone().requires_grad_(True)
     print_params = [ConfigPrint.sig_2_r.detach().clone().requires_grad_(True),

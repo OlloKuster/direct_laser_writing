@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from tidy3d import C_0
+import numpy as np
 
 @dataclass
 class ConfigSim:
@@ -7,15 +8,15 @@ class ConfigSim:
     Config file for the tidy3d Simulation. Units are given in um.
     Propagation direction is in z-direction.
     '''
-    wavelength = 1.55
-    freq0 = C_0 / wavelength
-    fwidth = freq0 / 5
-    run_time = 50 / fwidth
 
-    eval_wvls = [1.45, 1.65]
+    eval_wvls = [1.25, 1.55, 1.75]
     eval_freqs = [C_0 / wvl for wvl in eval_wvls[::-1]]
+    wavelength = np.mean(eval_wvls)
+    freq0 = C_0 / wavelength
 
-    rho_size = (10, 10, 3)
+    fwidth = np.max(eval_freqs) - np.min(eval_freqs)
+    run_time = 200 / fwidth
+    rho_size = (30, 30, 1.5)
     thickness_substrate = 3
     buffer = 1 * wavelength
 
@@ -41,11 +42,11 @@ class ConfigSim:
 
     num_modes = 1
 
-    refr_index = (1., 1.44, 3.5) # Air, SiO2, Polymer
+    refr_index = (1., 1.44, 1.53) # Air, SiO2, Polymer
     kappa = (1e-5, 1)  # Thermal conductivity
     min_feature_size = 0.5
 
-    dl = 10
+    dl = 8
     nx = rho_size[0]*dl
     ny = rho_size[1]*dl
     nz = rho_size[2]*dl

@@ -30,7 +30,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
     loss_hist = []
     em_hist = []
     grad_hist = []
-    field_info = 0
+    cur_eps = []
 
     def select_f(mode):
         if mode == "torch_jax":
@@ -43,7 +43,9 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         def forward(ctx, x):
             grad_em_sim_f = jax.value_and_grad(objective, has_aux=True)
             value_em_sim, grad_em_sim = grad_em_sim_f(projection(x.detach().cpu().numpy().astype(np.float64)))
-            em_hist.append(value_em_sim[1])
+            em_hist.append(value_em_sim[1][0])
+            cur_eps.append(value_em_sim[1][1])
+            # cur_field.append(value_em_sim[1][2])
             value_em_sim = value_em_sim[0]
             ctx.save_for_backward(torch.tensor(np.array(grad_em_sim), device='cuda', requires_grad=True))
             return torch.tensor(np.array(value_em_sim), device='cuda', requires_grad=True)
@@ -76,7 +78,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         end = time.time()
         print(f"time: {end - start}")
         if eval:
-            plotter(x, rho_final.detach().cpu().numpy(), projection, config.cur_it)
+            plotter(x, rho_final.detach().cpu().numpy(), cur_eps[-1], projection, config.cur_it)
         return value
 
     def f_jax(x, g):
@@ -98,7 +100,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         end = time.time()
         print(f"time: {end - start}")
         if eval:
-            plotter(x, rho_final, projection, config.cur_it)
+            plotter(x, rho_final, cur_eps, projection, config.cur_it)
         return value
 
     f = select_f(mode)

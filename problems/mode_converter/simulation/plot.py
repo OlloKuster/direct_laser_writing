@@ -6,7 +6,7 @@ import numpy as np
 from filtering._filter_loader import filter_loader
 from projection._projection_loader import projection_loader
 
-base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/mode_converter/plots/data_0_16.h5", "r")
+base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/mode_converter/plots/data_0_8.h5", "r")
 grp = base["mode_converter"]
 eps = grp["eps"][:]
 rho_0 = grp["rho"][:]

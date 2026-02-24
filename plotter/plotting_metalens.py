@@ -1,6 +1,7 @@
 import h5py
 import matplotlib.pyplot as plt
 import numpy as np
+import pyvista as pv
 import jax.numpy as jnp
 
 
@@ -9,8 +10,8 @@ def metalens_regular_intermediate_plot():
     Creates the plotting function used for the intermediate evulation of the structures.
     :return: Evaluation Plotter function.
     """
-    def plotter(rho_init, rho_final, projection, i):
-        fig, ax = plt.subplots(2, 1, sharex=True)
+    def plotter(rho_init, rho_final, cur_eps, projection, i):
+        fig, ax = plt.subplots(3, 1, sharex=True)
         rho_init = np.concatenate((rho_init, np.flip(rho_init, axis=0)), axis=0)
         rho_init = np.concatenate((rho_init, np.flip(rho_init, axis=1)), axis=1)
         ax[0].imshow(rho_init[rho_init.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
@@ -18,11 +19,26 @@ def metalens_regular_intermediate_plot():
         rho_final = np.concatenate((rho_final, np.flip(rho_final, axis=0)), axis=0)
         rho_final = np.concatenate((rho_final, np.flip(rho_final, axis=1)), axis=1)
         rho_final = projection(rho_final)
-        ax[1].imshow(rho_final[rho_final.shape[0] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
-        ax[1].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
+        ax[1].imshow(rho_final[rho_final.shape[0] // 4].T, origin='lower', cmap='binary')
         ax[1].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
+        ax[2].imshow(cur_eps[cur_eps.shape[0] // 4].T, origin='lower', cmap='binary')
+        ax[2].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
+        ax[2].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
         plt.savefig(f"problems/metalens/plots/progression/rho_{i:03d}.png")
         plt.close()
+
+        p = pv.Plotter(off_screen=True)
+        data = pv.wrap(np.array(cur_eps))
+        p.add_mesh(data.contour(), cmap='binary')
+        p.camera_position = 'yz'
+        p.camera.elevation = 30
+        p.camera.azimuth = - 45
+        p.remove_scalar_bar()
+        p.camera.zoom(1.3)
+        p.show(screenshot=f"problems/metalens/plots/progression/eps_{i:03d}.png")
+        p.close()
+
+        pv.plot(np.array(cur_eps), off_screen=True, screenshot=f"problems/metalens/plots/progression/eps_density_{i:03d}.png", cmap='binary')
 
     return plotter
 

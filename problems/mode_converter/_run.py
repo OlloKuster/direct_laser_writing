@@ -41,29 +41,32 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     plotter_eval = plot_loader(plotter_eval_name)
     plotter_final = plot_loader(plotter_final_name)
 
-    rho_0 = np.ones((ConfigSimMode.nx, ConfigSimMode.ny, ConfigSimMode.nz)) * 0.5
-    # rho_0[:, rho_0.shape[1]//2:] = 0
+    rho_0 = np.ones((ConfigSimMode.nx, ConfigSimMode.ny, ConfigSimMode.nz)) * 0.25
+    # rho_0[:, :rho_0.shape[1]//2] = 0.6
 
     rho_0 = np.random.rand(ConfigSimMode.nx, ConfigSimMode.ny,
                            ConfigSimMode.nz)
-    #
+
     # rho_0 = np.repeat(rho_0, ConfigSimMode.nz, axis=2)
 
-    start_wg = int(np.ceil((ConfigSimMode.rho_size[1] - ConfigSimMode.wg_width) / 2 * ConfigSimMode.dl))
-    end_wg = int(np.ceil((ConfigSimMode.rho_size[1] + ConfigSimMode.wg_width) / 2 * ConfigSimMode.dl))
+    start_wg = int(np.ceil((ConfigSimMode.rho_size[1] - ConfigSimMode.wg_width) / 2 * resolution))
+    end_wg = int(np.ceil((ConfigSimMode.rho_size[1] + ConfigSimMode.wg_width) / 2 * resolution))
 
     mask = np.ones_like(rho_0)
-    mask[:int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)), :start_wg,
-    :int(np.ceil(ConfigSimMode.wg_height * ConfigSimMode.dl))] = 0
-    mask[:int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)), end_wg:,
-    :int(np.ceil(ConfigSimMode.wg_height * ConfigSimMode.dl))] = 0
-    mask[-int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)):, :start_wg,
-    :int(np.ceil(ConfigSimMode.wg_height * ConfigSimMode.dl))] = 0
-    mask[-int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)):, end_wg:,
-    :int(np.ceil(ConfigSimMode.wg_height * ConfigSimMode.dl))] = 0
-    mask[:, :int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl))] = 0
-    mask[:, -int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)):] = 0
-    mask[:, :, -int(np.ceil(ConfigSimMode.buffer_top * ConfigSimMode.dl)):] = 0
+    # mask[:int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)), :start_wg,
+    # :int(np.ceil(ConfigSimMode.wg_height * ConfigSimMode.dl))] = 0
+    # mask[:int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)), end_wg:,
+    # :int(np.ceil(ConfigSimMode.wg_height * ConfigSimMode.dl))] = 0
+    # mask[-int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)):, :start_wg,
+    # :int(np.ceil(ConfigSimMode.wg_height * ConfigSimMode.dl))] = 0
+    # mask[-int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)):, end_wg:,
+    # :int(np.ceil(ConfigSimMode.wg_height * ConfigSimMode.dl))] = 0
+    # mask[:, :int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl))] = 0
+    # mask[:, -int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)):] = 0
+    # mask[:, :, -int(np.ceil(ConfigSimMode.buffer_top * ConfigSimMode.dl)):] = 0
+    # mask[:, :int(np.ceil(ConfigSimMode.buffer_side * resolution))] = 0
+    # mask[:, -int(np.ceil(ConfigSimMode.buffer_side * resolution)):] = 0
+    # mask[:, :, -int(np.ceil(ConfigSimMode.buffer_top * resolution)):] = 0
 
     objective_heat = objective_loader("heat_only")
     init_T_mat, init_T_void = objective_heat(np.ones_like(rho_0) * 0.5)
@@ -78,14 +81,11 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         f.close()
 
     for i in range(len(betas)):
-        if not full_bin:
-            beta_ssp = betas[i]
-        else:
-            beta_ssp = np.inf
+        print(f"beta: {betas[i]}")
         objective = objective_loader(objectives, init_val_mat, init_val_void)
 
         filter = filter_loader(filters, filter_values)
-        projection = projection_loader(projections, projection_values, beta_ssp, resolution)
+        projection = projection_loader(projections, projection_values, betas[i], resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
 
         if opt == "optax":

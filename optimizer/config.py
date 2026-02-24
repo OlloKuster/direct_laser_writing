@@ -2,7 +2,7 @@
 import nlopt
 
 MAXEVAL = 20
-FTOL_ABS = 1e-4
+FTOL_ABS = 1e-6
 FTOL_REL = 1e-3
 UPPER_BOUNDS = 1
 LOWER_BOUNDS = 0

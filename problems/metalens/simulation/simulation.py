@@ -3,8 +3,14 @@ import jax.numpy as jnp
 import jaxwell
 
 from problems.metalens.simulation.config_structure import ConfigSim
+from projection.SSP.subpixel_smoothed_projection import f2bin_smooth, ssp_proj_jax_f
 from tofea.fea3d import FEA3D_T
 from utility.helper import f2param, split_int
+
+
+def preprocess(rho, resolution):
+    rho_p = rho.at[:, :, :int(jnp.ceil(0.5 * resolution))].set(1)
+    return rho_p
 
 
 def em_simulation(rho, currents, resolution):
@@ -24,12 +30,11 @@ def em_simulation(rho, currents, resolution):
                 int(jnp.ceil(ConfigSim.rho_shape[2] * resolution)))
 
     omega = 2 * jnp.pi / (ConfigSim.wavelength * resolution)
-
-    eps = f2param(rho, ConfigSim.epsilon)
+    rho_p = preprocess(rho, resolution)
+    eps = f2param(rho_p, ConfigSim.epsilon)
 
     eps = jnp.concatenate((eps, jnp.flip(eps, axis=0)), axis=0)
     eps = jnp.concatenate((eps, jnp.flip(eps, axis=1)), axis=1)
-
 
     eps = jnp.pad(eps,
                   [split_int(simulation_domain[0] - size_rho[0])] +
@@ -37,16 +42,10 @@ def em_simulation(rho, currents, resolution):
                   [(0, int(jnp.ceil((ConfigSim.space_top + ConfigSim.dpml) * resolution)))], mode='constant',
                   constant_values=ConfigSim.epsilon[0])
 
-
-    # # Add a buffer at the bottom to make is less likely that the structure will "lift off" when the binarization
-    # #  increased.
-    # eps = eps.at[:, :, :int(0.5*resolution)].set(ConfigSim.epsilon[1])
-
     eps = jnp.pad(eps,
                   [(0, 0)] * 2 + [(int(jnp.ceil((ConfigSim.buffer_bottom + ConfigSim.dpml) * resolution)), 0)],
                   mode='constant',
                   constant_values=ConfigSim.epsilon[1])
-
 
     size_currents = (int(jnp.ceil(ConfigSim.currents_shape[0] * resolution)),
                      int(jnp.ceil(ConfigSim.currents_shape[1] * resolution)),
@@ -81,7 +80,7 @@ def em_simulation(rho, currents, resolution):
     return E, eps
 
 
-def heat_simulation(rho, resize_factor):
+def heat_simulation(rho, resize_factor, resolution):
     """
     Heat simulation given an input density. Material/void is seen as heat_eval sources. The heat_eval sinks are the
     points where the material/void should connect to.
@@ -89,8 +88,10 @@ def heat_simulation(rho, resize_factor):
     :param resize_factor: Resizes the density in case the FEM-simulation is too big for the memory.
     :return: (Heat of the material, Heat of the void.
     """
-    rho_n_shape = (rho.shape[0] // resize_factor, rho.shape[1] // resize_factor, rho.shape[2] // resize_factor)
-    rho_n = jax.image.resize(rho, rho_n_shape, 'bicubic', antialias=False)
+
+    rho_p = preprocess(jnp.array(rho), resolution)
+    rho_n_shape = (rho_p.shape[0] // resize_factor, rho_p.shape[1] // resize_factor, rho_p.shape[2] // resize_factor)
+    rho_n = jax.image.resize(rho_p, rho_n_shape, 'bicubic', antialias=False)
 
     heat_sinks_matter = jnp.zeros((rho_n_shape[0] + 1,
                                    rho_n_shape[1] + 1,
