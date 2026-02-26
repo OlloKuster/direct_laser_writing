@@ -16,9 +16,9 @@ def test(seed):
     jax.config.update("jax_enable_x64", True)
 
     np.random.seed(seed)
-    resolution = 15
+    resolution = 10
     ConfigPrint.lp = ConfigPrint.lp
-    for threshold_value in [1]:
+    for threshold_value in [0.25]:
         rho_0 = np.ones((5*resolution, 5*resolution, 5*resolution)) * threshold_value
         mask = np.ones_like(rho_0)
         mask[:int(1 * resolution)] = 0

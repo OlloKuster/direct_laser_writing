@@ -14,14 +14,13 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
 
 if __name__ == "__main__":
-    setting = setting_loader("metalens", "dlw_regular")
+    setting = setting_loader("metalens", "normal_gauss")
     eval = False
     device_id = 0
-    resolution = 10
+    resolution = 14
     loss_hist = []
     em_loss_hist = []
-    betas = np.linspace(0, 2, 15)
-    betas = np.append(betas, np.inf)
+    betas = [16, 32, np.inf]
     run_id = 0
 
     target_material = [0.8, 1., 1.2, 1.4, 1.6]
@@ -32,5 +31,6 @@ if __name__ == "__main__":
             em_loss_hist = []
             setting["target_material"] = mat
             setting["target_void"] = void
-            main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=10, opt="optax", eval=eval, full_bin=False, run_id=run_id)
+            loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15,
+                                           opt="nlopt", eval=eval, full_bin=False, run_id=run_id)
             run_id = run_id + 1

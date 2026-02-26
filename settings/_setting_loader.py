@@ -63,37 +63,39 @@ def setting_loader(system: str, setup: str):
 
         if setup == "normal_gauss":
             setting_dict = {
+                "run": Dispenser.LENS3D,
                 "objectives": "em_heat",
                 "filters": "gauss_jax",
                 "filter_factor": 1 / (2*np.sqrt(3)),
                 "plotter_eval": "eval_regular",
                 "plotter_final": "final_regular",
                 "projection": "ssp_jax",
-                "projection_values": ConfigPrint.rho_th_GT,
-                "init_projection": "ssp_jax",
+                "projection_values": 0.5,
+                "init_projection": "None",
                 "init_projection_values": 0.5,
                 "optimizers": "jax",
                 "conversions": "None",
                 "backconversions": "None",
                 
-                "target_material": 1.6,
-                "target_void": 1.6,
+                "target_material": 0.8,
+                "target_void": 0.8,
 
                 "init_em": "em_only",
                 "init_heat": "heat_only"
 
             }
             return setting_dict
-        if setup == "normal_gauss_2":
+        if setup == "gauss_em_only":
             setting_dict = {
-                "objectives": "em_heat",
+                "run": Dispenser.LENS3D,
+                "objectives": "em_only",
                 "filters": "gauss_jax",
                 "filter_factor": 1 / (4*np.sqrt(3)),
                 "plotter_eval": "eval_regular",
                 "plotter_final": "final_regular",
                 "projection": "ssp_jax",
                 "projection_values": ConfigPrint.rho_th_GT,
-                "init_projection": "ssp_jax",
+                "init_projection": "None",
                 "init_projection_values": 0.5,
                 "optimizers": "jax",
                 "conversions": "None",

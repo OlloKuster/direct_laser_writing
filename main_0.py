@@ -14,11 +14,12 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
     return run(resolution, betas, setting, loss_hist, em_loss_hist, opt=opt, max_evals=max_evals, load=load, eval=eval, full_bin=full_bin, run_id=run_id)
 
 
+
 if __name__ == "__main__":
-    setting = setting_loader("mode_converter", "dlw_regular")
+    setting = setting_loader("metalens", "normal_gauss")
     eval = True
-    resolution = 8
+    resolution = 10
     loss_hist = []
     em_loss_hist = []
-    betas = [2, 4, 8, 16, 32, np.inf]
+    betas = [16, 32, np.inf]
     loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15, opt="nlopt", eval=eval, full_bin=False, run_id=0)

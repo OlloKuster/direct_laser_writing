@@ -31,6 +31,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     :param eval: Activate intermediate evaluation/plotting of rho.
     :return: None.
     """
+    np.random.seed(42)
 
     jax.config.update("jax_enable_x64", True)
     torch.cuda.empty_cache()
@@ -56,7 +57,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
 
     rho_0 = np.ones((int(np.ceil(ConfigSim.rho_shape[0] * resolution)),
                      int(np.ceil(ConfigSim.rho_shape[1] * resolution)),
-                     int(np.ceil(ConfigSim.rho_shape[2] * resolution)))) * 0.25
+                     int(np.ceil(ConfigSim.rho_shape[2] * resolution)))) * 0.5
 
     # # rho_0[:, :, rho_0.shape[2]//2:] = 0
     # #

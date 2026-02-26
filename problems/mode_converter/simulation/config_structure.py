@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from tidy3d import C_0
-import numpy as np
 
 @dataclass
 class ConfigSimMode:
@@ -13,12 +12,12 @@ class ConfigSimMode:
     fwidth = freq0 / 10
     run_time = 50 / fwidth
 
-    rho_size = (10, 10, 4)
+    rho_size = (5, 5, 3)
     thickness_substrate = 3
     buffer = 1 * wavelength
 
-    buffer_side = 1
-    buffer_top = 2
+    buffer_side = 0.5
+    buffer_top = 1
 
     wg_width = 4
     wg_height = 2
@@ -41,11 +40,12 @@ class ConfigSimMode:
     min_feature_size = 0.5
 
     min_steps_per_wvl = 10
-    nx = int(np.ceil(rho_size[0] / 0.2))
-    ny = int(np.ceil(rho_size[1] / 0.2))
-    nz = int(np.ceil(rho_size[2] / 0.3))
+    dl = 10
+    nx = rho_size[0]*dl
+    ny = rho_size[1]*dl
+    nz = rho_size[2]*dl
 
-    TARGET_MATERIAL = 0.8
-    TARGET_VOID = 0.6
+    TARGET_MATERIAL = 1.0
+    TARGET_VOID = 1.0
 
     resize_factor = 1

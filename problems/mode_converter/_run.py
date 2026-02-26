@@ -41,8 +41,8 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     plotter_eval = plot_loader(plotter_eval_name)
     plotter_final = plot_loader(plotter_final_name)
 
-    rho_0 = np.ones((ConfigSimMode.nx, ConfigSimMode.ny, ConfigSimMode.nz)) * 0.25
-    # rho_0[:, :rho_0.shape[1]//2] = 0.6
+    rho_0 = np.ones((ConfigSimMode.nx, ConfigSimMode.ny, ConfigSimMode.nz)) * 0.2
+    rho_0[:, :rho_0.shape[1]//2] = 0.3
 
     rho_0 = np.random.rand(ConfigSimMode.nx, ConfigSimMode.ny,
                            ConfigSimMode.nz)
@@ -64,9 +64,11 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     # mask[:, :int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl))] = 0
     # mask[:, -int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)):] = 0
     # mask[:, :, -int(np.ceil(ConfigSimMode.buffer_top * ConfigSimMode.dl)):] = 0
-    # mask[:, :int(np.ceil(ConfigSimMode.buffer_side * resolution))] = 0
-    # mask[:, -int(np.ceil(ConfigSimMode.buffer_side * resolution)):] = 0
-    # mask[:, :, -int(np.ceil(ConfigSimMode.buffer_top * resolution)):] = 0
+    mask[:int(np.ceil(ConfigSimMode.buffer_side * resolution))] = 0
+    mask[-int(np.ceil(ConfigSimMode.buffer_side * resolution)):] = 0
+    mask[:, :int(np.ceil(ConfigSimMode.buffer_side * resolution))] = 0
+    mask[:, -int(np.ceil(ConfigSimMode.buffer_side * resolution)):] = 0
+    mask[:, :, -int(np.ceil(ConfigSimMode.buffer_top * resolution)):] = 0
 
     objective_heat = objective_loader("heat_only")
     init_T_mat, init_T_void = objective_heat(np.ones_like(rho_0) * 0.5)

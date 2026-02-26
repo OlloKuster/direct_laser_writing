@@ -86,21 +86,21 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         x = np.reshape(x, rho.shape)
         x = np.array(init_projection(x) * mask)
         rho_final = filter(x)
-        value_obj, grad = jax.value_and_grad(objective, has_aux=True)(projection(rho_final))
-        value = float(value_obj[0])  # Requires np float and not jax.numpy float
-        value_em = float(value_obj[1])
+        value_em_sim, grad = jax.value_and_grad(objective, has_aux=True)(projection(rho_final))
+        value = float(value_em_sim[0])  # Requires np float and not jax.numpy float
+        em_hist.append(value_em_sim[1][0])
+        cur_eps.append(value_em_sim[1][1])
         print(f"value: {value}")
         print(f"grad: {np.mean(grad)}")
         print(f"iteration: {config.cur_it}")
         config.cur_it += 1
         loss_hist.append(value)
-        em_hist.append(value_em)
         if g.size > 0:
             g[:] = grad.ravel()
         end = time.time()
         print(f"time: {end - start}")
         if eval:
-            plotter(x, rho_final, cur_eps, projection, config.cur_it)
+            plotter(x, rho_final, cur_eps[-1], projection, config.cur_it)
         return value
 
     f = select_f(mode)
