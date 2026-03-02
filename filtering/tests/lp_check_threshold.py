@@ -18,8 +18,15 @@ def test(seed):
     np.random.seed(seed)
     resolution = 8
     ConfigPrint.lp = ConfigPrint.lp
-    for threshold_value in [0.25]:
-        rho_0 = np.ones((5*resolution, 5*resolution, 5*resolution)) * threshold_value
+    rho_0 = np.ones((5*resolution, 5*resolution, 5*resolution))
+    rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(rho_0.shape[0],
+                                                                  rho_0.shape[1],
+                                                                  1), sigma=0.25 * resolution))
+
+    rho_0 = np.repeat(rho_0, rho_0.shape[2] * resolution, axis=2)
+    i = 0
+    f, ax = plt.subplots(1, 3)
+    for threshold_value in [0.4, 0.5, 0.6]:
         mask = np.ones_like(rho_0)
         mask[:int(1 * resolution)] = 0
         mask[:, :int(1 * resolution)] = 0
@@ -30,9 +37,10 @@ def test(seed):
         # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(5*resolution, 5*resolution, 5*resolution), sigma=0.3*resolution))
         # rho_0 = np.random.rand(5*resolution, 5*resolution, 5*resolution)
 
+
         init_proj = projection_loader("tanh_jax", threshold_value, 2, resolution)
         dose_filter = filter_loader("dose_conv", resolution)
-        proj = projection_loader("ssp_jax", 0.5, 2, resolution)
+        proj = projection_loader("ssp_jax", threshold_value, np.inf, resolution)
 
         rho_0_init = np.array(init_proj(rho_0))
         rho_0_torch = torch.tensor(rho_0_init, device='cuda', requires_grad=True)
@@ -40,15 +48,10 @@ def test(seed):
         result = rho_filt.detach().cpu().numpy().squeeze()
         result = proj(result)
         result_bin = np.where(result > ConfigPrint.rho_th_GT, 1, 0)
-        if result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2] >= 0.5:
-            print(factor)
-            break
-        f, ax = plt.subplots(1, 2)
-        ax[0].imshow(rho_0_init[rho_0.shape[0]//2], vmin=0, vmax=1)
-        ax[1].imshow(result[result.shape[0]//2], vmin=0, vmax=1)
-        # plt.show()
-        print(f"bin_value: {result_bin[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2]}")
-        print(f"actual_value: {result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2]}")
+
+        ax[i].imshow(result[:, :, rho_0.shape[2]//2], vmin=0, vmax=1)
+        i += 1
+    plt.show()
     return
 
 if __name__ == "__main__":

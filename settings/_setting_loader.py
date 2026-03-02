@@ -39,21 +39,22 @@ def setting_loader(system: str, setup: str):
 
         if setup == "dlw_robust":
             setting_dict = {
+                "run": Dispenser.LENS3D,
                 "objectives": "robust_em_heat",
                 "filters": "dose_conv",
                 "filter_factor": 1,
                 "plotter_eval": "eval_robust",
                 "plotter_final": "final_robust",
                 "projection": "robust_ssp_jax",
-                "projection_values": [0.9 * ConfigPrint.rho_th_GT, ConfigPrint.rho_th_GT, 1.1 * ConfigPrint.rho_th_GT],
+                "projection_values": [0.4, 0.5, 0.6],
                 "init_projection": "ssp_jax",
                 "init_projection_values": 0.5,
                 "optimizers": "torch_jax",
                 "conversions": "torch",
                 "backconversions": "torch2np",
                 
-                "target_material": 1.3,
-                "target_void": 1.3,
+                "target_material": 0.8,
+                "target_void": 0.8,
 
                 "init_em": "em_only",
                 "init_heat": "heat_only"

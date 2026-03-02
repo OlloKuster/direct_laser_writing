@@ -12,7 +12,7 @@ class ConfigSimMode:
     fwidth = freq0 / 10
     run_time = 50 / fwidth
 
-    rho_size = (5, 5, 3)
+    rho_size = (10, 10, 3)
     thickness_substrate = 3
     buffer = 1 * wavelength
 
@@ -39,8 +39,8 @@ class ConfigSimMode:
     kappa = (1e-5, 1)  # Thermal conductivity
     min_feature_size = 0.5
 
-    min_steps_per_wvl = 10
-    dl = 10
+    min_steps_per_wvl = 8
+    dl = 8
     nx = rho_size[0]*dl
     ny = rho_size[1]*dl
     nz = rho_size[2]*dl

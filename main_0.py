@@ -16,8 +16,8 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
 
 if __name__ == "__main__":
-    setting = setting_loader("metalens", "dlw_regular")
-    eval = True
+    setting = setting_loader("metalens", "dlw_robust")
+    eval = False
     resolution = 14
     loss_hist = []
     em_loss_hist = []

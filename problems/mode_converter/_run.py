@@ -41,12 +41,12 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     plotter_eval = plot_loader(plotter_eval_name)
     plotter_final = plot_loader(plotter_final_name)
 
-    rho_0 = np.ones((ConfigSimMode.nx, ConfigSimMode.ny, ConfigSimMode.nz)) * 0.2
-    rho_0[:, :rho_0.shape[1]//2] = 0.3
-
-    rho_0 = np.random.rand(ConfigSimMode.nx, ConfigSimMode.ny,
-                           ConfigSimMode.nz)
-
+    rho_0 = np.ones((ConfigSimMode.nx, ConfigSimMode.ny, ConfigSimMode.nz)) * 0.5
+    # rho_0[:, :rho_0.shape[1]//2] = 0.3
+    #
+    # rho_0 = np.random.rand(ConfigSimMode.nx, ConfigSimMode.ny,
+    #                        ConfigSimMode.nz)
+    #
     # rho_0 = np.repeat(rho_0, ConfigSimMode.nz, axis=2)
 
     start_wg = int(np.ceil((ConfigSimMode.rho_size[1] - ConfigSimMode.wg_width) / 2 * resolution))

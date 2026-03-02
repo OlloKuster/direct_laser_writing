@@ -111,7 +111,7 @@ def metalens_robust_intermediate_plot():
     Creates the plotting function used for the intermediate evaluation of the robust (3) designed structures.
     :return: Evaluation Plotter function.
     """
-    def plotter(rho_init, rho_final, projection, i):
+    def plotter(rho_init, rho_final, cur_eps, projection, i):
         fig, ax = plt.subplots(2, 3, sharex=True)
 
         rho_final = projection(rho_final)
@@ -143,6 +143,20 @@ def metalens_robust_intermediate_plot():
 
         plt.savefig(f"problems/metalens/plots/progression/rho_{i:03d}.png")
         plt.close()
+
+        p = pv.Plotter(off_screen=True)
+        data = pv.wrap(np.array(cur_eps))
+        p.add_mesh(data.contour(), cmap='binary')
+        p.camera_position = 'yz'
+        p.camera.elevation = 30
+        p.camera.azimuth = - 45
+        p.remove_scalar_bar()
+        p.camera.zoom(1.3)
+        p.show(screenshot=f"problems/metalens/plots/progression/eps_{i:03d}.png")
+        p.close()
+
+        pv.plot(np.array(cur_eps), off_screen=True,
+                screenshot=f"problems/metalens/plots/progression/eps_density_{i:03d}.png", cmap='binary')
 
     return plotter
 

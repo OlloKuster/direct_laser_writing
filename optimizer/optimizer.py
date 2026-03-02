@@ -147,6 +147,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
     loss_hist = []
     em_hist = []
     grad_hist = []
+    cur_eps = []
 
     rho_opt = np.array(rho)
 
@@ -158,9 +159,10 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
         def forward(ctx, x):
             grad_em_sim_f = jax.value_and_grad(objective, has_aux=True)
             value_em_sim, grad_em_sim = grad_em_sim_f(projection(x.detach().cpu().numpy().astype(np.float64)))
-            em_hist.append(value_em_sim[1])
-            value_em_sim = value_em_sim[0]
+            em_hist.append(value_em_sim[1][0])
+            cur_eps.append(value_em_sim[1][1])
             ctx.save_for_backward(torch.tensor(np.array(grad_em_sim), device='cuda', requires_grad=True))
+            value_em_sim = value_em_sim[0]
             return torch.tensor(np.array(value_em_sim), device='cuda', requires_grad=True)
 
         @staticmethod
@@ -214,7 +216,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
             rho_opt = rho.copy()
             best_val = value
         if eval:
-            plotter(rho_init, rho_final, projection, config.cur_it)
+            plotter(rho_init, rho_final, cur_eps[-1], projection, config.cur_it)
 
 
 
