@@ -132,7 +132,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         else:
             E, eps = em_simulation(jnp.array(rho_opt_proj), currents, resolution)
 
-        if betas[i] == betas[-1]:
+        if True:
             plotter_final(extent=(ConfigSim.simulation_domain_shape[1], ConfigSim.simulation_domain_shape[2]),
                           rho_0=convert_to(rho_0, backconversions),
                           loss_hist=loss_hist,

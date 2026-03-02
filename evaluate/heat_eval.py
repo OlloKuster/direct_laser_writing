@@ -10,7 +10,7 @@ font = {'family': 'sans-serif',
 
 matplotlib.rc('font', **font)
 
-path = "/scratch/local/okuster/data/dlw/heat_sweep_MMA/problems/metalens/plots/"
+path = "/scratch/local/okuster/data/dlw/heat_sweep_final_questionmark/plots/"
 
 inds = np.linspace(0, 24, 25)
 target_material = np.round(np.array([0.8, 1., 1.2, 1.4, 1.6]) - 1, 1)

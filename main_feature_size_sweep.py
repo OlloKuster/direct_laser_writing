@@ -16,17 +16,18 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
 
 if __name__ == "__main__":
-    setting = setting_loader("metalens", "normal_gauss")
+    setting = setting_loader("metalens", "gauss_em_only")
     eval = True
     resolution = 14
     betas = [16, 32, np.inf]
-    run_id = 0
+    run_id = 7
 
     feature_size_factor = [1, 0.75, 0.5, 0.4, 0.3, 0.2, 0.1]
     for fact in feature_size_factor:
         loss_hist = []
         em_loss_hist = []
-        loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=10, opt="nlopt", eval=eval, full_bin=False, run_id=0)
+        setting["filter_factor"] = fact / np.sqrt(3)
+        loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15, opt="nlopt", eval=eval, full_bin=False, run_id=run_id)
 
         run_id = run_id + 1
     # main(resolution, betas, setting, loss_hist, em_loss_hist, opt="optax", load=f"problems/metalens/plots/data_0_{init_beta[-1]}.h5", eval=eval, full_bin=False, run_id=2, device_id=1)

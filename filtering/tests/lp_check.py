@@ -13,12 +13,11 @@ from projection._projection_loader import projection_loader
 
 def test(seed):
     np.random.seed(seed)
-    resolution = 10
-    for factor in np.linspace(0.0072, 0.0076, 1):
+    resolution = 14
+    for factor in np.linspace(0.001, 0.01, 101):
         ConfigPrint.lp = factor
         size_lat = int(np.ceil(0.4*resolution))
         size_ax = int(np.ceil(0.9*resolution))
-        print(size_ax)
         rho_0 = np.zeros((5*resolution, 5*resolution, 5*resolution))
         rho_0[rho_0.shape[0]//2-size_lat:-rho_0.shape[0]//2+size_lat, rho_0.shape[1]//2-size_lat:-rho_0.shape[1]//2+size_lat,  rho_0.shape[2]//2-size_ax:-rho_0.shape[2]//2+size_ax] = 1
         #
@@ -46,17 +45,17 @@ def test(seed):
         plt.savefig(f"plots_1/lp_{factor:3f}.png")
         plt.close()
 
-        import pyvista as pv
-        p = pv.Plotter()
-        data = pv.wrap(np.array(result_bin))
-        p.add_mesh(data.contour(), cmap='binary')
-        p.camera_position = 'yz'
-        p.camera.elevation = 30
-        p.camera.azimuth = - 45
-        p.add_axes()
-        # p.remove_scalar_bar()
-        p.camera.zoom(1.3)
-        p.show()
+        # import pyvista as pv
+        # p = pv.Plotter()
+        # data = pv.wrap(np.array(result_bin))
+        # p.add_mesh(data.contour(), cmap='binary')
+        # p.camera_position = 'yz'
+        # p.camera.elevation = 30
+        # p.camera.azimuth = - 45
+        # p.add_axes()
+        # # p.remove_scalar_bar()
+        # p.camera.zoom(1.3)
+        # p.show()
         if result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2] >= 0.5:
             print(factor)
             break

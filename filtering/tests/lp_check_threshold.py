@@ -16,7 +16,7 @@ def test(seed):
     jax.config.update("jax_enable_x64", True)
 
     np.random.seed(seed)
-    resolution = 10
+    resolution = 8
     ConfigPrint.lp = ConfigPrint.lp
     for threshold_value in [0.25]:
         rho_0 = np.ones((5*resolution, 5*resolution, 5*resolution)) * threshold_value
@@ -40,12 +40,13 @@ def test(seed):
         result = rho_filt.detach().cpu().numpy().squeeze()
         result = proj(result)
         result_bin = np.where(result > ConfigPrint.rho_th_GT, 1, 0)
-        # if result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2] >= 0.5:
-        #     print(factor)
+        if result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2] >= 0.5:
+            print(factor)
+            break
         f, ax = plt.subplots(1, 2)
         ax[0].imshow(rho_0_init[rho_0.shape[0]//2], vmin=0, vmax=1)
         ax[1].imshow(result[result.shape[0]//2], vmin=0, vmax=1)
-        plt.show()
+        # plt.show()
         print(f"bin_value: {result_bin[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2]}")
         print(f"actual_value: {result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2]}")
     return
