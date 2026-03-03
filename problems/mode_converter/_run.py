@@ -49,6 +49,12 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     #
     # rho_0 = np.repeat(rho_0, ConfigSimMode.nz, axis=2)
 
+    rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(ConfigSimMode.rho_size[0] * resolution,
+                                                                  ConfigSimMode.rho_size[1] * resolution,
+                                                                  1), sigma=0.25 * resolution))
+
+    rho_0 = np.repeat(rho_0, ConfigSimMode.rho_size[2] * resolution, axis=2)
+
     start_wg = int(np.ceil((ConfigSimMode.rho_size[1] - ConfigSimMode.wg_width) / 2 * resolution))
     end_wg = int(np.ceil((ConfigSimMode.rho_size[1] + ConfigSimMode.wg_width) / 2 * resolution))
 

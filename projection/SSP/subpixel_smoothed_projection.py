@@ -64,6 +64,6 @@ def ssp_robust_proj_jax_f(alphas, beta, resolution):
     f2bin = tanh_filter_jax_f(alphas[1], beta)
     f2bin_dilated = tanh_filter_jax_f(alphas[2], beta)
 
-    return (lambda x: (f2bin_smooth(x, alphas[0], resolution, f2bin_eroded),
-                       f2bin_smooth(x, alphas[1], resolution, f2bin),
-                       f2bin_smooth(x, alphas[2], resolution, f2bin_dilated)))
+    return (lambda x: (f2bin_smooth(x[0], alphas[0], resolution, f2bin_eroded),
+                       f2bin_smooth(x[1], alphas[1], resolution, f2bin),
+                       f2bin_smooth(x[2], alphas[2], resolution, f2bin_dilated)))

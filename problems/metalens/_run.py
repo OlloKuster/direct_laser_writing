@@ -39,6 +39,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     objectives = setting["objectives"]
     filters = setting["filters"]
     filter_values = setting["filter_factor"] * resolution
+    lp_deviation = setting["lp_deviation"]
     projections = setting["projection"]
     init_projections = setting["init_projection"]
     projection_values = setting["projection_values"]
@@ -99,7 +100,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         print(f"beta: {betas[i]}")
         objective = objective_loader(objectives, currents, resolution, init_val_em, init_val_mat, init_val_void)
 
-        filter = filter_loader(filters, filter_values)
+        filter = filter_loader(filters, filter_values, lp_deviation)
         projection = projection_loader(projections, projection_values, betas[i], resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
 

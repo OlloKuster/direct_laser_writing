@@ -17,6 +17,7 @@ def setting_loader(system: str, setup: str):
                 "objectives": "em_heat",  # Objective function(s) of the problem.
                 "filters": "dose_conv",  # Filter function for the optimization.
                 "filter_factor": 1,  # Factor for the size of the filter (1 is 1um).
+                "lp_deviation": 0,
                 "plotter_eval": "eval_regular",  # Which plotting function is used for the evaluation.
                 "plotter_final": "final_regular",  # Which plotting function is used for the final plotting.
                 "projection": "ssp_jax",  # Projection used for the optimization.
@@ -41,12 +42,13 @@ def setting_loader(system: str, setup: str):
             setting_dict = {
                 "run": Dispenser.LENS3D,
                 "objectives": "robust_em_heat",
-                "filters": "dose_conv",
+                "filters": "dose_conv_robust",
                 "filter_factor": 1,
+                "lp_deviation": 0.1,
                 "plotter_eval": "eval_robust",
                 "plotter_final": "final_robust",
                 "projection": "robust_ssp_jax",
-                "projection_values": [0.4, 0.5, 0.6],
+                "projection_values": [0.5, 0.5, 0.5],
                 "init_projection": "ssp_jax",
                 "init_projection_values": 0.5,
                 "optimizers": "torch_jax",
