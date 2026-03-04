@@ -39,11 +39,11 @@ def make_sim_tidy(rho):
             size=(ConfigSimMode.rho_size[0], ConfigSimMode.rho_size[1], ConfigSimMode.rho_size[2])),
         eps_data=eps.reshape(eps.shape[0], eps.shape[1], eps.shape[2]))
 
-    # design_region_mesh = td.MeshOverrideStructure(
-    #     geometry=custom_structure.geometry,
-    #     dl=[0.2, 0.2, 0.3],
-    #     enforce=True,
-    # )
+    design_region_mesh = td.MeshOverrideStructure(
+        geometry=custom_structure.geometry,
+        dl=[1/ConfigSimMode.nx, 1/ConfigSimMode.ny, 1/ConfigSimMode.nz],
+        enforce=True,
+    )
 
     grid_spec = td.GridSpec.auto(
         wavelength=ConfigSimMode.wavelength,
@@ -63,12 +63,13 @@ def make_sim_tidy(rho):
 
     )
 
-    # grid_spec = sim.grid_spec.updated_copy(
-    #     override_structures=list(sim.grid_spec.override_structures)
-    #                         + [design_region_mesh]
-    # )
+    grid_spec = sim.grid_spec.updated_copy(
+        override_structures=list(sim.grid_spec.override_structures)
+                            + [design_region_mesh]
+    )
 
-    return sim
+    return sim.updated_copy(grid_spec=grid_spec)
+    # return sim
 
 
 def heat_simulation(rho, resize_factor):

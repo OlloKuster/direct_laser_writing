@@ -10,9 +10,9 @@ from filtering._filter_loader import filter_loader
 from filtering.dose_model.config_print import ConfigPrint
 from optimizer.optimizer import optimizer_nlopt, optimizer_optax
 from plotter._plot_loader import plot_loader
-from problems.mode_converter.simulation._objective_loader import objective_loader
-from problems.mode_converter.simulation.config_structure import ConfigSimMode
-from problems.mode_converter.simulation.simulation import make_sim_tidy
+from problems.polarization_splitter.simulation._objective_loader import objective_loader
+from problems.polarization_splitter.simulation.config_structure import ConfigSim
+from problems.polarization_splitter.simulation.simulation import make_sim_tidy
 from projection._projection_loader import projection_loader
 from utility.helper import convert_to
 
@@ -41,50 +41,50 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     plotter_eval = plot_loader(plotter_eval_name)
     plotter_final = plot_loader(plotter_final_name)
 
-    rho_0 = np.ones((ConfigSimMode.nx, ConfigSimMode.ny, ConfigSimMode.nz)) * 0.5
+    rho_0 = np.ones((ConfigSim.nx, ConfigSim.ny, ConfigSim.nz)) * 0.5
     # rho_0[:, :rho_0.shape[1]//2] = 0.3
     #
-    # rho_0 = np.random.rand(ConfigSimMode.nx, ConfigSimMode.ny,
-    #                        ConfigSimMode.nz)
-
-    # rho_0 = np.repeat(rho_0, ConfigSimMode.nz, axis=2)
-
-    rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(ConfigSimMode.rho_size[0] * resolution,
-                                                                  ConfigSimMode.rho_size[1] * resolution,
-                                                                  ConfigSimMode.rho_size[2] * resolution), sigma=0.25 * resolution))
+    rho_0 = np.random.rand(ConfigSim.nx, ConfigSim.ny,
+                           ConfigSim.nz)
     #
-    # rho_0 = np.repeat(rho_0, ConfigSimMode.rho_size[2] * resolution, axis=2)
+    # rho_0 = np.repeat(rho_0, ConfigSim.nz, axis=2)
 
-    start_wg = int(np.ceil((ConfigSimMode.rho_size[1] - ConfigSimMode.wg_width) / 2 * resolution))
-    end_wg = int(np.ceil((ConfigSimMode.rho_size[1] + ConfigSimMode.wg_width) / 2 * resolution))
+    # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(ConfigSim.nx,
+    #                                                               ConfigSim.ny,
+    #                                                               1), sigma=0.25 * ConfigSim.nx))
+    #
+    # rho_0 = np.repeat(rho_0, ConfigSim.nz, axis=2)
+
+    start_wg = int(np.ceil((ConfigSim.rho_size[1] - ConfigSim.wg_width) / 2 * resolution))
+    end_wg = int(np.ceil((ConfigSim.rho_size[1] + ConfigSim.wg_width) / 2 * resolution))
 
     mask = np.ones_like(rho_0)
-    # mask[:int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)), :start_wg,
-    # :int(np.ceil(ConfigSimMode.wg_height * ConfigSimMode.dl))] = 0
-    # mask[:int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)), end_wg:,
-    # :int(np.ceil(ConfigSimMode.wg_height * ConfigSimMode.dl))] = 0
-    # mask[-int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)):, :start_wg,
-    # :int(np.ceil(ConfigSimMode.wg_height * ConfigSimMode.dl))] = 0
-    # mask[-int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)):, end_wg:,
-    # :int(np.ceil(ConfigSimMode.wg_height * ConfigSimMode.dl))] = 0
-    # mask[:, :int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl))] = 0
-    # mask[:, -int(np.ceil(ConfigSimMode.buffer_side * ConfigSimMode.dl)):] = 0
-    # mask[:, :, -int(np.ceil(ConfigSimMode.buffer_top * ConfigSimMode.dl)):] = 0
-    mask[:int(np.ceil(ConfigSimMode.buffer_side * resolution))] = 0
-    mask[-int(np.ceil(ConfigSimMode.buffer_side * resolution)):] = 0
-    mask[:, :int(np.ceil(ConfigSimMode.buffer_side * resolution))] = 0
-    mask[:, -int(np.ceil(ConfigSimMode.buffer_side * resolution)):] = 0
-    mask[:, :, -int(np.ceil(ConfigSimMode.buffer_top * resolution)):] = 0
+    # mask[:int(np.ceil(ConfigSim.buffer_side * ConfigSim.dl)), :start_wg,
+    # :int(np.ceil(ConfigSim.wg_height * ConfigSim.dl))] = 0
+    # mask[:int(np.ceil(ConfigSim.buffer_side * ConfigSim.dl)), end_wg:,
+    # :int(np.ceil(ConfigSim.wg_height * ConfigSim.dl))] = 0
+    # mask[-int(np.ceil(ConfigSim.buffer_side * ConfigSim.dl)):, :start_wg,
+    # :int(np.ceil(ConfigSim.wg_height * ConfigSim.dl))] = 0
+    # mask[-int(np.ceil(ConfigSim.buffer_side * ConfigSim.dl)):, end_wg:,
+    # :int(np.ceil(ConfigSim.wg_height * ConfigSim.dl))] = 0
+    # mask[:, :int(np.ceil(ConfigSim.buffer_side * ConfigSim.dl))] = 0
+    # mask[:, -int(np.ceil(ConfigSim.buffer_side * ConfigSim.dl)):] = 0
+    # mask[:, :, -int(np.ceil(ConfigSim.buffer_top * ConfigSim.dl)):] = 0
+    mask[:int(np.ceil(ConfigSim.buffer_side * resolution))] = 0
+    mask[-int(np.ceil(ConfigSim.buffer_side * resolution)):] = 0
+    mask[:, :int(np.ceil(ConfigSim.buffer_side * resolution))] = 0
+    mask[:, -int(np.ceil(ConfigSim.buffer_side * resolution)):] = 0
+    mask[:, :, -int(np.ceil(ConfigSim.buffer_top * resolution)):] = 0
 
     objective_heat = objective_loader("heat_only")
     init_T_mat, init_T_void = objective_heat(np.ones_like(rho_0) * 0.5)
 
-    init_val_mat = init_T_mat / ConfigSimMode.TARGET_MATERIAL
-    init_val_void = init_T_void / ConfigSimMode.TARGET_VOID
+    init_val_mat = init_T_mat / ConfigSim.TARGET_MATERIAL
+    init_val_void = init_T_void / ConfigSim.TARGET_VOID
 
     if load is not None:
         f = h5py.File(load)
-        grp = f["mode_converter"]
+        grp = f["polarization_splitter"]
         rho_0 = grp["rho"][:]
         f.close()
 
@@ -118,12 +118,12 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         rho_opt_proj = projection(jnp.array(rho_opt_filtered))
 
         sim = make_sim_tidy(np.array(rho_opt_proj))
-        eps = np.abs(sim.epsilon(td.Box(
+        eps = np.abs(sim[0].epsilon(td.Box(
             center=(0, 0, 0),
-            size=(ConfigSimMode.lx, ConfigSimMode.ly, ConfigSimMode.lz)
+            size=(ConfigSim.lx, ConfigSim.ly, ConfigSim.lz)
         )))
 
-        plotter_final(extent=(ConfigSimMode.ly, ConfigSimMode.lz),
+        plotter_final(extent=(ConfigSim.ly, ConfigSim.lz),
                       rho_0=convert_to(rho_0, backconversions),
                       loss_hist=loss_hist,
                       beta=betas[i],

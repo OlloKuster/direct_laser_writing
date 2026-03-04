@@ -7,7 +7,7 @@ from jax.debug import print as jprint
 
 import numpy as np
 from autograd.extend import primitive, defvjp
-from tidy3d import C_0
+from tidy3d.plugins.autograd import smooth_min
 
 from problems.multiplexer.simulation.config_structure import ConfigSim
 from problems.multiplexer.simulation.simulation import heat_simulation, make_sim_tidy
@@ -29,10 +29,10 @@ def measure_mode_power_ag(rho):
         trans_list.append(trans)
         leaked_trans = anp.sum(anp.abs(amp) ** 2) - trans
         avg_leaked_trans = leaked_trans / (len(ConfigSim.eval_wvls) - 1)
-        trans_obj.append(trans - avg_leaked_trans)
-    trans_obj = np.array(trans)
+        trans_obj.append(trans)
+    trans_obj = anp.array(trans_obj)
 
-    return anp.sum(trans_obj**(-ConfigSim.p))**(-1/ConfigSim.p)
+    return smooth_min(trans_obj)
 
 
 @jax.custom_vjp
@@ -89,6 +89,6 @@ def objective_em_heat_f(init_values):
 
         objs = jnp.array([n_heat_m, n_heat_v])
 
-        return fom_tr * (1 - jnp.linalg.norm(softplus(objs))), fom_tr
+        return fom_tr * (1 - jnp.linalg.norm(softplus(objs))), (fom_tr, 0)
 
     return objective_softplus

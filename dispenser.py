@@ -3,6 +3,7 @@ from enum import Enum
 from problems.metalens._run import run as run_lens
 from problems.mode_converter._run import run as run_mode_converter
 from problems.multiplexer._run import run as run_multiplexer
+from problems.polarization_splitter._run import run as run_pol_splitter
 
 class Dispenser(Enum):
     """
@@ -12,3 +13,4 @@ class Dispenser(Enum):
     LENS3D = run_lens
     MODECONVERTER = run_mode_converter
     MULTIPLEXER = run_multiplexer
+    POLSPLITTER = run_pol_splitter

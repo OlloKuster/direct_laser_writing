@@ -8,19 +8,28 @@ from jax.debug import print as jprint
 import numpy as np
 from autograd.extend import primitive, defvjp
 
-from problems.mode_converter.simulation.config_structure import ConfigSimMode
-from problems.mode_converter.simulation.simulation import heat_simulation, make_sim_tidy
+from problems.polarization_splitter.simulation.config_structure import ConfigSim
+from problems.polarization_splitter.simulation.simulation import heat_simulation, make_sim_tidy
 from utility.helper import softplus
 
 
 def measure_mode_power_ag(rho):
     sim = make_sim_tidy(rho)
-    task_name = "mode_converter"
-    sim_data = web.run(sim, task_name=task_name, folder_name="mode_converter_dlw", verbose=False)
-    sim_data.to_file(fname='problems/mode_converter/plots/progression/current_simulation.hdf5')
-    output_amps = sim_data["Mode Monitor"].amps
-    amp = output_amps.sel(direction='+', f=ConfigSimMode.freq0, mode_index=2).values
-    return anp.sum(anp.abs(amp) ** 2)
+    sim_data_te = web.run(sim[0], task_name=f"pol_splitter_te_{ConfigSim.cur_it + 1}", folder_name="pol_splitter_dlw", verbose=False)
+    sim_data_te.to_file(fname='problems/polarization_splitter/plots/progression/current_simulation_te.hdf5')
+    output_amps_te = sim_data_te["Mode Monitor Horizontal"].amps
+    amp_te = output_amps_te.sel(direction='+', f=ConfigSim.freq0, mode_index=1).values
+    trans_te = anp.abs(amp_te) ** 2
+
+    sim_data_tm = web.run(sim[1], task_name=f"pol_splitter_tm_{ConfigSim.cur_it + 1}", folder_name="pol_splitter_dlw", verbose=False)
+    sim_data_tm.to_file(fname='problems/polarization_splitter/plots/progression/current_simulation_tm.hdf5')
+    output_amps_tm = sim_data_tm["Mode Monitor Vertical"].amps
+    amp_tm = output_amps_tm.sel(direction='+', f=ConfigSim.freq0, mode_index=0).values
+    trans_tm = anp.abs(amp_tm) ** 2
+
+    ConfigSim.cur_it += 1
+
+    return anp.sum(anp.abs(trans_te)**(-ConfigSim.p) + anp.abs(trans_tm)**(-ConfigSim.p))**(-1/ConfigSim.p)
 
 
 @jax.custom_vjp
@@ -48,7 +57,7 @@ def objective_heat(rho):
     :param rho: Density (design variable) of the problem [0, 1].
     :return: Tuple of material and void heat_eval.
     """
-    T_mat, T_void, _ = heat_simulation(rho, ConfigSimMode.resize_factor)
+    T_mat, T_void, _ = heat_simulation(rho, ConfigSim.resize_factor)
     return T_mat, T_void
 
 
@@ -59,10 +68,10 @@ def objective_heat_f():
 def objective_em_heat_f(init_values):
     def objective_softplus(rho):
         transmission = measure_mode_power(rho)
-        # v_heat_m, v_heat_v = objective_heat(rho)
+        v_heat_m, v_heat_v = objective_heat(rho)
 
-        # n_heat_m = (v_heat_m - init_values[0]) / init_values[0]
-        # n_heat_v = (v_heat_v - init_values[1]) / init_values[1]
+        n_heat_m = (v_heat_m - init_values[0]) / init_values[0]
+        n_heat_v = (v_heat_v - init_values[1]) / init_values[1]
 
         logs = {
             "transmission": transmission, "n_heat_m": n_heat_m, "n_heat_v": n_heat_v, "v_heat_m": v_heat_m,
@@ -74,7 +83,6 @@ def objective_em_heat_f(init_values):
             jprint("{name}:", name=name)
             jprint("    {log}", log=log)
         print("====================")
-
 
         return transmission, (transmission, 0)
 

@@ -3,6 +3,8 @@ from plotter.plotting_metalens import metalens_regular_intermediate_plot, metale
 from plotter.plotting_mode_converter import mode_converter_regular_final_plot, mode_converter_regular_intermediate_plot, \
     mode_converter_robust_intermediate_plot, mode_converter_robust_final_plot
 from plotter.plotting_multiplexer import multiplexer_regular_intermediate_plot, multiplexer_regular_final_plot
+from plotter.plotting_polarization_splitter import polarization_splitter_regular_intermediate_plot, \
+    polarization_splitter_regular_final_plot
 
 
 def plot_loader(plot: str, *args):
@@ -41,3 +43,8 @@ def plot_loader(plot: str, *args):
         return multiplexer_regular_intermediate_plot()
     if plot == "muliplex_final_regular":
         return multiplexer_regular_final_plot()
+
+    if plot == "pol_splitter_regular":
+        return polarization_splitter_regular_intermediate_plot()
+    if plot == "pol_splitter_regular":
+        return polarization_splitter_regular_final_plot()

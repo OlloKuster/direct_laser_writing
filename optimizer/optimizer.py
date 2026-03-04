@@ -175,12 +175,15 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
         rho_init = np.array(init_projection(rho) * mask)
         if mode == "jax":
             rho_final = filter(rho_init)
-            value_obj, grad = jax.value_and_grad(objective, has_aux=True)(projection(rho_final))
-            value = float(value_obj[0])  # Requires np float and not jax.numpy float
-            value_em = float(value_obj[1])
-            grad = np.array(grad)
+            value_em_sim, grad_em_sim = jax.value_and_grad(objective, has_aux=True)(projection(rho_final))
+            value = float(value_em_sim[0])  # Requires np float and not jax.numpy float
+            value_em = float(value_em_sim[1][0])
+            em_hist.append(value_em_sim[1][0])
+            cur_eps.append(value_em_sim[1][1])
+            grad = np.array(grad_em_sim)
             loss_hist.append(value)
             em_hist.append(value_em)
+            rho_0 = rho_init
 
         if mode == "torch_jax":
             rho_0 = torch.tensor(rho_init, device='cuda', requires_grad=True)

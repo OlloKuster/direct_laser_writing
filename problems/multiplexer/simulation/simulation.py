@@ -7,7 +7,7 @@ from tidy3d.plugins.autograd import make_filter_and_project, rescale
 
 from problems.multiplexer.simulation.config_structure import ConfigSim
 from problems.multiplexer.simulation.sources_and_monitors import Sources, Monitors
-from tofea.fea3d import FEA3D_T
+# from tofea.fea3d import FEA3D_T
 from utility.helper import f2param
 
 
@@ -33,7 +33,7 @@ def make_sim_tidy(rho):
 
         output_waveguide_2 = td.Structure(
             geometry=td.Box(center=((ConfigSim.lx - ConfigSim.wg_length) / 2,
-                                    - (i + 1) * ConfigSim.wg_dist,
+                                    - (i + 1) * ConfigSim.wg_dist / 2 - i * ConfigSim.wg_width,
                                     -ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.wg_height / 2),
                             size=(ConfigSim.wg_length + 5, ConfigSim.wg_width, ConfigSim.wg_height)),
             medium=td.Medium(permittivity=ConfigSim.refr_index[2] ** 2)
