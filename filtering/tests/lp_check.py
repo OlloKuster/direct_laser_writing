@@ -14,8 +14,7 @@ from projection._projection_loader import projection_loader
 def test(seed):
     np.random.seed(seed)
     resolution = 14
-    for factor in np.linspace(0.001, 0.01, 101):
-        ConfigPrint.lp = factor
+    for factor in np.linspace(0., 0.01, 101):
         size_lat = int(np.ceil(0.4*resolution))
         size_ax = int(np.ceil(0.9*resolution))
         rho_0 = np.zeros((5*resolution, 5*resolution, 5*resolution))
@@ -31,8 +30,8 @@ def test(seed):
 
 
         rho_0_torch = torch.tensor(rho_0, device='cuda', requires_grad=True)
-        dose_filter = filter_loader("dose_conv", resolution)
-        proj = projection_loader("ssp_jax", 0.5, 8, resolution)
+        dose_filter = filter_loader("dose_conv", resolution, factor)
+        proj = projection_loader("ssp_jax", 0.5, np.inf, resolution)
 
         rho_filt = dose_filter(rho_0_torch)
         result = rho_filt.detach().cpu().numpy().squeeze()
@@ -56,9 +55,9 @@ def test(seed):
         # # p.remove_scalar_bar()
         # p.camera.zoom(1.3)
         # p.show()
-        if result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2] >= 0.5:
-            print(factor)
-            break
+        # if result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2] >= 0.5:
+        #     print(factor)
+        #     break
         print(f"lp: {factor}")
         print(f"bin_value: {result_bin[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2]}")
         print(f"actual_value: {result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2]}")

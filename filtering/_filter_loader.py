@@ -18,8 +18,8 @@ def filter_loader(filter: str, *args):
     if filter == "None":
         return lambda x: x
     if filter == "dose_conv":
-        resolution = args[0]
-        return dose_filter_f(resolution)
+        resolution, lp = args
+        return dose_filter_f(resolution, lp)
     if filter == "dose_conv_robust":
         resolution, deviation = args
         return dose_filter_robust_f(resolution, deviation)

@@ -5,7 +5,7 @@ from filtering.dose_model.DoseMSBPM import DoseMSBPMFull3D
 from filtering.dose_model.utils_dose_sim import calc_laser_intensity
 
 
-def dose_filter_f(resolution):
+def dose_filter_f(resolution, lp=ConfigPrint.lp):
     """
     Creases the function for the dlw-model filter, given a resolution.
     :param resolution: Resolution of the simulation [px/um].
@@ -53,7 +53,7 @@ def dose_filter_f(resolution):
         :return: Accumulated power as a "density".
         """
         rho = msbpm(rho_0 * torch.tensor(ConfigPrint.power, device='cuda', requires_grad=True),
-                    torch.tensor([[ConfigPrint.lp]], device=ConfigPrint.device, requires_grad=True))
+                    torch.tensor([[lp]], device=ConfigPrint.device, requires_grad=True))
 
         return rho.squeeze()
 
