@@ -13,14 +13,14 @@ from utility.helper import f2param, split_int
 def make_sim_tidy(rho):
     input_waveguide = td.Structure(
         geometry=td.Box(center=(-(ConfigSim.lx - ConfigSim.wg_length) / 2 - 1,
-                                0,
+                                -(ConfigSim.rho_size[1] - ConfigSim.wg_width - ConfigSim.buffer_side) / 2,
                                 -ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.wg_width / 2),
                         size=(ConfigSim.wg_length + 4, ConfigSim.wg_width, ConfigSim.wg_width)),
         medium=td.Medium(permittivity=ConfigSim.refr_index[2] ** 2)
     )
     output_waveguide_te = td.Structure(
         geometry=td.Box(center=((ConfigSim.lx - ConfigSim.wg_length) / 2 + 1,
-                                -ConfigSim.wg_spacing / 2,
+                                -(ConfigSim.rho_size[1] - ConfigSim.wg_width - ConfigSim.buffer_side) / 2,
                                 -ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.wg_height / 2),
                         size=(ConfigSim.wg_length + 4, ConfigSim.wg_width, ConfigSim.wg_height)),
         medium=td.Medium(permittivity=ConfigSim.refr_index[2] ** 2)
@@ -28,7 +28,7 @@ def make_sim_tidy(rho):
 
     output_waveguide_tm = td.Structure(
         geometry=td.Box(center=((ConfigSim.lx - ConfigSim.wg_length) / 2 + 1,
-                                ConfigSim.wg_spacing / 2,
+                                (ConfigSim.rho_size[1] - ConfigSim.wg_width - ConfigSim.buffer_side) / 2,
                                 -ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.wg_width / 2),
                         size=(ConfigSim.wg_length + 4, ConfigSim.wg_height, ConfigSim.wg_width)),
         medium=td.Medium(permittivity=ConfigSim.refr_index[2] ** 2)
@@ -49,7 +49,7 @@ def make_sim_tidy(rho):
 
     design_region_mesh = td.MeshOverrideStructure(
         geometry=custom_structure.geometry,
-        dl=[1 / ConfigSim.nx, 1 / ConfigSim.ny, 1 / ConfigSim.nz],
+        dl=[1 / ConfigSim.dl] * 3,
         enforce=True,
     )
 
@@ -92,7 +92,7 @@ def make_sim_tidy(rho):
                             + [design_region_mesh]
     )
 
-    return (sim_te, sim_tm)
+    return (sim_te.updated_copy(grid_spec=grid_spec_te), sim_tm.updated_copy(grid_spec=grid_spec_tm))
 
 
 def heat_simulation(rho, resize_factor):

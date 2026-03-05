@@ -7,12 +7,12 @@ class ConfigSimMode:
     Config file for the tidy3d Simulation. Units are given in um.
     Propagation direction is in z-direction.
     '''
-    wavelength = 1.
+    wavelength = 1.55
     freq0 = C_0 / wavelength
     fwidth = freq0 / 10
     run_time = 50 / fwidth
 
-    rho_size = (6, 6, 2)
+    rho_size = (16, 16, 2)
     thickness_substrate = 3
     buffer = 1 * wavelength
 
@@ -40,7 +40,7 @@ class ConfigSimMode:
     min_feature_size = 0.5
 
     min_steps_per_wvl = 10
-    dl = 14
+    dl = 10
     nx = rho_size[0]*dl
     ny = rho_size[1]*dl
     nz = rho_size[2]*dl

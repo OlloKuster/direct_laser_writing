@@ -141,7 +141,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
     """
     rho = np.array(rho)
 
-    optimizer = optax.adam(learning_rate=config.lr)
+    optimizer = optax.rmsprop(learning_rate=config.lr)
     opt_state = optimizer.init(rho)
 
     loss_hist = []

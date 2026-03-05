@@ -28,6 +28,9 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     objectives = setting["objectives"]
     filters = setting["filters"]
     filter_values = setting["filter_factor"] * resolution
+    lp = setting["lp_deviation"]
+    if lp == 0:
+        lp = ConfigPrint.lp
     projections = setting["projection"]
     init_projections = setting["init_projection"]
     projection_values = setting["projection_values"]
@@ -44,8 +47,8 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     rho_0 = np.ones((ConfigSim.nx, ConfigSim.ny, ConfigSim.nz)) * 0.5
     # rho_0[:, :rho_0.shape[1]//2] = 0.3
     #
-    rho_0 = np.random.rand(ConfigSim.nx, ConfigSim.ny,
-                           ConfigSim.nz)
+    # rho_0 = np.random.rand(ConfigSim.nx, ConfigSim.ny,
+    #                        ConfigSim.nz)
     #
     # rho_0 = np.repeat(rho_0, ConfigSim.nz, axis=2)
 
@@ -92,7 +95,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         print(f"beta: {betas[i]}")
         objective = objective_loader(objectives, init_val_mat, init_val_void)
 
-        filter = filter_loader(filters, filter_values)
+        filter = filter_loader(filters, filter_values, lp)
         projection = projection_loader(projections, projection_values, betas[i], resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
 

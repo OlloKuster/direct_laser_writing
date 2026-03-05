@@ -10,7 +10,7 @@ class Sources:
         source_time=td.GaussianPulse(freq0=ConfigSimMode.freq0, fwidth=ConfigSimMode.fwidth),
         center=ConfigSimMode.pos_source,
         size=ConfigSimMode.size_source,
-        mode_index=1,
+        mode_index=0,
         mode_spec=td.ModeSpec(num_modes=ConfigSimMode.num_modes),
         direction='+'
     )

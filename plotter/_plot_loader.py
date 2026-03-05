@@ -46,5 +46,5 @@ def plot_loader(plot: str, *args):
 
     if plot == "pol_splitter_regular":
         return polarization_splitter_regular_intermediate_plot()
-    if plot == "pol_splitter_regular":
+    if plot == "pol_splitter_final":
         return polarization_splitter_regular_final_plot()

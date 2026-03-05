@@ -49,9 +49,9 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
 
     # rho_0 = np.repeat(rho_0, ConfigSimMode.nz, axis=2)
 
-    rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(ConfigSimMode.rho_size[0] * resolution,
-                                                                  ConfigSimMode.rho_size[1] * resolution,
-                                                                  ConfigSimMode.rho_size[2] * resolution), sigma=0.25 * resolution))
+    # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(ConfigSimMode.rho_size[0] * resolution,
+    #                                                               ConfigSimMode.rho_size[1] * resolution,
+    #                                                               ConfigSimMode.rho_size[2] * resolution), sigma=0.25 * resolution))
     #
     # rho_0 = np.repeat(rho_0, ConfigSimMode.rho_size[2] * resolution, axis=2)
 
@@ -92,7 +92,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         print(f"beta: {betas[i]}")
         objective = objective_loader(objectives, init_val_mat, init_val_void)
 
-        filter = filter_loader(filters, filter_values)
+        filter = filter_loader(filters, filter_values, ConfigPrint.lp)
         projection = projection_loader(projections, projection_values, betas[i], resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
 

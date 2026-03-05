@@ -22,19 +22,19 @@ class ConfigSim:
     buffer_top = 1
 
     wg_width = 2
-    wg_height = 1
+    wg_height = 2
     wg_length = 3
-    wg_spacing = 5
+    wg_spacing = 8
 
     lx = wg_length + rho_size[0] + wg_length
     ly = buffer + rho_size[1] + buffer
     lz = thickness_substrate + rho_size[2] + buffer
 
-    pos_source = [-lx / 2 + 0.5, 0, -lz / 2 + thickness_substrate + wg_height / 2]
+    pos_source = [-lx / 2 + 0.5, -(rho_size[1] - wg_width - buffer_side) / 2, -lz / 2 + thickness_substrate + wg_height / 2]
     size_source = [0, 3*wg_width, 3*wg_height]
 
-    pos_monitor_te = [lx / 2 - wg_length + 0.5, -wg_spacing / 2, -lz / 2 + thickness_substrate + wg_height / 2]
-    pos_monitor_tm = [lx / 2 - wg_length + 0.5, wg_spacing / 2, -lz / 2 + thickness_substrate + wg_height / 2]
+    pos_monitor_te = [lx / 2 - wg_length + 0.5, -(rho_size[1] - wg_width - buffer_side) / 2, -lz / 2 + thickness_substrate + wg_height / 2]
+    pos_monitor_tm = [lx / 2 - wg_length + 0.5, (rho_size[1] - wg_width - buffer_side) / 2, -lz / 2 + thickness_substrate + wg_height / 2]
     size_monitor = [0, 3*wg_width, 3*wg_width]
     size_monitor_te = [0, 3*wg_width, 3*wg_height]
     size_monitor_tm = [0, 3*wg_height, 3*wg_width]

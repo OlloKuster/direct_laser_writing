@@ -41,7 +41,7 @@ def make_sim_tidy(rho):
 
     design_region_mesh = td.MeshOverrideStructure(
         geometry=custom_structure.geometry,
-        dl=[1/ConfigSimMode.nx, 1/ConfigSimMode.ny, 1/ConfigSimMode.nz],
+        dl=[1/ConfigSimMode.dl] * 3,
         enforce=True,
     )
 

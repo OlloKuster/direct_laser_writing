@@ -20,7 +20,7 @@ def upload_sim(seed):
     # job = web.Job(simulation=sim, task_name="test")
     # estimated_cost = web.estimate_cost(job.task_id)
 
-    # sim_data = web.run(sim, task_name="name", folder_name="mode_converter", verbose=True)
+    sim_data = web.run(sim[0], task_name="name", folder_name="test_splitter", verbose=True)
     # e_x = sim_data["Mode Field Monitor"].Ex.values.squeeze()
     # print(e_x.shape)
     # plt.imshow(np.abs(e_x).T, origin='lower')

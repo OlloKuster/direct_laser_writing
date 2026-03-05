@@ -29,7 +29,7 @@ def measure_mode_power_ag(rho):
 
     ConfigSim.cur_it += 1
 
-    return anp.sum(anp.abs(trans_te)**(-ConfigSim.p) + anp.abs(trans_tm)**(-ConfigSim.p))**(-1/ConfigSim.p)
+    return (trans_tm + trans_te) / 2 - anp.abs(trans_tm - trans_te)
 
 
 @jax.custom_vjp

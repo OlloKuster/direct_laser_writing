@@ -126,7 +126,7 @@ def setting_loader(system: str, setup: str):
                 "filter_factor": 1,  # Factor for the size of the filter (1 is 1um).
                 "plotter_eval": "mc_eval_regular",  # Which plotting function is used for the evaluation.
                 "plotter_final": "mc_final_regular",  # Which plotting function is used for the final plotting.
-                "projection": "tanh_jax",  # Projection used for the optimization.
+                "projection": "ssp_jax",  # Projection used for the optimization.
                 "projection_values": ConfigPrint.rho_th_GT,  # Threshold value used in projection.
                 "init_projection": "tanh_jax",  # Initial projection used for the "precompensated" structure.
                 "init_projection_values": ConfigPrint.rho_th_GT,  # Threshold value for the inital projection.
@@ -144,14 +144,15 @@ def setting_loader(system: str, setup: str):
 
         if setup == "normal_gauss":
             setting_dict = {
+                "run": Dispenser.MODECONVERTER,
                 "objectives": "em_heat",
                 "filters": "gauss_jax",
                 "filter_factor": 1 / (3 * np.sqrt(3)),
-                "plotter_eval": "eval_regular",
-                "plotter_final": "final_regular",
+                "plotter_eval": "mc_eval_regular",
+                "plotter_final": "mc_final_regular",
                 "projection": "ssp_jax",
                 "projection_values": ConfigPrint.rho_th_GT,
-                "init_projection": "tanh_jax",
+                "init_projection": "None",
                 "init_projection_values": 0.5,
                 "optimizers": "jax",
                 "conversions": "None",
@@ -226,8 +227,9 @@ def setting_loader(system: str, setup: str):
                 "objectives": "em_heat",  # Objective function(s) of the problem.
                 "filters": "dose_conv",  # Filter function for the optimization.
                 "filter_factor": 1,  # Factor for the size of the filter (1 is 1um).
+                "lp_deviation": 0,
                 "plotter_eval": "pol_splitter_regular",  # Which plotting function is used for the evaluation.
-                "plotter_final": "pol_splitter_regular",  # Which plotting function is used for the final plotting.
+                "plotter_final": "pol_splitter_final",  # Which plotting function is used for the final plotting.
                 "projection": "ssp_jax",  # Projection used for the optimization.
                 "projection_values": ConfigPrint.rho_th_GT,  # Threshold value used in projection.
                 "init_projection": "tanh_jax",  # Initial projection used for the "precompensated" structure.

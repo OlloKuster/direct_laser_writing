@@ -36,7 +36,7 @@ def measure_mode_power_fwd(rho):
 
 def measure_mode_power_bwd(res, g):
     ans, dx = res
-    return g * dx,
+    return dx,
 
 
 measure_mode_power.defvjp(measure_mode_power_fwd, measure_mode_power_bwd)
@@ -64,17 +64,16 @@ def objective_em_heat_f(init_values):
         # n_heat_m = (v_heat_m - init_values[0]) / init_values[0]
         # n_heat_v = (v_heat_v - init_values[1]) / init_values[1]
 
-        logs = {
-            "transmission": transmission, "n_heat_m": n_heat_m, "n_heat_v": n_heat_v, "v_heat_m": v_heat_m,
-            "v_heat_v": v_heat_v
-        }
-
-        print("====================")
-        for name, log in logs.items():
-            jprint("{name}:", name=name)
-            jprint("    {log}", log=log)
-        print("====================")
-
+        # logs = {
+        #     "transmission": transmission, "n_heat_m": n_heat_m, "n_heat_v": n_heat_v, "v_heat_m": v_heat_m,
+        #     "v_heat_v": v_heat_v
+        # }
+        #
+        # print("====================")
+        # for name, log in logs.items():
+        #     jprint("{name}:", name=name)
+        #     jprint("    {log}", log=log)
+        # print("====================")
 
         return transmission, (transmission, 0)
 
