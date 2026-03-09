@@ -13,14 +13,14 @@ from utility.helper import f2param, split_int
 def make_sim_tidy(rho):
     input_waveguide = td.Structure(
         geometry=td.Box(center=(-(ConfigSim.lx - ConfigSim.wg_length) / 2 - 1,
-                                -(ConfigSim.rho_size[1] - ConfigSim.wg_width - ConfigSim.buffer_side) / 2,
-                                -ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.wg_width / 2),
-                        size=(ConfigSim.wg_length + 4, ConfigSim.wg_width, ConfigSim.wg_width)),
+                                -(ConfigSim.rho_size[1] - ConfigSim.wg_init_width) / 2 + 2*ConfigSim.buffer_side,
+                                -ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.wg_init_height / 2),
+                        size=(ConfigSim.wg_length + 4, ConfigSim.wg_init_width, ConfigSim.wg_init_height)),
         medium=td.Medium(permittivity=ConfigSim.refr_index[2] ** 2)
     )
     output_waveguide_te = td.Structure(
         geometry=td.Box(center=((ConfigSim.lx - ConfigSim.wg_length) / 2 + 1,
-                                -(ConfigSim.rho_size[1] - ConfigSim.wg_width - ConfigSim.buffer_side) / 2,
+                                -(ConfigSim.rho_size[1] - ConfigSim.wg_width) / 2 + 2*ConfigSim.buffer_side,
                                 -ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.wg_height / 2),
                         size=(ConfigSim.wg_length + 4, ConfigSim.wg_width, ConfigSim.wg_height)),
         medium=td.Medium(permittivity=ConfigSim.refr_index[2] ** 2)
@@ -28,7 +28,7 @@ def make_sim_tidy(rho):
 
     output_waveguide_tm = td.Structure(
         geometry=td.Box(center=((ConfigSim.lx - ConfigSim.wg_length) / 2 + 1,
-                                (ConfigSim.rho_size[1] - ConfigSim.wg_width - ConfigSim.buffer_side) / 2,
+                                (ConfigSim.rho_size[1] - ConfigSim.wg_width) / 2  - 2*ConfigSim.buffer_side,
                                 -ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.wg_width / 2),
                         size=(ConfigSim.wg_length + 4, ConfigSim.wg_height, ConfigSim.wg_width)),
         medium=td.Medium(permittivity=ConfigSim.refr_index[2] ** 2)
@@ -53,9 +53,8 @@ def make_sim_tidy(rho):
         enforce=True,
     )
 
-    grid_spec = td.GridSpec.auto(
-        wavelength=ConfigSim.wavelength,
-        min_steps_per_wvl=ConfigSim.min_steps_per_wvl
+    grid_spec = td.GridSpec.uniform(
+        dl=ConfigSim.dl
     )
 
     sim_te = td.Simulation(
@@ -63,7 +62,7 @@ def make_sim_tidy(rho):
         grid_spec=grid_spec,
         structures=[custom_structure, input_waveguide, output_waveguide_te, output_waveguide_tm, substrate],
         sources=[Sources.source_te],
-        monitors=[Monitors.mode_monitor_te, Monitors.field_monitor_source,
+        monitors=[Monitors.mode_monitor_te, Monitors.mode_monitor_tm, Monitors.field_monitor_source,
                   Monitors.field_monitor_center, Monitors.eps_monitor],
         run_time=ConfigSim.run_time,
         boundary_spec=td.BoundarySpec.pml(x=True, y=True, z=True),
@@ -76,7 +75,7 @@ def make_sim_tidy(rho):
         grid_spec=grid_spec,
         structures=[custom_structure, input_waveguide, output_waveguide_te, output_waveguide_tm, substrate],
         sources=[Sources.source_tm],
-        monitors=[Monitors.mode_monitor_tm, Monitors.field_monitor_source,
+        monitors=[Monitors.mode_monitor_te, Monitors.mode_monitor_tm, Monitors.field_monitor_source,
                   Monitors.field_monitor_center, Monitors.eps_monitor],
         run_time=ConfigSim.run_time,
         boundary_spec=td.BoundarySpec.pml(x=True, y=True, z=True),
@@ -92,7 +91,7 @@ def make_sim_tidy(rho):
                             + [design_region_mesh]
     )
 
-    return (sim_te.updated_copy(grid_spec=grid_spec_te), sim_tm.updated_copy(grid_spec=grid_spec_tm))
+    return (sim_te, sim_tm)
 
 
 def heat_simulation(rho, resize_factor):

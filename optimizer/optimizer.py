@@ -1,4 +1,5 @@
 import jax
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import nlopt
@@ -73,6 +74,9 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         print(f"iteration: {config.cur_it}")
         config.cur_it += 1
         loss_hist.append(value)
+        plt.plot(loss_hist)
+        plt.savefig("cur_loss.png")
+        plt.close()
         if g.size > 0:
             g[:] = grad.ravel()
         end = time.time()
@@ -141,7 +145,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
     """
     rho = np.array(rho)
 
-    optimizer = optax.rmsprop(learning_rate=config.lr)
+    optimizer = optax.adam(learning_rate=config.lr)
     opt_state = optimizer.init(rho)
 
     loss_hist = []
@@ -204,6 +208,9 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
         print(f"grad: {np.mean(grad)}")
         print(f"iteration: {config.cur_it}")
         print(f"time: {time.time() - start}")
+        plt.plot(loss_hist)
+        plt.savefig("loss_hist.png")
+        plt.close()
 
         # if np.abs(prev_val - value) <= 1e-4:
         #     break

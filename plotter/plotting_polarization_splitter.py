@@ -39,6 +39,7 @@ def polarization_splitter_regular_intermediate_plot():
         plt.savefig(f"problems/polarization_splitter/plots/progression/field_{i:03d}.png")
         plt.close()
 
+        pv.global_theme.allow_empty_mesh = True
         p = pv.Plotter(off_screen=True)
         data = pv.wrap(np.array(rho_final))
         p.add_mesh(data.contour(), cmap='binary')

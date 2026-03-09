@@ -7,22 +7,24 @@ class ConfigSim:
     Config file for the tidy3d Simulation. Units are given in um.
     Propagation direction is in z-direction.
     '''
-    p = 10
+    p = 5
 
-    wavelength = 1.55
+    wavelength = 1.0
     freq0 = C_0 / wavelength
     fwidth = freq0 / 10
     run_time = 50 / fwidth
 
-    rho_size = (11, 11, 3)
-    thickness_substrate = 3
+    rho_size = (8, 6, 3)
+    thickness_substrate = 2
     buffer = 1 * wavelength
 
     buffer_side = 0.5
     buffer_top = 1
 
-    wg_width = 2
-    wg_height = 2
+    wg_width = 1
+    wg_height = 1
+    wg_init_width = 1
+    wg_init_height = 1
     wg_length = 3
     wg_spacing = 8
 
@@ -30,11 +32,11 @@ class ConfigSim:
     ly = buffer + rho_size[1] + buffer
     lz = thickness_substrate + rho_size[2] + buffer
 
-    pos_source = [-lx / 2 + 0.5, -(rho_size[1] - wg_width - buffer_side) / 2, -lz / 2 + thickness_substrate + wg_height / 2]
-    size_source = [0, 3*wg_width, 3*wg_height]
+    pos_source = [-lx / 2 + 0.5, -(rho_size[1] - wg_init_width) / 2 + 2*buffer_side, -lz / 2 + thickness_substrate + wg_init_height / 2]
+    size_source = [0, 3*wg_init_width, 3*wg_init_width]
 
-    pos_monitor_te = [lx / 2 - wg_length + 0.5, -(rho_size[1] - wg_width - buffer_side) / 2, -lz / 2 + thickness_substrate + wg_height / 2]
-    pos_monitor_tm = [lx / 2 - wg_length + 0.5, (rho_size[1] - wg_width - buffer_side) / 2, -lz / 2 + thickness_substrate + wg_height / 2]
+    pos_monitor_te = [lx / 2 - wg_length + 0.5, -(rho_size[1] - wg_width) / 2 + 2*buffer_side , -lz / 2 + thickness_substrate + wg_height / 2]
+    pos_monitor_tm = [lx / 2 - wg_length + 0.5, (rho_size[1] - wg_width) / 2 - 2*buffer_side, -lz / 2 + thickness_substrate + wg_height / 2]
     size_monitor = [0, 3*wg_width, 3*wg_width]
     size_monitor_te = [0, 3*wg_width, 3*wg_height]
     size_monitor_tm = [0, 3*wg_height, 3*wg_width]
@@ -45,8 +47,8 @@ class ConfigSim:
     kappa = (1e-5, 1)  # Thermal conductivity
     min_feature_size = 0.5
 
-    min_steps_per_wvl = 8
-    dl = 8
+    min_steps_per_wvl = 14
+    dl = 14
     nx = rho_size[0]*dl
     ny = rho_size[1]*dl
     nz = rho_size[2]*dl

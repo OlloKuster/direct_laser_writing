@@ -18,18 +18,23 @@ def measure_mode_power_ag(rho):
     sim_data_te = web.run(sim[0], task_name=f"pol_splitter_te_{ConfigSim.cur_it + 1}", folder_name="pol_splitter_dlw", verbose=False)
     sim_data_te.to_file(fname='problems/polarization_splitter/plots/progression/current_simulation_te.hdf5')
     output_amps_te = sim_data_te["Mode Monitor Horizontal"].amps
-    amp_te = output_amps_te.sel(direction='+', f=ConfigSim.freq0, mode_index=1).values
-    trans_te = anp.abs(amp_te) ** 2
+    leaked_output_amps_te = sim_data_te["Mode Monitor Vertical"].amps
+    amp_te = output_amps_te.sel(direction='+', f=ConfigSim.freq0).values
+    leaked_amp_te = leaked_output_amps_te.sel(direction='+', f=ConfigSim.freq0).values
+    trans_te = np.sum(anp.abs(amp_te) ** 2) - np.sum(anp.abs(leaked_amp_te) ** 2)
 
     sim_data_tm = web.run(sim[1], task_name=f"pol_splitter_tm_{ConfigSim.cur_it + 1}", folder_name="pol_splitter_dlw", verbose=False)
     sim_data_tm.to_file(fname='problems/polarization_splitter/plots/progression/current_simulation_tm.hdf5')
     output_amps_tm = sim_data_tm["Mode Monitor Vertical"].amps
-    amp_tm = output_amps_tm.sel(direction='+', f=ConfigSim.freq0, mode_index=0).values
-    trans_tm = anp.abs(amp_tm) ** 2
+    leaked_output_amps_tm = sim_data_te["Mode Monitor Horizontal"].amps
+    amp_tm = output_amps_tm.sel(direction='+', f=ConfigSim.freq0).values
+    leaked_amp_tm = leaked_output_amps_tm.sel(direction='+', f=ConfigSim.freq0).values
+    trans_tm = np.sum(anp.abs(amp_tm) ** 2) - np.sum(anp.abs(leaked_amp_tm) ** 2)
 
     ConfigSim.cur_it += 1
 
-    return (trans_tm + trans_te) / 2 - anp.abs(trans_tm - trans_te)
+    # return anp.sum(anp.abs(trans_te)**(-ConfigSim.p) + anp.abs(trans_tm)**(-ConfigSim.p))**(-1/ConfigSim.p)
+    return (trans_te + trans_tm) / 2
 
 
 @jax.custom_vjp
