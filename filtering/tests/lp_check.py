@@ -55,9 +55,9 @@ def test(seed):
         # # p.remove_scalar_bar()
         # p.camera.zoom(1.3)
         # p.show()
-        # if result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2] >= 0.5:
-        #     print(factor)
-        #     break
+        if result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2] >= 0.5:
+            print(factor)
+            break
         print(f"lp: {factor}")
         print(f"bin_value: {result_bin[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2]}")
         print(f"actual_value: {result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2]}")

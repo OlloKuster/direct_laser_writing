@@ -74,7 +74,8 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         print(f"iteration: {config.cur_it}")
         config.cur_it += 1
         loss_hist.append(value)
-        plt.plot(loss_hist)
+        loss_hist_clipped = np.clip(loss_hist, 0, 1)
+        plt.plot(loss_hist_clipped)
         plt.savefig("cur_loss.png")
         plt.close()
         if g.size > 0:
@@ -113,8 +114,8 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
     # opt.set_param('tolg', 1e-12)
     opt.set_max_objective(f)
     opt.set_maxeval(max_evals)
-    # opt.set_ftol_abs(config.FTOL_ABS)
-    # opt.set_ftol_rel(config.FTOL_REL)
+    opt.set_ftol_abs(config.FTOL_ABS)
+    opt.set_ftol_rel(config.FTOL_REL)
     # opt.set_stopval(1e-4)
     opt.set_upper_bounds(config.UPPER_BOUNDS)
     opt.set_lower_bounds(config.LOWER_BOUNDS)

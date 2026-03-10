@@ -2,8 +2,8 @@
 import nlopt
 
 MAXEVAL = 20
-FTOL_ABS = 1e-6
-FTOL_REL = 1e-3
+FTOL_ABS = 1e-5
+FTOL_REL = 1e-4
 UPPER_BOUNDS = 1
 LOWER_BOUNDS = 0
 OPTIMISER = nlopt.LD_MMA  # MMA for lens, LBFGS for cross

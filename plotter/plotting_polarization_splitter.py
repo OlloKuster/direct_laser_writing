@@ -17,11 +17,11 @@ def polarization_splitter_regular_intermediate_plot():
     def plotter(rho_init, rho_final, _, projection, i):
         plt.switch_backend('agg')
         fig, ax = plt.subplots(2, 2, sharex=True)
-        ax[0, 0].imshow(rho_init[:, :, rho_init.shape[2] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+        ax[0, 0].imshow(rho_init[:, :, rho_init.shape[2] // 2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
         ax[0, 1].imshow(rho_init[:, rho_init.shape[1] // 2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
         rho_final = projection(rho_final)
-        ax[1, 0].imshow(rho_final[:, :, rho_init.shape[2] // 4].T, origin='lower', cmap='binary', vmin=0, vmax=1)
-        ax[1, 1].imshow(rho_final[:, rho_init.shape[2] // 2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+        ax[1, 0].imshow(rho_final[:, :, rho_init.shape[2] // 2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
+        ax[1, 1].imshow(rho_final[:, rho_init.shape[1] // 2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
         plt.savefig(f"problems/polarization_splitter/plots/progression/rho_{i:03d}.png")
         plt.close()
 
@@ -51,7 +51,14 @@ def polarization_splitter_regular_intermediate_plot():
         p.show(screenshot=f"problems/polarization_splitter/plots/progression/eps_{i:03d}.png")
         p.close()
 
-        pv.plot(np.array(rho_final), off_screen=True, screenshot=f"problems/mode_converter/plots/progression/eps_density_{i:03d}.png", cmap='binary')
+        pv.plot(np.array(rho_final), off_screen=True, screenshot=f"problems/polarization_splitter/plots/progression/eps_density_{i:03d}.png", cmap='binary')
+
+        with h5py.File(
+                f"problems/polarization_splitter/plots/current_rho.h5",
+                'w') as f:
+            grp = f.create_group("polarization_splitter")
+            grp.create_dataset("eps", data=rho_init)
+            f.close()
 
     return plotter
 
@@ -66,7 +73,8 @@ def polarization_splitter_regular_final_plot():
                 save=True):
 
         if loss_hist is not None:
-            plt.plot(loss_hist)
+            loss_hist_clipped = np.clip(loss_hist, 0, 1)
+            plt.plot(loss_hist_clipped)
             # plt.yscale('log')
             plt.savefig(
                 f"problems/polarization_splitter/plots/loss_{run_id}_{beta}.png")
@@ -79,9 +87,9 @@ def polarization_splitter_regular_final_plot():
             plt.close()
 
         if E is not None:
-            plt.imshow(eps[:, :, eps.shape[2] // 4].T, origin='lower', cmap='binary',
+            plt.imshow(eps[:, :, eps.shape[2] // 2].T, origin='lower', cmap='binary',
                        extent=(0, extent[0], 0, extent[1]))
-            plt.imshow(np.abs(E[0][E[0].shape[0] // 4].T), origin='lower', cmap="magma", alpha=0.8,
+            plt.imshow(np.abs(E[0][E[0].shape[0] // 2].T), origin='lower', cmap="magma", alpha=0.8,
                        extent=(0, extent[0], 0, extent[1]))
             plt.xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
             plt.ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
@@ -89,7 +97,7 @@ def polarization_splitter_regular_final_plot():
                 f"problems/polarization_splitter/plots/eps_and_e_{run_id}_{beta}.png")
             plt.close()
         if eps is not None:
-            plt.imshow(eps[:, :, eps.shape[2] // 4].T, origin='lower', cmap='binary',
+            plt.imshow(eps[:, :, eps.shape[2] // 2].T, origin='lower', cmap='binary',
                        extent=(0, extent[0], 0, extent[1]))
             plt.xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
             plt.ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)

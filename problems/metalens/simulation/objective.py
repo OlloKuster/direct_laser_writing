@@ -167,7 +167,7 @@ def objective_robust_em_heat_f(currents, resolution, init_values):
         :param rhos: Densities (design variable) of the problem 3x[0, 1].
         :return: robust objective function, values for the EM-performances.
         """
-        power = -20
+        power = -19 # Needs to be an odd number
         fom_eroded, (v_lens_eroded, eps_eroded) = objective_softplus(rhos[0])
         fom_normal, (v_lens_normal, eps_normal) = objective_softplus(rhos[1])
         fom_dilated, (v_lens_dilated, eps_dilated) = objective_softplus(rhos[2])

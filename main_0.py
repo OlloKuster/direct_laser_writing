@@ -22,6 +22,6 @@ if __name__ == "__main__":
     resolution = 14
     loss_hist = []
     em_loss_hist = []
-    betas = [np.inf]
-    loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=100, opt="optax",
+    betas = [8, 16, np.inf]
+    loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=150, opt="nlopt",
                                    eval=eval, full_bin=False, run_id=0)
