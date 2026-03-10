@@ -19,7 +19,7 @@ if __name__ == "__main__":
     setting = setting_loader("metalens", "gauss_em_only")
     eval = True
     resolution = 14
-    betas = [16, 32, np.inf]
+    betas = [8, 16, np.inf]
     run_id = 7
 
     feature_size_factor = [1, 0.75, 0.5, 0.4, 0.3, 0.2, 0.1]
