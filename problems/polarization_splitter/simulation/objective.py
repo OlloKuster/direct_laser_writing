@@ -21,7 +21,7 @@ def measure_mode_power_ag(rho):
     leaked_output_amps_te = sim_data_te["Mode Monitor Vertical"].amps
     amp_te = output_amps_te.sel(direction='+', f=ConfigSim.freq0).values
     leaked_amp_te = leaked_output_amps_te.sel(direction='+', f=ConfigSim.freq0).values
-    trans_te = np.sum(anp.abs(amp_te) ** 2) - 0.5*np.sum(anp.abs(leaked_amp_te) ** 2)
+    trans_te = np.sum(anp.abs(amp_te) ** 2) - 0.3*np.sum(anp.abs(leaked_amp_te) ** 2)
 
     sim_data_tm = web.run(sim[1], task_name=f"pol_splitter_tm_{ConfigSim.cur_it + 1}", folder_name="pol_splitter_dlw", verbose=False)
     sim_data_tm.to_file(fname='problems/polarization_splitter/plots/progression/current_simulation_tm.hdf5')
@@ -29,7 +29,7 @@ def measure_mode_power_ag(rho):
     leaked_output_amps_tm = sim_data_te["Mode Monitor Horizontal"].amps
     amp_tm = output_amps_tm.sel(direction='+', f=ConfigSim.freq0).values
     leaked_amp_tm = leaked_output_amps_tm.sel(direction='+', f=ConfigSim.freq0).values
-    trans_tm = np.sum(anp.abs(amp_tm) ** 2) - 0.5*np.sum(anp.abs(leaked_amp_tm) ** 2)
+    trans_tm = np.sum(anp.abs(amp_tm) ** 2) - 0.3*np.sum(anp.abs(leaked_amp_tm) ** 2)
 
     ConfigSim.cur_it += 1
 
@@ -117,7 +117,7 @@ def objective_robust_em_heat_f(init_values):
         :param rhos: Densities (design variable) of the problem 3x[0, 1].
         :return: robust objective function, values for the EM-performances.
         """
-        power = 20
+        power = 19
 
         fom_eroded, trans_eroded = objective_softplus(rhos[0])
         fom_normal, trans_normal = objective_softplus(rhos[1])

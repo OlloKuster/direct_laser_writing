@@ -15,12 +15,13 @@ def upload_sim(seed):
 
     sim = make_sim_tidy(rho_0)
     # sim.plot(z=-ConfigSimMode.lz / 2 + ConfigSimMode.thickness_substrate + ConfigSimMode.wg_height / 2 )
-    sim[0].plot(z=-ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.wg_height / 2)
+    sim[1].plot(z=-ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.wg_height / 2)
+    sim[1].plot(y=-3)
     plt.show()
     # job = web.Job(simulation=sim, task_name="test")
     # estimated_cost = web.estimate_cost(job.task_id)
 
-    sim_data = web.run(sim[0], task_name="name", folder_name="test_splitter", verbose=True)
+    # sim_data = web.run(sim[0], task_name="name", folder_name="test_splitter", verbose=True)
     # e_x = sim_data["Mode Field Monitor"].Ex.values.squeeze()
     # print(e_x.shape)
     # plt.imshow(np.abs(e_x).T, origin='lower')

@@ -17,11 +17,11 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
 
 if __name__ == "__main__":
-    setting = setting_loader("pol_splitter", "dlw_regular")
+    setting = setting_loader("metalens", "dlw_robust")
     eval = True
     resolution = 14
     loss_hist = []
     em_loss_hist = []
     betas = [8, 16, np.inf]
-    loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=150, opt="nlopt",
+    loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15, opt="nlopt",
                                    eval=eval, full_bin=False, run_id=0)

@@ -248,7 +248,7 @@ def metalens_robust_final_plot():
                 grp.create_dataset("E_dilation", data=E[2])
                 grp.create_dataset("eps_erosion", data=eps[0])
                 grp.create_dataset("eps_normal", data=eps[1])
-                grp.create_dataset("eps_final", data=eps[2])
+                grp.create_dataset("eps_dilation", data=eps[2])
                 grp.create_dataset("rho", data=rho_0)
                 grp.create_dataset("loss", data=loss_hist)
                 grp.create_dataset("em_loss", data=em_loss_hist)

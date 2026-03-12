@@ -95,6 +95,7 @@ def setting_loader(system: str, setup: str):
                 "objectives": "em_only",
                 "filters": "gauss_jax",
                 "filter_factor": 1 / (4*np.sqrt(3)),
+                "lp_deviation": 0.1,
                 "plotter_eval": "eval_regular",
                 "plotter_final": "final_regular",
                 "projection": "ssp_jax",

@@ -25,7 +25,7 @@ for i in inds_feature_size:
         grp = f["lens_3d"]
         em_loss_feature_size = grp["em_loss"][:]
         loss_feature_size = grp["loss"][:]
-        em_loss_list_feature_size[int(i)] = em_loss_feature_size[-1]
+        em_loss_list_feature_size[int(i)] = np.max(em_loss_feature_size)
 
 path_lp = "/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/lp_sweep/"
 
