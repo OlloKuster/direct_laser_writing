@@ -20,7 +20,7 @@ def gkernel(sigma):
     kernel = jnp.exp(-0.5 * (xx ** 2 + yy ** 2 + zz ** 2) / sigma ** 2)
     return kernel / jnp.sum(kernel)
 
-gauss = gkernel(0.4/np.sqrt(3)*resolution)
+gauss = gkernel(1/np.sqrt(3)*resolution)
 
 res_lat = 1 / resolution * 10 ** (-6)  # hatching
 res_ax = 1 / resolution * 10 ** (-6)  # slicing
@@ -39,6 +39,7 @@ psf_GT = calc_laser_intensity(lam=torch.tensor(ConfigPrint.lam),
 psf = np.clip(psf_GT.detach().cpu().numpy(), 5, 30)
 
 plt.imshow(gauss[gauss.shape[0]//2].T, origin='lower', cmap=cm.lapaz_r, interpolation='spline36')
+plt.show()
 plt.axis('off')
 plt.savefig("plots/gauss_filter/gauss.png")
 plt.close()

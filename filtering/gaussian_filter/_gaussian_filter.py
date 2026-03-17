@@ -21,7 +21,7 @@ def gaussian_filter_jax_f(sigma):
         """
 
         def gkernel(sigma):
-            l = int(jnp.ceil(4.0 * sigma) + 1)
+            l = int(2*jnp.ceil(4.0 * sigma) + 1)
             ax = jnp.linspace(-(l - 1) / 2., (l - 1) / 2., l)
             xx, yy, zz = jnp.meshgrid(ax, ax, ax)
 
