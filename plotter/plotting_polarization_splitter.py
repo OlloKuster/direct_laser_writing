@@ -147,6 +147,20 @@ def mode_converter_robust_intermediate_plot():
         plt.savefig(f"problems/mode_converter/plots/progression/rho_{i:03d}.png")
         plt.close()
 
+        p = pv.Plotter(off_screen=True)
+        data = pv.wrap(np.array(rho_final))
+        p.add_mesh(data.contour(), cmap='binary')
+        p.camera_position = 'yz'
+        p.camera.elevation = 30
+        p.camera.azimuth = - 45
+        p.remove_scalar_bar()
+        p.camera.zoom(1.3)
+        p.show(screenshot=f"problems/polarization_splitter/plots/progression/eps_{i:03d}.png")
+        p.close()
+
+        pv.plot(np.array(rho_final), off_screen=True, screenshot=f"problems/mode_converter/plots/progression/eps_density_{i:03d}.png", cmap='binary')
+        pv.close_all()
+
     return plotter
 
 

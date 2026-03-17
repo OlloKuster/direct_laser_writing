@@ -14,14 +14,14 @@ def make_sim_tidy(rho):
     input_waveguide = td.Structure(
         geometry=td.Box(center=(-(ConfigSim.lx - ConfigSim.wg_length) / 2 - 1,
                                 -(ConfigSim.rho_size[1] - ConfigSim.wg_init_width) / 2 + 2*ConfigSim.buffer_side,
-                                0),
-                        size=(ConfigSim.wg_length + 4, ConfigSim.wg_init_width, ConfigSim.wg_init_height)),
+                                -ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.wg_width / 2),
+                        size=(ConfigSim.wg_length + 4, ConfigSim.wg_width, ConfigSim.wg_width)),
         medium=td.Medium(permittivity=ConfigSim.refr_index[2] ** 2)
     )
     output_waveguide_te = td.Structure(
         geometry=td.Box(center=((ConfigSim.lx - ConfigSim.wg_length) / 2 + 1,
                                 -(ConfigSim.rho_size[1] - ConfigSim.wg_width) / 2 + 2*ConfigSim.buffer_side,
-                                0),
+                                -ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.wg_height / 2),
                         size=(ConfigSim.wg_length + 4, ConfigSim.wg_width, ConfigSim.wg_height)),
         medium=td.Medium(permittivity=ConfigSim.refr_index[2] ** 2)
     )
@@ -29,21 +29,21 @@ def make_sim_tidy(rho):
     output_waveguide_tm = td.Structure(
         geometry=td.Box(center=((ConfigSim.lx - ConfigSim.wg_length) / 2 + 1,
                                 (ConfigSim.rho_size[1] - ConfigSim.wg_width) / 2 - 2*ConfigSim.buffer_side,
-                                0),
+                                -ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.wg_width / 2),
                         size=(ConfigSim.wg_length + 4, ConfigSim.wg_height, ConfigSim.wg_width)),
         medium=td.Medium(permittivity=ConfigSim.refr_index[2] ** 2)
     )
 
-    # substrate = td.Structure(
-    #     geometry=td.Box(center=(0, 0, (-ConfigSim.lz + ConfigSim.thickness_substrate) / 2 - 1),
-    #                     size=(td.inf, td.inf, ConfigSim.thickness_substrate + 2)),
-    #     medium=td.Medium(permittivity=ConfigSim.refr_index[1] ** 2)
-    # )
+    substrate = td.Structure(
+        geometry=td.Box(center=(0, 0, (-ConfigSim.lz + ConfigSim.thickness_substrate) / 2 - 1),
+                        size=(td.inf, td.inf, ConfigSim.thickness_substrate + 2)),
+        medium=td.Medium(permittivity=ConfigSim.refr_index[1] ** 2)
+    )
     eps = rescale(rho, ConfigSim.refr_index[0] ** 2, ConfigSim.refr_index[2] ** 2)
 
     custom_structure = td.Structure.from_permittivity_array(
         geometry=td.Box(
-            center=(0, 0, 0),
+            center=(0, 0, -ConfigSim.lz / 2 + ConfigSim.thickness_substrate + ConfigSim.rho_size[2] / 2),
             size=(ConfigSim.rho_size[0], ConfigSim.rho_size[1], ConfigSim.rho_size[2])),
         eps_data=eps.reshape(eps.shape[0], eps.shape[1], eps.shape[2]))
 
@@ -53,14 +53,15 @@ def make_sim_tidy(rho):
         enforce=True,
     )
 
-    grid_spec = td.GridSpec.uniform(
-        dl=1/ConfigSim.dl
+    grid_spec = td.GridSpec.auto(
+        wavelength=ConfigSim.wavelength,
+        min_steps_per_wvl=ConfigSim.min_steps_per_wvl
     )
 
     sim_te = td.Simulation(
         size=[ConfigSim.lx, ConfigSim.ly, ConfigSim.lz],
         grid_spec=grid_spec,
-        structures=[custom_structure, input_waveguide, output_waveguide_te, output_waveguide_tm],
+        structures=[custom_structure, input_waveguide, output_waveguide_te, output_waveguide_tm, substrate],
         sources=[Sources.source_te],
         monitors=[Monitors.mode_monitor_te, Monitors.mode_monitor_tm, Monitors.field_monitor_source,
                   Monitors.field_monitor_center, Monitors.eps_monitor],
@@ -73,7 +74,7 @@ def make_sim_tidy(rho):
     sim_tm = td.Simulation(
         size=[ConfigSim.lx, ConfigSim.ly, ConfigSim.lz],
         grid_spec=grid_spec,
-        structures=[custom_structure, input_waveguide, output_waveguide_te, output_waveguide_tm],
+        structures=[custom_structure, input_waveguide, output_waveguide_te, output_waveguide_tm, substrate],
         sources=[Sources.source_tm],
         monitors=[Monitors.mode_monitor_te, Monitors.mode_monitor_tm, Monitors.field_monitor_source,
                   Monitors.field_monitor_center, Monitors.eps_monitor],
@@ -91,7 +92,7 @@ def make_sim_tidy(rho):
                             + [design_region_mesh]
     )
 
-    return (sim_te, sim_tm)
+    return (sim_te.updated_copy(grid_spec=grid_spec_te), sim_tm.updated_copy(grid_spec=grid_spec_tm))
 
 
 def heat_simulation(rho, resize_factor):
@@ -108,9 +109,7 @@ def heat_simulation(rho, resize_factor):
     heat_sinks_matter = jnp.zeros((rho_n_shape[0] + 1,
                                    rho_n_shape[1] + 1,
                                    rho_n_shape[2] + 1), dtype='?')
-    wg_width = int(jnp.ceil(ConfigSim.wg_init_width * ConfigSim.dl))
-    wg_height = int(jnp.ceil(ConfigSim.wg_init_height * ConfigSim.dl))
-    heat_sinks_matter = heat_sinks_matter.at[int(jnp.ceil(ConfigSim.dl)), -(ConfigSim.dl + wg_width):-ConfigSim.dl, (rho.shape[2] - wg_height) // 2:(rho.shape[2] + wg_height) // 2].set(True)
+    heat_sinks_matter = heat_sinks_matter.at[..., 0].set(True)
     kappa_r_matter = f2param(rho_n, ConfigSim.kappa)
     fem_matter = FEA3D_T(heat_sinks_matter)
     src_matter = jnp.pad(rho_n, [(0, 1), (0, 1), (0, 1)], mode='constant', constant_values=0)
@@ -121,7 +120,6 @@ def heat_simulation(rho, resize_factor):
     heat_sinks_void = heat_sinks_void.at[-1].set(True)
     heat_sinks_void = heat_sinks_void.at[:, 0].set(True)
     heat_sinks_void = heat_sinks_void.at[:, -1].set(True)
-    heat_sinks_void = heat_sinks_void.at[..., 0].set(True)
     heat_sinks_void = heat_sinks_void.at[..., -1].set(True)
     kappa_r_void = f2param(1 - rho_n, ConfigSim.kappa)
     fem_void = FEA3D_T(heat_sinks_void)
