@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 #SBATCH --partition="accelerated"
-#SBATCH --job-name="robust_lp"
+#SBATCH --job-name="heat_gauss"
 #SBATCH --time=48:00:00
 #SBATCH --gres=gpu:1
 #SBATCH --err=std.err
@@ -29,6 +29,6 @@ unset __mamba_setup
 
 micromamba activate dlw_horeka
 
-time python main_feature_size_sweep > output.log
+time python main_heat_sweep.py > output.log
 
 cd ..
