@@ -12,5 +12,5 @@ cur_it = 0
 ind = 0
 
 
-lr = 3
+lr = 10
 

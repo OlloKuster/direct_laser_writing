@@ -54,13 +54,13 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         @staticmethod
         def backward(ctx, grad):
             grad_em_sim, = ctx.saved_tensors
-            return grad_em_sim
+            return grad_em_sim * grad
 
     def f_torch_jax(x, g):
         start = time.time()
         x = np.reshape(x, rho.shape)
-        x = np.array(init_projection(x) * mask)
-        rho_0 = torch.tensor(x, device='cuda', requires_grad=True)
+        rho_0 = np.array(init_projection(x))
+        rho_0 = torch.tensor(rho_0, device='cuda', requires_grad=True)
         rho_final = filter(rho_0)
         fom = FomEmTorchF.apply(rho_final)
         fom.backward(retain_graph=True)
@@ -83,13 +83,20 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         end = time.time()
         print(f"time: {end - start}")
         if eval:
+            fig, (ax0, ax1, ax2) = plt.subplots(1, 3)
+            ax0.imshow(x[grad.shape[0] // 2, :grad.shape[1] // 2].T, origin='lower')
+            ax1.imshow(projection(rho_final.detach().cpu().numpy())[grad.shape[0] // 2, :grad.shape[1] // 2].T,
+                       origin='lower')
+            ax2.imshow(grad[grad.shape[0] // 2, :grad.shape[1] // 2].T, origin='lower')
+            plt.show()
+            # plt.savefig(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/progression/grad_{config.cur_it}.png")
             plotter(x, rho_final.detach().cpu().numpy(), cur_eps[-1], projection, config.cur_it)
         return value
 
     def f_jax(x, g):
         start = time.time()
         x = np.reshape(x, rho.shape)
-        x = np.array(init_projection(x) * mask)
+        x = np.array(init_projection(x * mask))
         rho_final = filter(x)
         value_em_sim, grad = jax.value_and_grad(objective, has_aux=True)(projection(rho_final))
         value = float(value_em_sim[0])  # Requires np float and not jax.numpy float
@@ -227,8 +234,11 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
             rho_opt = rho.copy()
             best_val = value
         if eval:
+            fig, (ax0, ax1, ax2) = plt.subplots(1, 3)
+            ax0.imshow(rho_0[grad.shape[0] // 2, :grad.shape[1] // 2].T, origin='lower')
+            ax1.imshow(projection(rho_final)[grad.shape[0] // 2, :grad.shape[1] // 2].T, origin='lower')
+            ax2.imshow(grad[grad.shape[0] // 2, :grad.shape[1] // 2].T, origin='lower')
+            plt.show()
             plotter(rho_init, rho_final, cur_eps[-1], projection, config.cur_it)
-
-
 
     return rho_opt, loss_hist, em_hist, grad_hist

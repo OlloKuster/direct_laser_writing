@@ -56,14 +56,14 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     plotter_eval = plot_loader(plotter_eval_name)
     plotter_final = plot_loader(plotter_final_name)
 
-    rho_0 = np.ones((int(np.ceil(ConfigSim.rho_shape[0] * resolution)),
-                     int(np.ceil(ConfigSim.rho_shape[1] * resolution)),
+    rho_0 = np.ones((int(np.ceil(2*ConfigSim.rho_shape[0] * resolution)),
+                     int(np.ceil(2*ConfigSim.rho_shape[1] * resolution)),
                      int(np.ceil(ConfigSim.rho_shape[2] * resolution)))) * 0.5
 
     # # rho_0[:, :, rho_0.shape[2]//2:] = 0
     # #
-    # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(int(np.ceil(ConfigSim.rho_shape[0] * resolution)),
-    #                        int(np.ceil(ConfigSim.rho_shape[1] * resolution)),
+    # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(int(np.ceil(2*ConfigSim.rho_shape[0] * resolution)),
+    #                        int(np.ceil(2*ConfigSim.rho_shape[1] * resolution)),
     #                        1), sigma=0.3*resolution))
     # rho_0 = np.repeat(rho_0, int(np.ceil(ConfigSim.rho_shape[2] * resolution)), axis=2)
     # rho_0 = np.random.rand(int(np.ceil(ConfigSim.rho_shape[0] * resolution)),
@@ -82,13 +82,21 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
 
     currents = jnp.ones(size_currents, jnp.complex128)
 
-    objective_em = objective_loader(setting["init_em"], currents, resolution, 1, 1, 1)
-    init_val_em, _ = objective_em(jnp.ones_like(rho_0) * 0.5)
-    objective_heat = objective_loader(setting["init_heat"])
-    init_T_mat, init_T_void = objective_heat(np.ones_like(rho_0) * 0.5, resolution)
+    filter = filter_loader(filters, filter_values, lp_deviation)
+    init_projection = projection_loader(init_projections, init_projection_values, betas[0], resolution)
+    projection = projection_loader(projections, projection_values, betas[0], resolution)
 
-    init_val_mat = init_T_mat / target_material
-    init_val_void = init_T_void / target_void
+    objective_em = objective_loader(setting["init_em"], currents, resolution, 1, 1, 1)
+    init_val_em, _ = objective_em(jnp.zeros_like(rho_0))
+    objective_heat = objective_loader(setting["init_heat"])
+
+    rho_0_init_bin = np.array(init_projection(rho_0)) * mask
+    rho_0_init = filter((torch.tensor(rho_0_init_bin, device='cuda', requires_grad=True))).detach().cpu().numpy()
+    rho_0_bin = projection(rho_0_init)
+    init_T_mat, init_T_void = objective_heat(rho_0_bin, resolution)
+
+    init_val_mat = (init_T_mat + 1e-3) / (1+target_material)
+    init_val_void = (init_T_void + 1e-3) / (1+target_void)
 
     if load is not None:
         f = h5py.File(load)

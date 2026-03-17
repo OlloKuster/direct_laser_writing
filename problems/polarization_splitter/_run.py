@@ -44,13 +44,13 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     plotter_eval = plot_loader(plotter_eval_name)
     plotter_final = plot_loader(plotter_final_name)
 
-    rho_0 = np.ones((ConfigSim.nx, ConfigSim.ny, ConfigSim.nz)) * 0.5
+    rho_0 = np.ones((ConfigSim.nx, ConfigSim.ny, ConfigSim.nz)) * 1
     # rho_0[:, ConfigSim.ny//2-resolution//3:ConfigSim.ny//2+resolution//3] = 0
     # rho_0[:, rho_0.shape[1]//2 - resolution:rho_0.shape[1]//2+resolution] = 0
     # rho_0[:, :rho_0.shape[1]//2] = 0.3
     #
-    # rho_0 = np.random.rand(ConfigSim.nx, ConfigSim.ny,
-    #                        ConfigSim.nz)
+    rho_0 = np.random.rand(ConfigSim.nx, ConfigSim.ny,
+                           ConfigSim.nz)
     #
     # rho_0 = np.repeat(rho_0, ConfigSim.nz, axis=2)
 

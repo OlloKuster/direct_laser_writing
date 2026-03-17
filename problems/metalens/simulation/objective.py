@@ -89,12 +89,11 @@ def objective_em_heat_f(currents, resolution, init_values):
         v_lens, eps = objective_em(rho_0)
         v_heat_m, v_heat_v = objective_heat(rho_0)
 
-        n_lens = (ConfigSim.TARGET_EM - v_lens) / ConfigSim.TARGET_EM
         n_heat_m = (v_heat_m - init_values[1]) / init_values[1]
         n_heat_v = (v_heat_v - init_values[2]) / init_values[2]
 
         logs = {
-            "n_lens": n_lens, "n_heat_m": n_heat_m, "n_heat_v": n_heat_v, "v_lens": v_lens, "v_heat_m": v_heat_m,
+            "v_lens": v_lens, "n_heat_m": n_heat_m, "n_heat_v": n_heat_v, "v_heat_m": v_heat_m,
             "v_heat_v": v_heat_v
         }
 
