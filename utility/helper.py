@@ -1,4 +1,5 @@
 import jax.numpy as jnp
+import jax
 import torch
 import numpy as np
 
@@ -23,15 +24,19 @@ def split_int(a):
     return a // 2, a // 2 + a % 2
 
 
-def softplus(x, beta=50):
-    """
-    Softplus function to balance out the optimisation.
-    :param x: Array of figure of merits which are evaluated.
-    :param beta: Steepness of the curve.
-    :return: Array of softplus of all figure of merits.
-    """
-    mask = x * beta > 20
-    return jnp.where(mask, x, 1 / beta * jnp.log(1 + jnp.exp(jnp.where(mask, 0, x * beta))))
+# def softplus(x, beta=50):
+#     """
+#     Softplus function to balance out the optimisation.
+#     :param x: Array of figure of merits which are evaluated.
+#     :param beta: Steepness of the curve.
+#     :return: Array of softplus of all figure of merits.
+#     """
+#     mask = x * beta > 20
+#     return jnp.where(mask, x, 1 / beta * jnp.log(1 + jnp.exp(jnp.where(mask, 0, x * beta))))
+
+
+def relu(x):
+    return jax.nn.relu6(x)
 
 
 def convert_to(x, package):

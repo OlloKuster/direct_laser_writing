@@ -10,7 +10,7 @@ from autograd.extend import primitive, defvjp
 
 from problems.polarization_splitter.simulation.config_structure import ConfigSim
 from problems.polarization_splitter.simulation.simulation import heat_simulation, make_sim_tidy
-from utility.helper import softplus
+from utility.helper import relu
 
 
 def measure_mode_power_ag(rho):
@@ -93,7 +93,7 @@ def objective_em_heat_f(init_values):
 
         objs = jnp.array([n_heat_m, n_heat_v])
 
-        return transmission * (1 - jnp.linalg.norm(softplus(objs))), (transmission, 0)
+        return transmission * (1 - jnp.linalg.norm(relu(objs))), (transmission, 0)
 
     return objective_softplus
 
@@ -108,7 +108,7 @@ def objective_robust_em_heat_f(init_values):
 
         objs = jnp.array([n_heat_m, n_heat_v])
 
-        return transmission * (1 - jnp.linalg.norm(softplus(objs))), transmission
+        return transmission * (1 - jnp.linalg.norm(relu(objs))), transmission
 
     def objective_robust_softplus(rhos):
         """

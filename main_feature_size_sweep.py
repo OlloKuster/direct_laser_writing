@@ -20,7 +20,7 @@ if __name__ == "__main__":
     eval = True
     resolution = 14
     betas = [16, 32, np.inf]
-    run_id = 7
+    run_id = 0
 
     feature_size_factor = [1, 0.75, 0.5, 0.4, 0.3, 0.2, 0.1]
     for fact in feature_size_factor:

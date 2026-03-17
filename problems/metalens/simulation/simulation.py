@@ -10,7 +10,7 @@ from utility.helper import f2param, split_int
 
 def preprocess(rho, resolution):
     rho_p = rho.at[:, :, :int(jnp.ceil(0.5 * resolution))].set(1)
-    return rho
+    return rho_p
 
 
 def em_simulation(rho, currents, resolution):
@@ -30,7 +30,7 @@ def em_simulation(rho, currents, resolution):
                 int(jnp.ceil(ConfigSim.rho_shape[2] * resolution)))
 
     omega = 2 * jnp.pi / (ConfigSim.wavelength * resolution)
-    rho_p = rho[:rho.shape[0]//2, :rho.shape[1]//2]
+    rho_p = preprocess(rho[:-ConfigSim.buffer_side * resolution, :-ConfigSim.buffer_side*resolution], resolution)
     eps = f2param(rho_p, ConfigSim.epsilon)
 
     eps = jnp.concatenate((eps, jnp.flip(eps, axis=0)), axis=0)
@@ -90,7 +90,7 @@ def heat_simulation(rho, resize_factor, resolution):
     :return: (Heat of the material, Heat of the void.
     """
 
-    rho_p =jnp.array(rho[:rho.shape[0]//2, :rho.shape[1]//2])
+    rho_p = preprocess(jnp.array(rho[:-ConfigSim.buffer_side * resolution, :-ConfigSim.buffer_side*resolution]), resolution)
     rho_n_shape = (rho_p.shape[0] // resize_factor, rho_p.shape[1] // resize_factor, rho_p.shape[2] // resize_factor)
     rho_n = jax.image.resize(rho_p, rho_n_shape, 'bicubic', antialias=False)
 

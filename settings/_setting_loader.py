@@ -29,8 +29,8 @@ def setting_loader(system: str, setup: str):
                 "backconversions": "torch2np",  # Backconversion of the variables while they are being reset in
                 #  between steps.
 
-                "target_material": 0.4,
-                "target_void": 0.,
+                "target_material": -0.8,
+                "target_void": -0.8,
 
                 "init_em": "em_only",  # Initial EM-objective function.
                 "init_heat": "heat_only"  # Initial heat_eval-objective function.
@@ -93,24 +93,25 @@ def setting_loader(system: str, setup: str):
             setting_dict = {
                 "run": Dispenser.LENS3D,
                 "objectives": "em_only",
-                "filters": "gauss_jax",
-                "filter_factor": 1 / (4*np.sqrt(3)),
-                "lp_deviation": 0.1,
+                "filters": "dose_conv",
+                "filter_factor": 1,
+                "lp_deviation":ConfigPrint.lp,
                 "plotter_eval": "eval_regular",
                 "plotter_final": "final_regular",
                 "projection": "ssp_jax",
-                "projection_values": ConfigPrint.rho_th_GT,
-                "init_projection": "None",
-                "init_projection_values": 0.5,
-                "optimizers": "jax",
-                "conversions": "None",
-                "backconversions": "None",
-                
-                "target_material": 1.3,
-                "target_void": 1.3,
+                "projection_values": ConfigPrint.rho_th_GT,  # Threshold value used in projection.
+                "init_projection": "ssp_jax",  # Initial projection used for the "precompensated" structure.
+                "init_projection_values": 0.5,  # Threshold value for the inital projection.
+                "optimizers": "torch_jax",  # Which mode the opimizer runs in.
+                "conversions": "torch",  # Conversion of the variables while they are being reset in between steps.
+                "backconversions": "torch2np",  # Backconversion of the variables while they are being reset in
+                #  between steps.
 
-                "init_em": "em_only",
-                "init_heat": "heat_only"
+                "target_material": 0.,
+                "target_void": 0.,
+
+                "init_em": "em_only",  # Initial EM-objective function.
+                "init_heat": "heat_only"  # Initial heat_eval-objective function.
 
             }
             return setting_dict

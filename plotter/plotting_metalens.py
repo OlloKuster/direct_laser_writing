@@ -48,7 +48,7 @@ def metalens_regular_final_plot():
     Creates the plotting function used for the final evaluation of the structures.
     :return: Final Plotter function.
     """
-    def plotter(extent, rho_0=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None, run_id=0,
+    def plotter(extent, rho_0=None, rho_precomp=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None, run_id=0,
                 save=False):
 
         if loss_hist is not None:
@@ -99,6 +99,7 @@ def metalens_regular_final_plot():
                 grp.create_dataset("E", data=E)
                 grp.create_dataset("eps", data=eps)
                 grp.create_dataset("rho", data=rho_0)
+                grp.create_dataset("rho_precomp", data=rho_precomp)
                 grp.create_dataset("loss", data=loss_hist)
                 grp.create_dataset("em_loss", data=em_loss_hist)
                 f.close()
@@ -166,7 +167,7 @@ def metalens_robust_final_plot():
     Creates the plotting function used for the final evaluation of the robust (3) designed structures.
     :return: Final Plotter function.
     """
-    def plotter(extent, rho_0=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None, run_id=0,
+    def plotter(extent, rho_0=None, rho_precomp=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None, run_id=0,
                 save=False):
 
         if loss_hist is not None:
@@ -250,6 +251,7 @@ def metalens_robust_final_plot():
                 grp.create_dataset("eps_normal", data=eps[1])
                 grp.create_dataset("eps_dilation", data=eps[2])
                 grp.create_dataset("rho", data=rho_0)
+                grp.create_dataset("rho_precomp", data=rho_precomp)
                 grp.create_dataset("loss", data=loss_hist)
                 grp.create_dataset("em_loss", data=em_loss_hist)
                 f.close()
