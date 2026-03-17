@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 #SBATCH --partition="accelerated"
-#SBATCH --job-name="heat_gauss"
+#SBATCH --job-name="heat_dlw"
 #SBATCH --time=48:00:00
 #SBATCH --gres=gpu:1
 #SBATCH --err=std.err

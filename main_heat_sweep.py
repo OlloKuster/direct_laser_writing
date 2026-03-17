@@ -16,7 +16,7 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
 
 if __name__ == "__main__":
-    setting = setting_loader("metalens", "normal_gauss")
+    setting = setting_loader("metalens", "dlw_regular")
     eval = False
     device_id = 0
     resolution = 14
