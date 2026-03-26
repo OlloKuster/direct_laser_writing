@@ -1,6 +1,8 @@
 import jax
+import torch
 import numpy as np
 
+from dispenser import Dispenser
 from settings._setting_loader import setting_loader
 
 
@@ -15,7 +17,7 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
 
 if __name__ == "__main__":
-    setting = setting_loader("metalens", "dlw_robust")
+    setting = setting_loader("metalens", "dlw_regular")
     eval = True
     resolution = 14
     loss_hist = []

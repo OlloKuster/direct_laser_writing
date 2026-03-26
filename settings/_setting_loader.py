@@ -29,8 +29,34 @@ def setting_loader(system: str, setup: str):
                 "backconversions": "torch2np",  # Backconversion of the variables while they are being reset in
                 #  between steps.
 
-                "target_material": 0.,
-                "target_void": 0.,
+                "target_material": -0.8,
+                "target_void": -0.8,
+
+                "init_em": "em_only",  # Initial EM-objective function.
+                "init_heat": "heat_only"  # Initial heat_eval-objective function.
+
+            }
+            return setting_dict
+        if setup == "dlw_em_only":
+            setting_dict = {
+                "run": Dispenser.LENS3D,
+                "objectives": "em_only",  # Objective function(s) of the problem.
+                "filters": "dose_conv",  # Filter function for the optimization.
+                "filter_factor": 1,  # Factor for the size of the filter (1 is 1um).
+                "lp_deviation": ConfigPrint.lp,
+                "plotter_eval": "eval_regular",  # Which plotting function is used for the evaluation.
+                "plotter_final": "final_regular",  # Which plotting function is used for the final plotting.
+                "projection": "ssp_jax",  # Projection used for the optimization.
+                "projection_values": ConfigPrint.rho_th_GT,  # Threshold value used in projection.
+                "init_projection": "ssp_jax",  # Initial projection used for the "precompensated" structure.
+                "init_projection_values": 0.5,  # Threshold value for the inital projection.
+                "optimizers": "torch_jax",  # Which mode the opimizer runs in.
+                "conversions": "torch",  # Conversion of the variables while they are being reset in between steps.
+                "backconversions": "torch2np",  # Backconversion of the variables while they are being reset in
+                #  between steps.
+
+                "target_material": 0.05,
+                "target_void": 0.05,
 
                 "init_em": "em_only",  # Initial EM-objective function.
                 "init_heat": "heat_only"  # Initial heat_eval-objective function.

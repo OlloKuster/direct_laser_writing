@@ -74,10 +74,6 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         print(f"iteration: {config.cur_it}")
         config.cur_it += 1
         loss_hist.append(value)
-        loss_hist_clipped = np.clip(loss_hist, 0, 1)
-        plt.plot(loss_hist_clipped)
-        plt.savefig("cur_loss.png")
-        plt.close()
         if g.size > 0:
             g[:] = grad.ravel()
         end = time.time()

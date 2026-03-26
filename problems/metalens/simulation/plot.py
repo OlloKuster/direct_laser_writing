@@ -7,7 +7,7 @@ from filtering._filter_loader import filter_loader
 from problems.metalens.simulation.config_structure import ConfigSim
 from projection._projection_loader import projection_loader
 
-base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_0_8.h5", "r")
+base = h5py.File(f"/scratch/local/okuster/data/dlw/heat_sweep/data_24_inf.h5", "r")
 grp = base["lens_3d"]
 eps = grp["eps"][:]
 rho_0 = grp["rho"][:]

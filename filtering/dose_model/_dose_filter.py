@@ -106,7 +106,7 @@ def dose_filter_robust_f(resolution, deviation):
         :return: Accumulated power as a "density".
         """
         rho_eroded = msbpm(rho_0 * torch.tensor(ConfigPrint.power, device='cuda', requires_grad=True),
-                    torch.tensor([[(1.-deviation) *ConfigPrint.lp]], device=ConfigPrint.device, requires_grad=True))
+                    torch.tensor([[(1.- deviation) * ConfigPrint.lp]], device=ConfigPrint.device, requires_grad=True))
         rho_normal = msbpm(rho_0 * torch.tensor(ConfigPrint.power, device='cuda', requires_grad=True),
                     torch.tensor([[ConfigPrint.lp]], device=ConfigPrint.device, requires_grad=True))
         rho_dilated = msbpm(rho_0 * torch.tensor(ConfigPrint.power, device='cuda', requires_grad=True),

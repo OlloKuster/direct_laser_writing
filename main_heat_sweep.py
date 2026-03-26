@@ -17,7 +17,7 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
 if __name__ == "__main__":
     setting = setting_loader("metalens", "dlw_regular")
-    eval = False
+    eval = True
     device_id = 0
     resolution = 14
     loss_hist = []
@@ -25,8 +25,8 @@ if __name__ == "__main__":
     betas = [8, 16, np.inf]
     run_id = 0
 
-    target_material = [-0.8, -0.6, -0.4, 0.2, 0.]
-    target_void = [-0.8, -0.6, -0.4, 0.2, 0.]
+    target_material = [-0.8, -0.6, -0.4, -0.2, 0.]
+    target_void = [-0.8, -0.6, -0.4, -0.2, 0.]
     for mat in target_material:
         for void in target_void:
             loss_hist = []
