@@ -29,6 +29,6 @@ unset __mamba_setup
 
 micromamba activate dlw_horeka
 
-time python main_heat_sweep.py > output.log
+time python main_lp_robust_sweep.py > output.log
 
 cd ..

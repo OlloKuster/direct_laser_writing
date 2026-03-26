@@ -81,8 +81,8 @@ def setting_loader(system: str, setup: str):
                 "conversions": "torch",
                 "backconversions": "torch2np",
                 
-                "target_material": 0.8,
-                "target_void": 0.8,
+                "target_material": -0.8,
+                "target_void": -0.8,
 
                 "init_em": "em_only",
                 "init_heat": "heat_only"

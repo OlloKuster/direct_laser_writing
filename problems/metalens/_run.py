@@ -98,7 +98,12 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     if optimizers == "jax":
         rho_0_init = filter_0(rho_0_init_bin)
     rho_0_bin = projection_0(rho_0_init)
-    init_T_mat, init_T_void = objective_heat(rho_0_bin, resolution)
+    if len(rho_0_bin) == 3:
+        init_T_mat, init_T_void = objective_heat(rho_0_bin[1], resolution)
+    else:
+        init_T_mat, init_T_void = objective_heat(rho_0_bin, resolution)
+
+
 
     init_val_mat = (init_T_mat + 1e-3) / (1 + target_material)
     init_val_void = (init_T_void + 1e-3) / (1 + target_void)

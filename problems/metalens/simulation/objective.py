@@ -6,7 +6,6 @@ from problems.metalens.simulation.simulation import em_simulation, heat_simulati
 from utility.helper import relu
 
 
-
 def objective_em_f(currents, resolution, init_value):
     """
     Generates the pure EM-objective function.
@@ -166,12 +165,12 @@ def objective_robust_em_heat_f(currents, resolution, init_values):
         :param rhos: Densities (design variable) of the problem 3x[0, 1].
         :return: robust objective function, values for the EM-performances.
         """
-        power = -19 # Needs to be an odd number
+        power = -20  # Needs to be an odd number
         fom_eroded, (v_lens_eroded, eps_eroded) = objective_softplus(rhos[0])
         fom_normal, (v_lens_normal, eps_normal) = objective_softplus(rhos[1])
         fom_dilated, (v_lens_dilated, eps_dilated) = objective_softplus(rhos[2])
 
-        fom_min = (fom_eroded ** power + fom_normal ** power + fom_dilated ** power) ** (1 / power)
+        fom_min = (jnp.abs(fom_eroded) ** power + jnp.abs(fom_normal) ** power + jnp.abs(fom_dilated) ** power) ** (1 / power)
 
         logs = {
             "v_lens_eroded": v_lens_eroded, "v_lens_normal": v_lens_normal, "v_lens_dilated": v_lens_dilated,
