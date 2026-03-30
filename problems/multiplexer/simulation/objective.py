@@ -11,7 +11,7 @@ from tidy3d.plugins.autograd import smooth_min
 
 from problems.multiplexer.simulation.config_structure import ConfigSim
 from problems.multiplexer.simulation.simulation import heat_simulation, make_sim_tidy
-from utility.helper import logsumexp
+from utility.helper import relu
 
 
 def measure_mode_power_ag(rho):
@@ -89,6 +89,6 @@ def objective_em_heat_f(init_values):
 
         objs = jnp.array([n_heat_m, n_heat_v])
 
-        return fom_tr * (1 - jnp.linalg.norm(logsumexp(objs))), (fom_tr, 0)
+        return fom_tr * (1 - jnp.linalg.norm(relu(objs))), (fom_tr, 0)
 
     return objective_softplus

@@ -1,9 +1,10 @@
 import jax.numpy as jnp
+import jax.nn as nn
 from jax.debug import print as jprint
 
 from problems.metalens.simulation.config_structure import ConfigSim
 from problems.metalens.simulation.simulation import em_simulation, heat_simulation
-from utility.helper import logsumexp
+from utility.helper import relu
 
 
 def objective_em_f(currents, resolution, init_value):
@@ -104,7 +105,7 @@ def objective_em_heat_f(currents, resolution, init_values):
 
         objs = jnp.array([n_heat_m, n_heat_v])
 
-        return v_lens * (1 - jnp.linalg.norm(logsumexp(objs))), (v_lens, eps)
+        return v_lens * (1 - jnp.linalg.norm(relu(objs))), (v_lens, eps)
 
     return objective_softplus
 
@@ -156,7 +157,7 @@ def objective_robust_em_heat_f(currents, resolution, init_values):
 
         objs = jnp.array([n_heat_m, n_heat_v])
 
-        return v_lens * (1 - jnp.linalg.norm(logsumexp(objs))), (v_lens, eps)
+        return v_lens * (1 - jnp.linalg.norm(relu(objs))), (v_lens, eps)
 
     def objective_robust_softplus(rhos):
         """
@@ -165,12 +166,11 @@ def objective_robust_em_heat_f(currents, resolution, init_values):
         :param rhos: Densities (design variable) of the problem 3x[0, 1].
         :return: robust objective function, values for the EM-performances.
         """
-        power = -20  # Needs to be an odd number
         fom_eroded, (v_lens_eroded, eps_eroded) = objective_softplus(rhos[0])
         fom_normal, (v_lens_normal, eps_normal) = objective_softplus(rhos[1])
         fom_dilated, (v_lens_dilated, eps_dilated) = objective_softplus(rhos[2])
 
-        fom_min = (jnp.abs(fom_eroded) ** power + jnp.abs(fom_normal) ** power + jnp.abs(fom_dilated) ** power) ** (1 / power)
+        fom_min = -nn.logsumexp(-jnp.array([fom_eroded, fom_normal, fom_dilated]))
 
         logs = {
             "v_lens_eroded": v_lens_eroded, "v_lens_normal": v_lens_normal, "v_lens_dilated": v_lens_dilated,

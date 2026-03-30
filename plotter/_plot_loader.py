@@ -5,6 +5,8 @@ from plotter.plotting_mode_converter import mode_converter_regular_final_plot, m
 from plotter.plotting_multiplexer import multiplexer_regular_intermediate_plot, multiplexer_regular_final_plot
 from plotter.plotting_polarization_splitter import polarization_splitter_regular_intermediate_plot, \
     polarization_splitter_regular_final_plot
+from plotter.plotting_power_splitter import power_splitter_regular_intermediate_plot, power_splitter_regular_final_plot, \
+    power_splitter_robust_intermediate_plot, power_splitter_robust_final_plot
 
 
 def plot_loader(plot: str, *args):
@@ -48,3 +50,13 @@ def plot_loader(plot: str, *args):
         return polarization_splitter_regular_intermediate_plot()
     if plot == "pol_splitter_final":
         return polarization_splitter_regular_final_plot()
+
+    if plot == "power_splitter_regular":
+        return power_splitter_regular_intermediate_plot()
+    if plot == "power_splitter_final":
+        return power_splitter_regular_final_plot()
+
+    if plot == "power_splitter_robust":
+        return power_splitter_robust_intermediate_plot()
+    if plot == "power_splitter_robust_final":
+        return power_splitter_robust_final_plot()

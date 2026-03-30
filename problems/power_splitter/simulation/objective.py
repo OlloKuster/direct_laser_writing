@@ -1,40 +1,28 @@
 import autograd
 import tidy3d.web as web
 import jax
+import jax.nn as nn
 import jax.numpy as jnp
 import autograd.numpy as anp
 from jax.debug import print as jprint
 
-import numpy as np
-from autograd.extend import primitive, defvjp
-
-from problems.polarization_splitter.simulation.config_structure import ConfigSim
-from problems.polarization_splitter.simulation.simulation import heat_simulation, make_sim_tidy
+from problems.power_splitter.simulation.config_structure import ConfigSim
+from problems.power_splitter.simulation.simulation import heat_simulation, make_sim_tidy
 from utility.helper import relu
 
 
 def measure_mode_power_ag(rho):
     sim = make_sim_tidy(rho)
-    sim_data_te = web.run(sim[0], task_name=f"pol_splitter_te_{ConfigSim.cur_it + 1}", folder_name="pol_splitter_dlw", verbose=False)
-    sim_data_te.to_file(fname='problems/polarization_splitter/plots/progression/current_simulation_te.hdf5')
-    output_amps_te = sim_data_te["Mode Monitor Horizontal"].amps
-    leaked_output_amps_te = sim_data_te["Mode Monitor Vertical"].amps
-    amp_te = output_amps_te.sel(direction='+', f=ConfigSim.freq0).values
-    leaked_amp_te = leaked_output_amps_te.sel(direction='+', f=ConfigSim.freq0).values
-    trans_te = np.sum(anp.abs(amp_te) ** 2) - 0.3*np.sum(anp.abs(leaked_amp_te) ** 2)
-
-    sim_data_tm = web.run(sim[1], task_name=f"pol_splitter_tm_{ConfigSim.cur_it + 1}", folder_name="pol_splitter_dlw", verbose=False)
-    sim_data_tm.to_file(fname='problems/polarization_splitter/plots/progression/current_simulation_tm.hdf5')
-    output_amps_tm = sim_data_tm["Mode Monitor Vertical"].amps
-    leaked_output_amps_tm = sim_data_te["Mode Monitor Horizontal"].amps
-    amp_tm = output_amps_tm.sel(direction='+', f=ConfigSim.freq0).values
-    leaked_amp_tm = leaked_output_amps_tm.sel(direction='+', f=ConfigSim.freq0).values
-    trans_tm = np.sum(anp.abs(amp_tm) ** 2) - 0.3*np.sum(anp.abs(leaked_amp_tm) ** 2)
+    sim_data = web.run(sim, task_name=f"power_splitter_{ConfigSim.cur_it + 1}", folder_name="power_splitter",
+                       verbose=False)
+    sim_data.to_file(fname='problems/power_splitter/plots/progression/current_simulation.hdf5')
+    output_amp = sim_data["Mode Monitor"].amps
+    amp = output_amp.sel(mode_index=0, direction='+', f=ConfigSim.freq0).values
+    trans = anp.mean(anp.abs(amp) ** 2)
 
     ConfigSim.cur_it += 1
 
-    # return anp.sum(anp.abs(trans_te)**(-ConfigSim.p) + anp.abs(trans_tm)**(-ConfigSim.p))**(-1/ConfigSim.p)
-    return (trans_te + trans_tm) / 2
+    return trans * 100  # given in % so the values are nicer to handle for the logsumexp
 
 
 @jax.custom_vjp
@@ -62,7 +50,7 @@ def objective_heat(rho):
     :param rho: Density (design variable) of the problem [0, 1].
     :return: Tuple of material and void heat_eval.
     """
-    T_mat, T_void, _ = heat_simulation(rho, ConfigSim.resize_factor)
+    T_mat, T_void, _ = heat_simulation(rho)
     return T_mat, T_void
 
 
@@ -79,11 +67,8 @@ def objective_em_heat_f(init_values):
         n_heat_v = (v_heat_v - init_values[1]) / init_values[1]
 
         logs = {
-            "transmission": transmission, "n_heat_m": n_heat_m, "n_heat_v": n_heat_v, "v_heat_m": v_heat_m,
-            "v_heat_v": v_heat_v
+            "transmission": transmission, "n_heat_m": n_heat_m, "n_heat_v": n_heat_v
         }
-
-
 
         print("====================")
         for name, log in logs.items():
@@ -117,13 +102,12 @@ def objective_robust_em_heat_f(init_values):
         :param rhos: Densities (design variable) of the problem 3x[0, 1].
         :return: robust objective function, values for the EM-performances.
         """
-        power = 19
 
         fom_eroded, trans_eroded = objective_softplus(rhos[0])
         fom_normal, trans_normal = objective_softplus(rhos[1])
         fom_dilated, trans_dilated = objective_softplus(rhos[2])
 
-        fom_max = (fom_eroded ** power + fom_normal ** power + fom_dilated ** power) ** (1 / power)
+        fom_max = -nn.logsumexp(-jnp.array([fom_eroded, fom_normal, fom_dilated]))
 
         logs = {
             "trans_eroded": trans_eroded, "trans_normal": trans_normal, "trans_dilated": trans_dilated,
@@ -137,6 +121,6 @@ def objective_robust_em_heat_f(init_values):
             jprint("    {log}", log=log)
         print("====================")
 
-        return fom_max, (trans_eroded, trans_normal, trans_dilated)
+        return fom_max, ((trans_eroded, trans_normal, trans_dilated), 0)
 
     return objective_robust_softplus
