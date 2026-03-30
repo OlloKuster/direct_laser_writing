@@ -70,7 +70,7 @@ def setting_loader(system: str, setup: str):
                 "objectives": "robust_em_heat",
                 "filters": "dose_conv_robust",
                 "filter_factor": 1,
-                "lp_deviation": 0.1,
+                "lp_deviation": 0.125,
                 "plotter_eval": "eval_robust",
                 "plotter_final": "final_robust",
                 "projection": "robust_ssp_jax",

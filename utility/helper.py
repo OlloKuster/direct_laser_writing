@@ -36,7 +36,7 @@ def split_int(a):
 
 
 def relu(x):
-    return jax.nn.relu6(x)
+    return jnp.min(jnp.array([jax.nn.relu(x), 1]))
 
 
 def convert_to(x, package):

@@ -7,12 +7,13 @@ from filtering._filter_loader import filter_loader
 from problems.metalens.simulation.config_structure import ConfigSim
 from projection._projection_loader import projection_loader
 
-base = h5py.File(f"/scratch/local/okuster/data/dlw/heat_sweep/data_24_inf.h5", "r")
+base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/lp_robust_sweep/data_0_inf.h5", "r")
 grp = base["lens_3d"]
-eps = grp["eps"][:]
+print(grp.keys())
+eps = grp["eps_normal"][:]
 rho_0 = grp["rho"][:]
 rho_precomp = grp["rho_precomp"][:]
-E_0 = grp["E"][:]
+E_0 = grp["E_normal"][:]
 loss_inf = grp["em_loss"][:]
 base.close()
 
@@ -48,7 +49,7 @@ plt.ylabel(r"$L_\text{EM}$", fontsize=14)
 plt.show()
 
 p = pv.Plotter(off_screen=False)
-data = pv.wrap(np.array(np.round(rho_0)))
+data = pv.wrap(np.array((eps)))
 #data_e = pv.wrap(200*np.clip(np.abs(E_0)[0], 0.004, 1))
 p.add_mesh(data.contour(), cmap='binary')
 # p.add_volume(data_e, cmap='magma')
