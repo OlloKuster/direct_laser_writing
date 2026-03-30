@@ -10,7 +10,7 @@ from autograd.extend import primitive, defvjp
 
 from problems.mode_converter.simulation.config_structure import ConfigSimMode
 from problems.mode_converter.simulation.simulation import heat_simulation, make_sim_tidy
-from utility.helper import relu
+from utility.helper import logsumexp
 
 
 def measure_mode_power_ag(rho):
@@ -90,7 +90,7 @@ def objective_robust_em_heat_f(init_values):
 
         objs = jnp.array([n_heat_m, n_heat_v])
 
-        return transmission * (1 - jnp.linalg.norm(relu(objs))), transmission
+        return transmission * (1 - jnp.linalg.norm(logsumexp(objs))), transmission
 
     def objective_robust_softplus(rhos):
         """

@@ -35,8 +35,8 @@ def split_int(a):
 #     return jnp.where(mask, x, 1 / beta * jnp.log(1 + jnp.exp(jnp.where(mask, 0, x * beta))))
 
 
-def relu(x):
-    return jnp.min(jnp.array([jax.nn.relu(x), 1]))
+def logsumexp(x):
+    return jax.nn.logsumexp(x)
 
 
 def convert_to(x, package):

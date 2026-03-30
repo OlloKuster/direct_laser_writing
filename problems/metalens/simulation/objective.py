@@ -3,7 +3,7 @@ from jax.debug import print as jprint
 
 from problems.metalens.simulation.config_structure import ConfigSim
 from problems.metalens.simulation.simulation import em_simulation, heat_simulation
-from utility.helper import relu
+from utility.helper import logsumexp
 
 
 def objective_em_f(currents, resolution, init_value):
@@ -104,7 +104,7 @@ def objective_em_heat_f(currents, resolution, init_values):
 
         objs = jnp.array([n_heat_m, n_heat_v])
 
-        return v_lens * (1 - jnp.linalg.norm(relu(objs))), (v_lens, eps)
+        return v_lens * (1 - jnp.linalg.norm(logsumexp(objs))), (v_lens, eps)
 
     return objective_softplus
 
@@ -156,7 +156,7 @@ def objective_robust_em_heat_f(currents, resolution, init_values):
 
         objs = jnp.array([n_heat_m, n_heat_v])
 
-        return v_lens * (1 - jnp.linalg.norm(relu(objs))), (v_lens, eps)
+        return v_lens * (1 - jnp.linalg.norm(logsumexp(objs))), (v_lens, eps)
 
     def objective_robust_softplus(rhos):
         """
