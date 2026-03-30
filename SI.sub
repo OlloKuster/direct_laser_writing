@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-#SBATCH --partition="accelerated"
+#SBATCH --partition="accelerated-h100"
 #SBATCH --job-name="robust_dlw"
 #SBATCH --time=48:00:00
 #SBATCH --gres=gpu:1
@@ -29,6 +29,6 @@ unset __mamba_setup
 
 micromamba activate dlw_horeka
 
-time python main_lp_robust_sweep.py > output.log
+time python main_0.py > output.log
 
 cd ..

@@ -7,7 +7,7 @@ class ConfigSim:
     """
     Config the 3D lens, defines the required parameters which are used for the simulation.
     """
-    rho_shape = (5, 5, 4)
+    rho_shape = (11, 11, 4)
     buffer_side = 1  # Buffer for the mask.
     buffer_top = 1.  # Buffer for the mask.
     space_top = 3  # Actual space above the design region

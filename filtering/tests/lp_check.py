@@ -13,7 +13,7 @@ from projection._projection_loader import projection_loader
 
 def test(seed):
     np.random.seed(seed)
-    resolution = 8
+    resolution = 14
     for factor in np.linspace(0.001, 0.01, 11):
         size_lat = int(np.ceil(0.4*resolution))
         size_ax = int(np.ceil(0.9*resolution))
