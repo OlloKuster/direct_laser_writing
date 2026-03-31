@@ -6,14 +6,19 @@ import numpy as np
 from filtering._filter_loader import filter_loader
 from projection._projection_loader import projection_loader
 
-base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/mode_converter/plots/data_0_8.h5", "r")
-grp = base["mode_converter"]
-eps = grp["eps"][:]
+base = h5py.File(f"/scratch/local/okuster/data/dlw/power_splitter/plots/data_0_inf.h5", "r")
+grp = base["power_splitter"]
+print(grp.keys())
+eps = grp["eps_normal"][:]
 rho_0 = grp["rho"][:]
 loss_inf = grp["em_loss"][:]
 base.close()
 
 
+eps = eps[:, eps.shape[1] // 2:, eps.shape[2] // 2:]
+
+eps = np.concatenate((np.flip(eps, axis=1), eps), axis=1)
+eps = np.concatenate((np.flip(eps, axis=2), eps), axis=2)
 # base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_16.h5", "r")
 # grp = base["lens_3d"]
 # loss_16 = grp["em_loss"][:]
@@ -51,5 +56,5 @@ p.camera.elevation = 30
 p.camera.azimuth = - 45
 p.remove_scalar_bar()
 p.camera.zoom(1.3)
-p.show(screenshot="/scratch/local/okuster/data/dlw/dlw_params_paper/problems/metalens/plots/example_rho.png")
-p.close()
+p.show()
+# p.close()

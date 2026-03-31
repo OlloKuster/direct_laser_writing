@@ -11,7 +11,7 @@ class Sources:
         center=ConfigSim.pos_source,
         size=ConfigSim.size_source,
         mode_index=0,
-        mode_spec=td.ModeSpec(num_modes=ConfigSim.num_modes),
+        mode_spec=td.ModeSpec(num_modes=1),
         direction='+'
     )
 

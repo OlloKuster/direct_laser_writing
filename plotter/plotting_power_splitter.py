@@ -243,7 +243,7 @@ def power_splitter_robust_final_plot():
                 grp = f.create_group("power_splitter")
                 grp.create_dataset("eps_erosion", data=eps[0])
                 grp.create_dataset("eps_normal", data=eps[1])
-                grp.create_dataset("eps_final", data=eps[2])
+                grp.create_dataset("eps_dilated", data=eps[2])
                 grp.create_dataset("rho", data=rho_0)
                 grp.create_dataset("loss", data=loss_hist)
                 grp.create_dataset("em_loss", data=em_loss_hist)

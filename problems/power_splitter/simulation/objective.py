@@ -17,8 +17,8 @@ def measure_mode_power_ag(rho):
                        verbose=False)
     sim_data.to_file(fname='problems/power_splitter/plots/progression/current_simulation.hdf5')
     output_amp = sim_data["Mode Monitor"].amps
-    amp = output_amp.sel(mode_index=0, direction='+', f=ConfigSim.freq0).values
-    trans = anp.mean(anp.abs(amp) ** 2)
+    amp = output_amp.sel(direction='+', f=ConfigSim.freq0).values
+    trans = anp.sum(anp.abs(amp) ** 2)
 
     ConfigSim.cur_it += 1
 
