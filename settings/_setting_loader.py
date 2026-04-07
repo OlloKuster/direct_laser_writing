@@ -311,7 +311,7 @@ def setting_loader(system: str, setup: str):
                 "objectives": "robust_em_heat",  # Objective function(s) of the problem.
                 "filters": "dose_conv_robust",  # Filter function for the optimization.
                 "filter_factor": 1,  # Factor for the size of the filter (1 is 1um).
-                "lp_deviation": 0.125,
+                "lp_deviation": 0.1,
                 "plotter_eval": "power_splitter_robust",  # Which plotting function is used for the evaluation.
                 "plotter_final": "power_splitter_robust_final",  # Which plotting function is used for the final plotting.
                 "projection": "robust_ssp_jax",  # Projection used for the optimization.

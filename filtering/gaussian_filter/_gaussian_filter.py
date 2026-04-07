@@ -1,6 +1,5 @@
 import jax
 import jax.numpy as jnp
-from jax.scipy.signal import convolve
 from jax.lax import conv_general_dilated as convolve_lax
 from jax.lax import conv_dimension_numbers
 
