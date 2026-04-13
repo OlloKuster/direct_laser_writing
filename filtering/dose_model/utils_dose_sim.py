@@ -172,6 +172,7 @@ def calc_laser_intensity(lam: torch.Tensor = torch.tensor(780e-9), n: torch.Tens
                          torch_device: str = 'cpu',
                          complex_type: torch.dtype = torch.complex64,
                          normalize: bool = True,
+                         linear_polarization: bool = False,
                          **kwargs) -> torch.Tensor:
     """
     Calculates the laser intensity I/I_0 around the laser focus.
@@ -189,7 +190,7 @@ def calc_laser_intensity(lam: torch.Tensor = torch.tensor(780e-9), n: torch.Tens
         n_theta (int, optional): number of angles to integrate over. Defaults to 500.
         torch_device (str, optional): torch device. Defaults to 'cpu'.
         complex_type (torch.dtype, optional): complex type. Defaults to torch.complex64.
-
+        linear_polarization (bool, optional): whether to use linear polarization. Defaults to True.
     Returns:
         torch.Tensor: laser intensity.
     """
@@ -197,19 +198,15 @@ def calc_laser_intensity(lam: torch.Tensor = torch.tensor(780e-9), n: torch.Tens
         torch_device = kwargs['device']
     if 'n_monomer' in kwargs:
         n = kwargs['n_monomer']
-    w = NA * tubus / M
-    # w0 = lam/(torch.pi*NA)*np.sqrt(n**2-NA**2) # Beam waist radius for high NA objective lens
-    fl = tubus / M
+    fl = tubus / M  # Focal length of the objective lens
+    w = NA * tubus / M / n
+
     k = 2 * torch.pi * n / lam
     theta_max = torch.arcsin(NA / n).to(torch_device)
     f_0 = w / (fl * NA / n)
-    # f_0 = w0/(fl * NA / n)
 
     bessel_j2 = BesselJ.apply
 
-    # x = torch.arange(-r_r, r_r + res_lat, res_lat, device=torch_device)
-    # y = torch.arange(-r_r, r_r + res_lat, res_lat, device=torch_device)
-    # z = torch.arange(-r_z, r_z + res_ax, res_ax, device=torch_device)
     x = torch.linspace(-r_r, r_r, int(torch.round(2 * r_r / res_lat)) + 1, device=torch_device)
     y = torch.linspace(-r_r, r_r, int(torch.round(2 * r_r / res_lat)) + 1, device=torch_device)
     z = torch.linspace(-r_z, r_z, int(torch.round(2 * r_z / res_ax)) + 1, device=torch_device)
@@ -245,15 +242,20 @@ def calc_laser_intensity(lam: torch.Tensor = torch.tensor(780e-9), n: torch.Tens
 
     for i, z in enumerate(z):
         I00[:, :, i] = torch.trapz(term_00_1 * term_00_bessel * torch.exp(1j * k * z * torch.cos(theta)),
-                                   dx=theta_max / n_theta)
+                                   dx=theta_max / (n_theta - 1))
         I01[:, :, i] = torch.trapz(term_01_1 * term_01_bessel * torch.exp(1j * k * z * torch.cos(theta)),
-                                   dx=theta_max / n_theta)
+                                   dx=theta_max / (n_theta - 1))
         I02[:, :, i] = torch.trapz(term_02_2 * term_02_bessel * torch.exp(1j * k * z * torch.cos(theta)),
-                                   dx=theta_max / n_theta)
+                                   dx=theta_max / (n_theta - 1))
 
-    e_x = I00 + I02 * torch.cos(2 * phi).unsqueeze(-1)
-    e_y = I02 * torch.sin(2 * phi).unsqueeze(-1)
-    e_z = -2 * 1j * I01 * torch.cos(phi).unsqueeze(-1)
+    if linear_polarization:
+        e_x = I00 + I02 * torch.cos(2 * phi).unsqueeze(-1)
+        e_y = I02 * torch.sin(2 * phi).unsqueeze(-1)
+        e_z = -2 * 1j * I01 * torch.cos(phi).unsqueeze(-1)
+    else:  # Circular polarization (right circular polarization assumed, but doesn't matter for the intensity)
+        e_x = I00 + I02 * torch.exp(2j * phi).unsqueeze(-1)
+        e_y = 1j * (I00 - I02 * torch.exp(2j * phi).unsqueeze(-1))
+        e_z = -2 * 1j * I01 * torch.exp(1j * phi).unsqueeze(-1)
     intensity = (torch.abs(e_x).pow(2) + torch.abs(e_y).pow(2) + torch.abs(e_z).pow(2))  # / n * (k * fl / 2)**2
 
     if normalize:
@@ -339,11 +341,11 @@ def calc_laser_intensity_OLD(lam: float = 780e-9, n: float = 1.483, NA: float = 
 
     for i, z in enumerate(z):
         I00[:, :, i] = torch.trapz(term_00_1 * term_00_bessel * torch.exp(1j * k * z * torch.cos(theta)),
-                                   dx=theta_max / n_theta)
+                                   dx=theta_max / (n_theta-1))
         I01[:, :, i] = torch.trapz(term_01_1 * term_01_bessel * torch.exp(1j * k * z * torch.cos(theta)),
-                                   dx=theta_max / n_theta)
+                                   dx=theta_max / (n_theta-1))
         I02[:, :, i] = torch.trapz(term_02_2 * term_02_bessel * torch.exp(1j * k * z * torch.cos(theta)),
-                                   dx=theta_max / n_theta)
+                                   dx=theta_max / (n_theta-1))
 
     e_x = I00 + I02 * torch.cos(2 * phi).unsqueeze(-1)
     e_y = I02 * torch.sin(2 * phi).unsqueeze(-1)
