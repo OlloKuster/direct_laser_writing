@@ -27,4 +27,4 @@ if __name__ == "__main__":
     loss_hist, em_loss_hist = main(resolution, betas_init, setting_init, loss_hist, em_loss_hist, max_evals=25, opt="nlopt",
                                    eval=eval, full_bin=False, run_id=0)
     loss_hist, em_loss_hist = main(resolution, betas_final, setting_final, loss_hist, em_loss_hist, max_evals=25, opt="nlopt",
-                                   eval=eval, full_bin=False, run_id=0, load=f'/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/multiplexer/plots/data_0_32.h5')
+                                   eval=eval, full_bin=False, run_id=0, load=f'/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_0_32.h5')
