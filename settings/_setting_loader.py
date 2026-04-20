@@ -115,6 +115,33 @@ def setting_loader(system: str, setup: str):
 
             }
             return setting_dict
+
+        if setup == "no_filter":
+            setting_dict = {
+                "run": Dispenser.LENS3D,
+                "objectives": "em_heat",
+                "filters": "None",
+                "filter_factor": 1 / (2*np.sqrt(3)),
+                "lp_deviation": 0.1,
+                "plotter_eval": "eval_regular",
+                "plotter_final": "final_regular",
+                "projection": "ssp_jax",
+                "projection_values": 0.5,
+                "init_projection": "None",
+                "init_projection_values": 0.5,
+                "optimizers": "jax",
+                "conversions": "None",
+                "backconversions": "None",
+
+                "target_material": -0.8,
+                "target_void": -0.8,
+
+                "init_em": "em_only",
+                "init_heat": "heat_only"
+
+            }
+            return setting_dict
+
         if setup == "gauss_em_only":
             setting_dict = {
                 "run": Dispenser.LENS3D,
@@ -305,13 +332,39 @@ def setting_loader(system: str, setup: str):
 
             return setting_dict
 
+        if setup == "no_filter":
+            setting_dict = {
+                "run": Dispenser.POWERSPLITTER,
+                "objectives": "em_heat",
+                "filters": "None",
+                "filter_factor": 1 / (2*np.sqrt(3)),
+                "lp_deviation": 0.1,
+                "plotter_eval": "power_splitter_regular",
+                "plotter_final": "power_splitter_final",
+                "projection": "ssp_jax",
+                "projection_values": 0.5,
+                "init_projection": "None",
+                "init_projection_values": 0.5,
+                "optimizers": "jax",
+                "conversions": "None",
+                "backconversions": "None",
+
+                "target_material": -0.8,
+                "target_void": -0.8,
+
+                "init_em": "em_only",
+                "init_heat": "heat_only"
+
+            }
+            return setting_dict
+
         if setup == "dlw_robust":
             setting_dict = {
                 "run": Dispenser.POWERSPLITTER,
                 "objectives": "robust_em_heat",  # Objective function(s) of the problem.
                 "filters": "dose_conv_robust",  # Filter function for the optimization.
                 "filter_factor": 1,  # Factor for the size of the filter (1 is 1um).
-                "lp_deviation": 0.1,
+                "lp_deviation": 0.15,
                 "plotter_eval": "power_splitter_robust",  # Which plotting function is used for the evaluation.
                 "plotter_final": "power_splitter_robust_final",  # Which plotting function is used for the final plotting.
                 "projection": "robust_ssp_jax",  # Projection used for the optimization.

@@ -75,11 +75,11 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
 
     filter_0 = filter_loader(filters, filter_values, lp_deviation)
     init_projection_0 = projection_loader(init_projections, init_projection_values, betas[0], resolution)
-    projection_0 = projection_loader(projections, projection_values, betas[0], resolution)
+    projection_0 = projection_loader(projections, projection_values, 8, resolution)
 
     objective_heat = objective_loader(setting["init_heat"])
 
-    rho_0_init_bin = np.array(init_projection_0(np.ones_like(rho_0) * init_value)) * mask
+    rho_0_init_bin = np.array(np.ones_like(rho_0)*init_value) * mask
     if optimizers == 'torch_jax':
         rho_0_init = filter_0((torch.tensor(rho_0_init_bin, device='cuda', requires_grad=True))).detach().cpu().numpy()
     if optimizers == "jax":

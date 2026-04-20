@@ -71,7 +71,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         grad_hist.append(np.mean(grad))
         print(f"value: {value}")
         print(f"grad: {np.mean(grad)}")
-        print(f"iteration: {config.cur_it}")
+        print(f"iteration: {config.cur_it + 1}")
         config.cur_it += 1
         loss_hist.append(value)
         if g.size > 0:
@@ -93,7 +93,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         cur_eps.append(value_em_sim[1][1])
         print(f"value: {value}")
         print(f"grad: {np.mean(grad)}")
-        print(f"iteration: {config.cur_it}")
+        print(f"iteration: {config.cur_it + 1}")
         config.cur_it += 1
         loss_hist.append(value)
         if g.size > 0:
@@ -203,7 +203,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
         config.cur_it += 1
         print(f"value: {value}")
         print(f"grad: {np.mean(grad)}")
-        print(f"iteration: {config.cur_it}")
+        print(f"iteration: {config.cur_it + 1}")
         print(f"time: {time.time() - start}")
         plt.plot(loss_hist)
         plt.savefig("loss_hist.png")

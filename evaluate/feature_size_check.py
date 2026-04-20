@@ -29,11 +29,14 @@ for i in inds_feature_size:
 
 path_lp = "/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/lp_sweep/"
 
-inds_lp = np.linspace(0, 10, 11)
-lps = np.linspace(0.001, 0.01, 11) / 0.0019 * 20
+inds_lp = np.linspace(0, 13, 14)
+lps = np.linspace(0.001, 0.01, 11) / 0.003 * 20
+lps = np.concat((lps, np.linspace(0.011, 0.015, 3)  / 0.003 * 20))
+
+print(lps)
 # i = 0
 
-em_loss_list_lp = np.zeros(11)
+em_loss_list_lp = np.zeros(14)
 
 
 for i in inds_lp:
@@ -43,17 +46,26 @@ for i in inds_lp:
         loss_lp = grp["loss"][:]
         em_loss_list_lp[int(i)] = em_loss_lp[-1]
 
-with h5py.File(path_lp + f"data_reference_inf.h5") as f:
+with h5py.File("/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/heat_sweep/data_0_inf.h5") as f:
     grp = f["lens_3d"]
     em_loss_reference_reference = grp["em_loss"][-1]
     loss_reference = grp["loss"][:]
+
+with h5py.File("/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/lp_robust_sweep/data_2_inf.h5") as f:
+    grp = f["lens_3d"]
+    em_loss_robust = grp["em_loss"][-1][1]
+    loss_robust = grp["loss"][:]
+with h5py.File("/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/lp_robust_sweep/data_1_inf.h5") as f:
+    grp = f["lens_3d"]
+    em_loss_robust_worse = grp["em_loss"][-1][1]
+    loss_robust_worse = grp["loss"][:]
 
 pos_reference = 4
 lps = list(lps)
 em_loss_list_lp = list(em_loss_list_lp)
 print(em_loss_list_lp)
-lps.insert(pos_reference, np.float64(40))
-em_loss_list_lp.insert(pos_reference, em_loss_reference_reference)
+# lps.insert(pos_reference, np.float64(40))
+# em_loss_list_lp.insert(pos_reference, em_loss_reference_reference)
 
 print(lps)
 
@@ -63,6 +75,7 @@ ax1.set_xlabel(r"Rel. Laser Power$\,$(%)", fontsize=18)
 ax1.set_ylabel(r"$\mathcal{L}_\text{EM}$", fontsize=18)
 ax1.set_xlim(lps[0], 100)
 ax1.scatter(40, em_loss_reference_reference, c='black')
+ax1.scatter(40, em_loss_robust, marker='x', c='red')
 
 ax2 = ax1.twiny()
 lns2 = ax2.plot(feature_size[::-1], em_loss_list_feature_size[::-1], color='gray', label='Min. Feature Size')

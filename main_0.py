@@ -15,11 +15,16 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
 
 if __name__ == "__main__":
-    setting = setting_loader("metalens", "dlw_robust")
-    eval = True
+    setting_init = setting_loader("metalens", "no_filter")
+    setting_final = setting_loader("metalens", "dlw_robust")
+    eval = False
     resolution = 14
     loss_hist = []
     em_loss_hist = []
-    betas = [8, 16, np.inf]
-    loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15, opt="nlopt",
+    betas_init = [16, 32]
+    betas_final = [np.inf]
+
+    loss_hist, em_loss_hist = main(resolution, betas_init, setting_init, loss_hist, em_loss_hist, max_evals=25, opt="nlopt",
                                    eval=eval, full_bin=False, run_id=0)
+    loss_hist, em_loss_hist = main(resolution, betas_final, setting_final, loss_hist, em_loss_hist, max_evals=25, opt="nlopt",
+                                   eval=eval, full_bin=False, run_id=0, load=f'/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/multiplexer/plots/data_0_32.h5')

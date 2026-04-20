@@ -15,11 +15,11 @@ class ConfigSim:
     f_eval = np.linspace(freq0-fwidth, freq0+fwidth, 11)
     run_time = 50 / fwidth
 
-    rho_size = (11, 6, 6)
+    rho_size = (12, 7, 7)
     thickness_substrate = 2
     buffer = 1 * wavelength
 
-    buffer_side = 0.5
+    buffer_side = 1
     buffer_top = 1
 
     wg_width = 1

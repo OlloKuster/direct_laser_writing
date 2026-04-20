@@ -93,8 +93,8 @@ def objective_em_heat_f(currents, resolution, init_values):
         n_heat_v = (v_heat_v - init_values[2]) / init_values[2]
 
         logs = {
-            "v_lens": v_lens, "n_heat_m": n_heat_m, "n_heat_v": n_heat_v, "v_heat_m": v_heat_m,
-            "v_heat_v": v_heat_v
+            "v_lens": v_lens, "n_heat_m": n_heat_m, "n_heat_v": n_heat_v, "v_heat_m": relu(n_heat_m),
+            "v_heat_v": relu(n_heat_v)
         }
 
         print("====================")

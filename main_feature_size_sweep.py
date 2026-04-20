@@ -16,18 +16,24 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
 
 if __name__ == "__main__":
-    setting = setting_loader("metalens", "gauss_em_only")
+    setting_init = setting_loader("metalens", "no_filter")
+    setting_final = setting_loader("metalens", "gauss_em_only")
     eval = True
     resolution = 14
-    betas = [8, 16, np.inf]
+    betas_init = [16, 32]
+    betas_final = [np.inf]
     run_id = 0
 
-    feature_size_factor = [1, 0.75, 0.5, 0.4, 0.3, 0.2, 0.1]
+    feature_size_factor = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
     for fact in feature_size_factor:
         loss_hist = []
         em_loss_hist = []
-        setting["filter_factor"] = fact / np.sqrt(3)
-        loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=3, opt="nlopt", eval=eval, full_bin=False, run_id=run_id)
+        setting_init["objectives"] = "em_only"
+        setting_final["filter_factor"] = fact / np.sqrt(3)
+        loss_hist, em_loss_hist = main(resolution, betas_final, setting_final, loss_hist, em_loss_hist, max_evals=15,
+                                       opt="nlopt",
+                                       eval=eval, full_bin=False, run_id=run_id,
+                                       load=f'/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_base.h5')
 
         run_id = run_id + 1
     # main(resolution, betas, setting, loss_hist, em_loss_hist, opt="optax", load=f"problems/metalens/plots/data_0_{init_beta[-1]}.h5", eval=eval, full_bin=False, run_id=2, device_id=1)
