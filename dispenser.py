@@ -11,8 +11,8 @@ class Dispenser(Enum):
     Add the respective problems  here and their setup, problem and config classes as the call. Plot and data saving
     are also passed here.
     """
-    LENS3D = run_lens
-    MODECONVERTER = run_mode_converter
-    MULTIPLEXER = run_multiplexer
-    POLSPLITTER = run_pol_splitter
-    POWERSPLITTER = run_power_splitter
+    LENS3D = run_lens  # Working
+    MODECONVERTER = run_mode_converter  # Experimental
+    MULTIPLEXER = run_multiplexer  # Experimental
+    POLSPLITTER = run_pol_splitter  # Experimental
+    POWERSPLITTER = run_power_splitter  # Working
