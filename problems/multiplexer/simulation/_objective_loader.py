@@ -11,7 +11,7 @@ def objective_loader(objective: str, *args):
                     "heat_only": Returns the pure heat_eval optimization function.
                     "em_heat": Returns the (softmax) connectivity optimization function.
                     "conic_jax": Returns a cone filter which uses Jax.
-                    "robust_em_heat": Returns the (softmax) connectivity optimization function for a robust
+                    "robust_em_heat": Returns the (softmax) connectivity optimization function for a dlw
                                       optimization.
     :return: The objective function with rho -> L(rho)
     """

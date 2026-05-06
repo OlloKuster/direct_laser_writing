@@ -217,7 +217,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
         updates, opt_state = optimizer.update(-grad, opt_state, rho_0)
 
         rho[:] = optax.apply_updates(rho_0, updates)
-        np.clip(rho, 0.0, 1.0, out=rho)
+        rho = np.clip(rho, 0, 1)
 
         if value > best_val:
             rho_opt = rho.copy()

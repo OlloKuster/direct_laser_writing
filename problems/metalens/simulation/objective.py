@@ -112,7 +112,7 @@ def objective_em_heat_f(currents, resolution, init_values):
 
 def objective_robust_em_heat_f(currents, resolution, init_values):
     """
-    Generates the (softmax) connectivity-objective function. A robust optimization is done by averaging over three
+    Generates the (softmax) connectivity-objective function. A dlw optimization is done by averaging over three
     different structures (eroded, normal and dialted).
     :param currents: Source currents of the simulation.
     :param resolution: Resolution of the simulation [px/um].
@@ -161,10 +161,10 @@ def objective_robust_em_heat_f(currents, resolution, init_values):
 
     def objective_robust_softplus(rhos):
         """
-        Generates the robust objective function. By using the lp-norm (set by power), we approximate the maximum norm.
+        Generates the dlw objective function. By using the lp-norm (set by power), we approximate the maximum norm.
         The worst performing of the three input densities is optimized for.
         :param rhos: Densities (design variable) of the problem 3x[0, 1].
-        :return: robust objective function, values for the EM-performances.
+        :return: dlw objective function, values for the EM-performances.
         """
         fom_eroded, (v_lens_eroded, eps_eroded) = objective_softplus(rhos[0])
         fom_normal, (v_lens_normal, eps_normal) = objective_softplus(rhos[1])

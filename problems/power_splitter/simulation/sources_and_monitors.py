@@ -51,3 +51,10 @@ class Monitors:
         freqs=[ConfigSim.freq0],
         name="Permittivity Monitor"
     )
+
+    eps_monitor_full = td.PermittivityMonitor(
+        center=(0, 0, 0),
+        size=(td.inf, td.inf, td.inf),
+        freqs=[ConfigSim.freq0],
+        name="Permittivity Monitor Full"
+    )

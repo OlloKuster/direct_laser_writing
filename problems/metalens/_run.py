@@ -56,7 +56,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     plotter_eval = plot_loader(plotter_eval_name)
     plotter_final = plot_loader(plotter_final_name)
 
-    init_value = 0.5
+    init_value = 1
 
     rho_0 = np.ones((int(np.ceil((ConfigSim.rho_shape[0] + ConfigSim.buffer_side) * resolution)),
                      int(np.ceil((ConfigSim.rho_shape[1] + ConfigSim.buffer_side) * resolution)),
@@ -89,7 +89,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     projection_0 = projection_loader(projections, projection_values, betas[0], resolution)
 
     objective_em = objective_loader(setting["init_em"], currents, resolution, 1, 1, 1)
-    init_val_em, _ = objective_em(jnp.zeros_like(rho_0))
+    init_val_em, _ = objective_em(jnp.ones_like(rho_0))
     objective_heat = objective_loader(setting["init_heat"])
 
     rho_0_init_bin = np.array(np.ones_like(rho_0)*init_value) * mask

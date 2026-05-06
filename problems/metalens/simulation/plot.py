@@ -7,10 +7,10 @@ from filtering._filter_loader import filter_loader
 from problems.metalens.simulation.config_structure import ConfigSim
 from projection._projection_loader import projection_loader
 
-base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/lp_robust_sweep/data_0_inf.h5", "r")
+base = h5py.File(f"/scratch/local/okuster/data/dlw/big_metalens/fy4301-dlw_plots/dlw_params_paper_more_heat/problems/metalens/plots/data_0_inf.h5", "r")
 grp = base["lens_3d"]
 print(grp.keys())
-eps = grp["eps_normal"][:]
+eps = grp["eps_dilation"][:]
 rho_0 = grp["rho"][:]
 rho_precomp = grp["rho_precomp"][:]
 E_0 = grp["E_normal"][:]

@@ -24,7 +24,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
 
     np.random.seed(42)
 
-    init_value = 0.5
+    init_value = 1
 
     objectives = setting["objectives"]
     filters = setting["filters"]
@@ -53,8 +53,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     # rho_0[:, rho_0.shape[1]//2 - resolution:rho_0.shape[1]//2+resolution] = 0
     # rho_0[:, :rho_0.shape[1]//2] = 0.3
     #
-    # rho_0 = np.random.rand(ConfigSim.nx, ConfigSim.ny,
-    #                        ConfigSim.nz)
+
     #
     # rho_0 = np.repeat(rho_0, ConfigSim.nz, axis=2)
 
@@ -75,7 +74,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
 
     filter_0 = filter_loader(filters, filter_values, lp_deviation)
     init_projection_0 = projection_loader(init_projections, init_projection_values, betas[0], resolution)
-    projection_0 = projection_loader(projections, projection_values, 8, resolution)
+    projection_0 = projection_loader(projections, projection_values, betas[0], resolution)
 
     objective_heat = objective_loader(setting["init_heat"])
 

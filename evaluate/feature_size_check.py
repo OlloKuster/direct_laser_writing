@@ -12,12 +12,12 @@ matplotlib.rc('font', **font)
 
 path_feature_size = "/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/feature_size_check/"
 
-inds_feature_size = np.linspace(0, 6, 7)
-feature_size_factor = [1, 0.75, 0.5, 0.4, 0.3, 0.2, 0.1]
+inds_feature_size = np.linspace(0, 7, 8)
+feature_size_factor = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
 feature_size = np.array(feature_size_factor) / np.sqrt(3)
 # i = 0
 
-em_loss_list_feature_size = np.zeros(7)
+em_loss_list_feature_size = np.zeros(8)
 
 
 for i in inds_feature_size:
@@ -46,7 +46,7 @@ for i in inds_lp:
         loss_lp = grp["loss"][:]
         em_loss_list_lp[int(i)] = em_loss_lp[-1]
 
-with h5py.File("/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/heat_sweep/data_0_inf.h5") as f:
+with h5py.File("/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/heat_sweep/power_splitter.h5") as f:
     grp = f["lens_3d"]
     em_loss_reference_reference = grp["em_loss"][-1]
     loss_reference = grp["loss"][:]

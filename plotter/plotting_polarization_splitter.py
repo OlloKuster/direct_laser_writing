@@ -121,7 +121,7 @@ def polarization_splitter_regular_final_plot():
 
 def mode_converter_robust_intermediate_plot():
     """
-    Creates the plotting function used for the intermediate evaluation of the robust (3) designed structures.
+    Creates the plotting function used for the intermediate evaluation of the dlw (3) designed structures.
     :return: Evaluation Plotter function.
     """
 
@@ -166,7 +166,7 @@ def mode_converter_robust_intermediate_plot():
 
 def mode_converter_robust_final_plot():
     """
-    Creates the plotting function used for the final evaluation of the robust (3) designed structures.
+    Creates the plotting function used for the final evaluation of the dlw (3) designed structures.
     :return: Final Plotter function.
     """
 

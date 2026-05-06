@@ -54,7 +54,7 @@ def ssp_proj_jax_f(alpha, beta, resolution):
 
 def ssp_robust_proj_jax_f(alphas, beta, resolution):
     """
-    Generates the SSP Projection function for a robust optimization.
+    Generates the SSP Projection function for a dlw optimization.
     :param alphas: Tuple of threshold values.
     :param beta: Binarization level.
     :param resolution: Resolution of the problem.

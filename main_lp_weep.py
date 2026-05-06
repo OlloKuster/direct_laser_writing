@@ -24,6 +24,8 @@ if __name__ == "__main__":
     run_id = 11
 
     lps = np.linspace(0.011, 0.015, 3)
+    print(lps)
+    print(radsfasf)
     for lp in lps:
         loss_hist = []
         em_loss_hist = []

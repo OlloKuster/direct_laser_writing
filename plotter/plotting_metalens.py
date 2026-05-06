@@ -109,7 +109,7 @@ def metalens_regular_final_plot():
 
 def metalens_robust_intermediate_plot():
     """
-    Creates the plotting function used for the intermediate evaluation of the robust (3) designed structures.
+    Creates the plotting function used for the intermediate evaluation of the dlw (3) designed structures.
     :return: Evaluation Plotter function.
     """
     def plotter(rho_init, rho_final, cur_eps, projection, i):
@@ -164,7 +164,7 @@ def metalens_robust_intermediate_plot():
 
 def metalens_robust_final_plot():
     """
-    Creates the plotting function used for the final evaluation of the robust (3) designed structures.
+    Creates the plotting function used for the final evaluation of the dlw (3) designed structures.
     :return: Final Plotter function.
     """
     def plotter(extent, rho_0=None, rho_precomp=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None, run_id=0,

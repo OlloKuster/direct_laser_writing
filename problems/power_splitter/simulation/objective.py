@@ -97,10 +97,10 @@ def objective_robust_em_heat_f(init_values):
 
     def objective_robust_softplus(rhos):
         """
-        Generates the robust objective function. By using the lp-norm (set by power), we approximate the maximum norm.
+        Generates the dlw objective function. By using the lp-norm (set by power), we approximate the maximum norm.
         The worst performing of the three input densities is optimized for.
         :param rhos: Densities (design variable) of the problem 3x[0, 1].
-        :return: robust objective function, values for the EM-performances.
+        :return: dlw objective function, values for the EM-performances.
         """
 
         fom_eroded, trans_eroded = objective_softplus(rhos[0])

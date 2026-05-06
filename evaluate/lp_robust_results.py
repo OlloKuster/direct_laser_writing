@@ -90,7 +90,7 @@ axs.set_ylim(0, 7)
 axs.set_xlabel(r"Laser Power Deviation$\,$(%)", fontsize=18)
 axs.set_ylabel(r"$\mathcal{L}_\text{EM}$", fontsize=18)
 plt.legend()
-plt.savefig("plots/robust.png")
+plt.savefig("plots/dlw.png")
 plt.close()
 
 

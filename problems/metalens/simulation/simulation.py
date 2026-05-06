@@ -115,3 +115,12 @@ def heat_simulation(rho, resize_factor, resolution):
     T_void = fem_void.temperature(kappa_r_void, src_void)
 
     return jnp.sum(T_matter) / T_matter.size, jnp.sum(T_void) / T_void.size, kappa_r_matter
+
+
+if __name__ == "__main__":
+    import numpy as np
+    resolution = 14
+    rho_0 =  np.ones((int(np.ceil((ConfigSim.rho_shape[0] + ConfigSim.buffer_side) * resolution)),
+                     int(np.ceil((ConfigSim.rho_shape[1] + ConfigSim.buffer_side) * resolution)),
+                     int(np.ceil(ConfigSim.rho_shape[2] * resolution)))) * 1
+    em_simulation(rho_0, 0, 14)

@@ -16,8 +16,8 @@ def plot_loader(plot: str, *args):
                  Modes:
                   "eval_regular" Intermediate plotting for regular optimization.
                   "final_regular" Final plotting for regular optimization.
-                  "eval_robust" Intermediate plotting for robust optimization.
-                  "final_robust" Final plotting for robust optimization.
+                  "eval_robust" Intermediate plotting for dlw optimization.
+                  "final_robust" Final plotting for dlw optimization.
     :param args:
     :return:
     """
