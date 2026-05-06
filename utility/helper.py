@@ -24,18 +24,23 @@ def split_int(a):
     return a // 2, a // 2 + a % 2
 
 
-# def softplus(x, beta=50):
-#     """
-#     Softplus function to balance out the optimisation.
-#     :param x: Array of figure of merits which are evaluated.
-#     :param beta: Steepness of the curve.
-#     :return: Array of softplus of all figure of merits.
-#     """
-#     mask = x * beta > 20
-#     return jnp.where(mask, x, 1 / beta * jnp.log(1 + jnp.exp(jnp.where(mask, 0, x * beta))))
+def softplus(x, beta=50):
+    """
+    Softplus function to balance out the optimisation.
+    :param x: Array of figure of merits which are evaluated.
+    :param beta: Steepness of the curve.
+    :return: Array of softplus of all figure of merits.
+    """
+    mask = x * beta > 20
+    return jnp.where(mask, x, 1 / beta * jnp.log(1 + jnp.exp(jnp.where(mask, 0, x * beta))))
 
 
 def relu(x):
+    """
+    ReLu function.
+    :param x: Input value(s)
+    :return: ReLu of x.
+    """
     return jax.nn.relu6(x)
 
 
@@ -52,12 +57,3 @@ def convert_to(x, package):
         return x.detach().cpu().numpy()
     else:
         return x
-
-
-def draw_circle(rho, x_cen, y_cen, radius):
-    x = np.linspace(0, rho.shape[0], rho.shape[0])
-    y = np.linspace(0, rho.shape[1], rho.shape[0])
-    xx, yy = np.meshgrid(x, y)
-    for x_c, y_c in zip(x_cen, y_cen):
-        rho = rho + np.round(np.exp(-((xx-x_c)**2 + (yy-y_c)**2) / (2 * radius)))
-    return np.exp(-((xx-x_cen)**2 + (yy-y_cen)**2) / (2 * radius))
