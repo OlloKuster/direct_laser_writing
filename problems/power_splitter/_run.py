@@ -19,13 +19,10 @@ from utility.helper import convert_to
 def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_evals, load=None, eval=False,
         full_bin=False,
         run_id=0):
-    jax.config.update("jax_enable_x64", True)
+    jax.config.update("jax_enable_x64", True)# Might be redundant
     torch.cuda.empty_cache()
 
-    np.random.seed(42)
-
-    init_value = 1
-
+    # Setting up the optimization parameters
     objectives = setting["objectives"]
     filters = setting["filters"]
     filter_values = setting["filter_factor"] * resolution
@@ -48,21 +45,11 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     plotter_eval = plot_loader(plotter_eval_name)
     plotter_final = plot_loader(plotter_final_name)
 
+    # Initial density setup
+    init_value = 0.5
     rho_0 = np.ones((ConfigSim.nx, ConfigSim.ny, ConfigSim.nz)) * init_value
-    # rho_0[:, ConfigSim.ny//2-resolution//3:ConfigSim.ny//2+resolution//3] = 0
-    # rho_0[:, rho_0.shape[1]//2 - resolution:rho_0.shape[1]//2+resolution] = 0
-    # rho_0[:, :rho_0.shape[1]//2] = 0.3
-    #
 
-    #
-    # rho_0 = np.repeat(rho_0, ConfigSim.nz, axis=2)
-
-    # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(ConfigSim.nx,
-    #                                                               ConfigSim.ny,
-    #                                                               1), sigma=0.25 * ConfigSim.nx))
-    #
-    # rho_0 = np.repeat(rho_0, ConfigSim.nz, axis=2)
-
+    # Mask for forcing sides to be 0
     mask = np.ones_like(rho_0)
 
     mask[:int(np.ceil(ConfigSim.buffer_side * resolution))] = 0
@@ -72,8 +59,8 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     mask[:, :, :int(np.ceil(ConfigSim.buffer_top * resolution))] = 0
     mask[:, :, -int(np.ceil(ConfigSim.buffer_top * resolution)):] = 0
 
+    # Calculating initial L_heat/void
     filter_0 = filter_loader(filters, filter_values, lp_deviation)
-    init_projection_0 = projection_loader(init_projections, init_projection_values, betas[0], resolution)
     projection_0 = projection_loader(projections, projection_values, betas[0], resolution)
 
     objective_heat = objective_loader(setting["init_heat"])
@@ -92,6 +79,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     init_val_mat = (init_T_mat + 1e-3) / (1 + target_material)
     init_val_void = (init_T_void + 1e-3) / (1 + target_void)
 
+    # Main Optimization loop
     if load is not None:
         f = h5py.File(load)
         grp = f["power_splitter"]
@@ -121,6 +109,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         loss_hist += loss
         em_loss_hist += em_loss
 
+        # Final manipulations to save the relevant details.
         rho_proj_init = init_projection(rho_0) * mask
         rho_0 = convert_to(rho_proj_init, conversions)
         rho_opt_filtered = filter(rho_0)

@@ -4,8 +4,7 @@ import numpy as np
 from settings._setting_loader import setting_loader
 
 
-def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, load=None, eval=False, full_bin=False,
-         run_id=0):
+def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, load=None, eval=False, run_id=0):
     """
     This function can be run to reproduce the results of the paper regarding the minimum feature size.
     :param resolution: Resolution of the problem (in px/lenght)
@@ -25,7 +24,8 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
     run = setting["run"]
 
-    return run(resolution, betas, setting, loss_hist, em_loss_hist, opt=opt, max_evals=max_evals, load=load, eval=eval, full_bin=full_bin, run_id=run_id)
+    return run(resolution, betas, setting, loss_hist, em_loss_hist, opt=opt, max_evals=max_evals, load=load, eval=eval,
+               run_id=run_id)
 
 
 
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         setting_final["filter_factor"] = fact / np.sqrt(3)
         loss_hist, em_loss_hist = main(resolution, betas_final, setting_final, loss_hist, em_loss_hist, max_evals=15,
                                        opt="nlopt",
-                                       eval=eval, full_bin=False, run_id=run_id,
+                                       eval=eval, run_id=run_id,
                                        load=f'/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_base.h5')
 
         run_id = run_id + 1

@@ -1,14 +1,10 @@
-import matplotlib
 import numpy as np
 import jax
 import jax.numpy as jnp
-import scipy
 import torch
 import h5py
 
 from filtering._filter_loader import filter_loader
-from filtering.dose_model._dose_filter import dose_filter_f
-from filtering.dose_model.config_print import ConfigPrint
 from optimizer.optimizer import optimizer_nlopt, optimizer_optax
 from plotter._plot_loader import plot_loader
 from problems.metalens.simulation._objective_loader import objective_loader
@@ -16,12 +12,9 @@ from problems.metalens.simulation.config_structure import ConfigSim
 from problems.metalens.simulation.simulation import em_simulation
 from projection._projection_loader import projection_loader
 from utility.helper import convert_to
-from optimizer import config as ConfigOpt
 
 
-def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_evals, load=None, eval=False,
-        full_bin=False,
-        run_id=0):
+def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_evals, load=None, eval=False, run_id=0):
     """
     Runs the optimization process. Lower level "main".
     :param resolution: Resolution of the problem.
@@ -31,11 +24,11 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     :param eval: Activate intermediate evaluation/plotting of rho.
     :return: None.
     """
-    np.random.seed(42)
 
-    jax.config.update("jax_enable_x64", True)
+    jax.config.update("jax_enable_x64", True)  # Might be redundant
     torch.cuda.empty_cache()
 
+    # Setting up the optimization parameters
     objectives = setting["objectives"]
     filters = setting["filters"]
     filter_values = setting["filter_factor"] * resolution
@@ -56,36 +49,28 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     plotter_eval = plot_loader(plotter_eval_name)
     plotter_final = plot_loader(plotter_final_name)
 
-    init_value = 1
+    # Initial density setup
+    init_value = 0.5
 
     rho_0 = np.ones((int(np.ceil((ConfigSim.rho_shape[0] + ConfigSim.buffer_side) * resolution)),
                      int(np.ceil((ConfigSim.rho_shape[1] + ConfigSim.buffer_side) * resolution)),
                      int(np.ceil(ConfigSim.rho_shape[2] * resolution)))) * init_value
 
-    # # rho_0[:, :, rho_0.shape[2]//2:] = 0
-    # #
-    # rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(int(np.ceil((ConfigSim.rho_shape[0] + ConfigSim.buffer_side) * resolution)),
-    #                  int(np.ceil((ConfigSim.rho_shape[1] + ConfigSim.buffer_side) * resolution)),
-    #                  1), sigma=0.5*resolution))
-    # rho_0 = np.repeat(rho_0, int(np.ceil(ConfigSim.rho_shape[2] * resolution)), axis=2)
-    # rho_0 = np.random.rand(int(np.ceil((ConfigSim.rho_shape[0] + ConfigSim.buffer_side) * resolution)),
-    #                  int(np.ceil((ConfigSim.rho_shape[1] + ConfigSim.buffer_side) * resolution)),
-    #                  int(np.ceil(ConfigSim.rho_shape[2] * resolution)))
-    # rho_0 = np.repeat(rho_0, int(np.ceil(ConfigSim.rho_shape[2] * resolution)), axis=2)
-
+    # Mask for forcing sides to be 0
     mask = np.ones_like(rho_0)
     mask[:int(ConfigSim.buffer_side * resolution)] = 0
     mask[:, :int(ConfigSim.buffer_side * resolution)] = 0
     mask[:, :, -int(ConfigSim.buffer_top * resolution):] = 0
 
+    # Input current terms (Plane Wave)
     size_currents = (ConfigSim.currents_shape[0] * resolution,
                      ConfigSim.currents_shape[1] * resolution,
                      1)
 
     currents = jnp.ones(size_currents, jnp.complex128)
 
+    # Calculating initial L_heat/void
     filter_0 = filter_loader(filters, filter_values, lp_deviation)
-    init_projection_0 = projection_loader(init_projections, init_projection_values, betas[0], resolution)
     projection_0 = projection_loader(projections, projection_values, betas[0], resolution)
 
     objective_em = objective_loader(setting["init_em"], currents, resolution, 1, 1, 1)
@@ -104,8 +89,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         init_T_mat, init_T_void = objective_heat(rho_0_bin, resolution)
 
 
-
-    init_val_mat = (init_T_mat + 1e-3) / (1 + target_material)
+    init_val_mat = (init_T_mat + 1e-3) / (1 + target_material)  # Small offset to avoid singularities
     init_val_void = (init_T_void + 1e-3) / (1 + target_void)
 
     if load is not None:
@@ -114,6 +98,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         rho_0 = grp["rho"][:]
         f.close()
 
+    # Main Optimization loop
     for i in range(len(betas)):
         print(f"beta: {betas[i]}")
 
@@ -138,6 +123,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         loss_hist += loss
         em_loss_hist += em_loss
 
+        # Final manipulations to save the relevant details.
         rho_precomp = (
         init_projection((rho_0) * mask)[:-ConfigSim.buffer_side * resolution, :-ConfigSim.buffer_side * resolution])
         rho_proj_init = init_projection(rho_0) * mask

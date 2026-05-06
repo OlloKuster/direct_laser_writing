@@ -1,5 +1,4 @@
 import jax.numpy as jnp
-import autograd.numpy as anp
 
 
 def tanh_filter_jax_f(alpha=0.5, beta=30):

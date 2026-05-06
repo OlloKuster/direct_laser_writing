@@ -1,5 +1,4 @@
 import jax.numpy as jnp
-import autograd.numpy as anp
 import tidy3d as td
 from tidy3d.plugins.autograd import rescale
 

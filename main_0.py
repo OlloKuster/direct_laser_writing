@@ -4,8 +4,7 @@ import numpy as np
 from settings._setting_loader import setting_loader
 
 
-def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, load=None, eval=False, full_bin=False,
-         run_id=0):
+def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, load=None, eval=False, run_id=0):
     """
     Main function, starts the optimization process with the specified settings. The way it is set up,
     multiple runs can be done sequentially with different settings.
@@ -18,7 +17,6 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
     :param max_evals: How many evaluations/iterations are done in the optimization.
     :param load: If set, will load the density from the specified file.
     :param eval: If intermediate plots will be plotted.
-    :param full_bin: If the designs are fully binarized.
     :param run_id: Tracking id for the runs.
     :return: Loss and EM loss history.
     """
@@ -27,20 +25,20 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
     run = setting["run"]
 
     return run(resolution, betas, setting, loss_hist, em_loss_hist, opt=opt, max_evals=max_evals, load=load, eval=eval,
-               full_bin=full_bin, run_id=run_id)
+               run_id=run_id)
 
 
 if __name__ == "__main__":
     setting_init = setting_loader("metalens", "dlw_regular")
     setting_final = setting_loader("metalens", "dlw_regular")
     eval = True
-    resolution = 14
+    resolution = 8
     loss_hist = []
     em_loss_hist = []
     betas_init = [16, 32]
     betas_final = [np.inf]
 
     # loss_hist, em_loss_hist = main(resolution, betas_init, setting_init, loss_hist, em_loss_hist, max_evals=25, opt="nlopt",
-    #                                eval=eval, full_bin=False, run_id=0)
+    #                                eval=eval, run_id=0)
     loss_hist, em_loss_hist = main(resolution, betas_final, setting_final, loss_hist, em_loss_hist, max_evals=1, opt="nlopt",
-                                   eval=eval, full_bin=False, run_id=0)
+                                   eval=eval, run_id=0)

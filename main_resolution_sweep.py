@@ -2,7 +2,7 @@ import jax
 from settings._setting_loader import setting_loader
 
 
-def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, load=None, eval=False, full_bin=False,
+def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, load=None, eval=False,
          run_id=0):
     """
     This function can be run to check the resolution dependencies of the results.
@@ -23,7 +23,8 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
     run = setting["run"]
 
-    return run(resolution, betas, setting, loss_hist, em_loss_hist, opt=opt, max_evals=max_evals, load=load, eval=eval, full_bin=full_bin, run_id=run_id)
+    return run(resolution, betas, setting, loss_hist, em_loss_hist, opt=opt, max_evals=max_evals, load=load, eval=eval,
+               run_id=run_id)
 
 
 if __name__ == "__main__":

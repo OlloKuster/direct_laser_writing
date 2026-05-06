@@ -5,8 +5,7 @@ from dispenser import Dispenser
 from settings._setting_loader import setting_loader
 
 
-def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, load=None, eval=False, full_bin=False,
-         run_id=0):
+def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, load=None, eval=False, run_id=0):
     """
     This function can be run to reproduce the results of the paper regarding the connectivity constraints using the
     virutal temperature method.
@@ -27,7 +26,7 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
     run = Dispenser.LENS3D
     return run(resolution, betas, setting, loss_hist, em_loss_hist, opt=opt, max_evals=max_evals, load=load, eval=eval,
-               full_bin=full_bin, run_id=run_id)
+               run_id=run_id)
 
 
 if __name__ == "__main__":
@@ -49,6 +48,6 @@ if __name__ == "__main__":
             setting["target_material"] = mat
             setting["target_void"] = void
             loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15,
-                                           opt="nlopt", eval=eval, full_bin=False, run_id=run_id,
+                                           opt="nlopt", eval=eval, run_id=run_id,
                                            load=f'/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/base/data_base_no_filter.h5')
             run_id = run_id + 1

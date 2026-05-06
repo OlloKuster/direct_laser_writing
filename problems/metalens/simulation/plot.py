@@ -7,6 +7,9 @@ from filtering._filter_loader import filter_loader
 from problems.metalens.simulation.config_structure import ConfigSim
 from projection._projection_loader import projection_loader
 
+
+# Mostly used to just plot things in between
+
 base = h5py.File(f"/scratch/local/okuster/data/dlw/big_metalens/fy4301-dlw_plots/dlw_params_paper_more_heat/problems/metalens/plots/data_0_inf.h5", "r")
 grp = base["lens_3d"]
 print(grp.keys())

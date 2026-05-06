@@ -3,7 +3,6 @@ import jax.numpy as jnp
 import jaxwell
 
 from problems.metalens.simulation.config_structure import ConfigSim
-from projection.SSP.subpixel_smoothed_projection import f2bin_smooth, ssp_proj_jax_f
 from tofea.fea3d import FEA3D_T
 from utility.helper import f2param, split_int
 

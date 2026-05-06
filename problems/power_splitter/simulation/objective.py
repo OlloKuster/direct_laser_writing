@@ -12,6 +12,11 @@ from utility.helper import relu
 
 
 def measure_mode_power_ag(rho):
+    """
+    Returns the transmission (%) of the fundamental mode.
+    :param rho: Input density.
+    :return: Transmission of the fundamental mode.
+    """
     sim = make_sim_tidy(rho)
     sim_data = web.run(sim, task_name=f"power_splitter_{ConfigSim.cur_it + 1}", folder_name="power_splitter",
                        verbose=False)

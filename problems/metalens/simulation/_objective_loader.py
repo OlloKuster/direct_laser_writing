@@ -30,4 +30,5 @@ def objective_loader(objective: str, *args):
     if objective == "robust_em_heat":
         currents, resolution, init_value_em, init_value_mat, init_value_void = args
         return objective_robust_em_heat_f(currents, resolution, (init_value_em, init_value_mat, init_value_void))
+    return None
 

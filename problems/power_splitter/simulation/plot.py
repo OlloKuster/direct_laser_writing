@@ -1,11 +1,6 @@
 import pyvista as pv
 import h5py
-import matplotlib.pyplot as plt
 import numpy as np
-
-from filtering._filter_loader import filter_loader
-from problems.power_splitter.simulation.config_structure import ConfigSim
-from projection._projection_loader import projection_loader
 
 base = h5py.File(f"/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/power_splitter/plots/data_0_16.h5", "r")
 grp = base["power_splitter"]
