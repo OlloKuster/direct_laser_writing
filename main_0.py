@@ -40,13 +40,3 @@ if __name__ == "__main__":
 
     loss_hist, em_loss_hist = main(resolution, betas_init, setting_init, loss_hist, em_loss_hist, max_evals=15, opt="nlopt",
                                    eval=eval, run_id=1)
-    loss_hist, em_loss_hist = main(resolution, betas_init, setting_init, loss_hist, em_loss_hist, max_evals=15, opt="nlopt",
-                                   eval=eval, run_id=2)
-    loss_hist, em_loss_hist = main(resolution, betas_init, setting_init, loss_hist, em_loss_hist, max_evals=15, opt="nlopt",
-                                   eval=eval, run_id=3)
-    loss_hist, em_loss_hist = main(resolution, betas_init, setting_init, loss_hist, em_loss_hist, max_evals=15, opt="nlopt",
-                                   eval=eval, run_id=4)
-    loss_hist, em_loss_hist = main(resolution, betas_init, setting_init, loss_hist, em_loss_hist, max_evals=15, opt="nlopt",
-                                   eval=eval, run_id=5)
-    # loss_hist, em_loss_hist = main(resolution, betas_final, setting_final, loss_hist, em_loss_hist, max_evals=1, opt="nlopt",
-    #                                eval=eval, run_id=0)
