@@ -7,7 +7,7 @@ from cmcrameri import cm
 
 
 font = {'family': 'sans-serif',
-        'size': 14}
+        'size': 16}
 
 matplotlib.rc('font', **font)
 

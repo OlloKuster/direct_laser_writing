@@ -26,7 +26,7 @@ print(eps.shape)
 p = pv.Plotter(off_screen=True)
 p.add_mesh(data.contour(), cmap='binary')
 p.camera_position = 'yz'
-p.camera.elevation = 20
+p.camera.elevation = 30
 p.camera.azimuth = - 45
 p.remove_scalar_bar()
 p.camera.zoom(1.3)

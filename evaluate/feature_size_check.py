@@ -5,7 +5,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 
-font = {'family': 'sans-serif',
+font = {'family': 'arial',
         'size': 14}
 
 matplotlib.rc('font', **font)
@@ -27,16 +27,16 @@ for i in inds_feature_size:
         loss_feature_size = grp["loss"][:]
         em_loss_list_feature_size[int(i)] = np.max(em_loss_feature_size)
 
-path_lp = "/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/lp_sweep/"
+path_lp = "/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/lp_sweep_old/"
 
 inds_lp = np.linspace(0, 13, 14)
-lps = np.linspace(0.001, 0.01, 11) / 0.003 * 20
-lps = np.concat((lps, np.linspace(0.011, 0.015, 3)  / 0.003 * 20))
+lps = np.linspace(0.001, 0.01, 11) / 0.003
+lps = np.concat((lps, np.linspace(0.011, 0.015, 3)  / 0.003))
 
 print(lps)
 # i = 0
 
-em_loss_list_lp = np.zeros(14)
+em_loss_list_lp = np.zeros(len(lps))
 
 
 for i in inds_lp:
@@ -46,7 +46,7 @@ for i in inds_lp:
         loss_lp = grp["loss"][:]
         em_loss_list_lp[int(i)] = em_loss_lp[-1]
 
-with h5py.File("/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/heat_sweep/power_splitter.h5") as f:
+with h5py.File("/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/heat_sweep/data_1_inf.h5") as f:
     grp = f["lens_3d"]
     em_loss_reference_reference = grp["em_loss"][-1]
     loss_reference = grp["loss"][:]
@@ -69,20 +69,13 @@ print(em_loss_list_lp)
 
 print(lps)
 
-fig, ax1 = plt.subplots(1, 1, figsize=(6, 6))
-lns1 = ax1.plot(lps, em_loss_list_lp, color='black', label='Laser Power')
-ax1.set_xlabel(r"Rel. Laser Power$\,$(%)", fontsize=18)
-ax1.set_ylabel(r"$\mathcal{L}_\text{EM}$", fontsize=18)
-ax1.set_xlim(lps[0], 100)
-ax1.scatter(40, em_loss_reference_reference, c='black')
-ax1.scatter(40, em_loss_robust, marker='x', c='red')
-
-ax2 = ax1.twiny()
-lns2 = ax2.plot(feature_size[::-1], em_loss_list_feature_size[::-1], color='gray', label='Min. Feature Size')
-ax2.set_xlabel(r"Min. Feature Size$\,$($\mathregular{\mu}$m)", fontsize=18)
-ax2.set_xlim(feature_size[-1], feature_size[0])
-lns = lns1 + lns2
-labs = [l.get_label() for l in lns]
-ax1.legend(lns, labs, loc=4)
+fig, ax1 = plt.subplots(1, 1, figsize=(16, 8))
+lns1 = ax1.plot(lps, em_loss_list_lp, '--o', color='black', label='Laser Power')
+ax1.set_xlabel(r"Relative laser power$\,$", fontsize=16)
+ax1.set_ylabel(r"Electromagnetic FoM", fontsize=16)
+ax1.set_xlim(lps[0], lps[-1])
+ax1.scatter(2, em_loss_reference_reference, c='black')
+ax1.scatter(2, em_loss_robust, marker='x', c='red')
+plt.tight_layout()
 plt.savefig("plots/feature_size_comparison.png")
 plt.close()

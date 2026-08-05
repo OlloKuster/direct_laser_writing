@@ -7,7 +7,7 @@ import pyvista as pv
 
 
 font = {'family': 'sans-serif',
-        'size': 14}
+        'size': 16}
 
 matplotlib.rc('font', **font)
 
@@ -87,8 +87,8 @@ axs.plot(lp_diff_rel, loss_list_normal, '-ro', color='black', label='Normal')
 axs.plot(lp_diff_rel, loss_list_dilated, color='grey', label='Dilated', linestyle='--')
 # axs.plot(lp_diff_rel, loss_final, color='black', label='Dilated', linestyle='--')
 axs.set_ylim(0, 7)
-axs.set_xlabel(r"Laser Power Deviation$\,$(%)", fontsize=18)
-axs.set_ylabel(r"$\mathcal{L}_\text{EM}$", fontsize=18)
+axs.set_xlabel(r"Laser Power Deviation$\,$(%)", fontsize=24)
+axs.set_ylabel(r"$\mathcal{L}_\text{EM}$", fontsize=24)
 plt.legend()
 plt.savefig("plots/dlw.png")
 plt.close()

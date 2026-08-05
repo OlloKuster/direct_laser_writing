@@ -53,6 +53,8 @@ eps_final = eps_final[:, eps_final.shape[1]//2:, eps_final.shape[2]//2:]
 eps_final = np.concatenate((np.flip(eps_final, axis=1), eps_final), axis=1)
 eps_final = np.concatenate((np.flip(eps_final, axis=2), eps_final), axis=2)
 
+print(f"printed shape: {eps_final.shape}")
+
 data_nothing = pv.wrap(eps_final)
 data_e = pv.wrap(np.clip(E[:], 1., 35))
 
@@ -149,12 +151,22 @@ sim = td.Simulation(
         symmetry=(0, -1, 1)
 )
 
+grid_spec = sim.grid_spec.updated_copy(
+    override_structures=list(sim.grid_spec.override_structures)
+                        + [design_region_mesh]  # + [waveguide_mesh]
+)
+
+sim = sim.updated_copy(grid_spec=grid_spec)
+sim_data = web.run(sim, verbose=True)
+
 path = "/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/plots/init_structures/"
-sim_data = web.load("fdve-0779e6b9-c699-4828-8f9b-5f30261d3863", path=path + "_simulation_results.hdf5", verbose=True)
+# sim_data = web.load("fdve-f355bea1-d82a-4b94-93dd-9bbafed7877e", path=path + "_simulation_results.hdf5", verbose=True)
 eps = sim_data["Permittivity Monitor Full"].eps_xx.real.squeeze()
 
 
-data = pv.wrap(np.array(eps[:, 14:-14, 14:-14]))
+print(f"init shape: {eps.shape}")
+
+data = pv.wrap(np.array(eps[14:-14, 14:-14, 14:-14]))
 p = pv.Plotter(off_screen=True)
 p.add_mesh(data.contour(), cmap='binary')
 p.camera_position = 'xy'

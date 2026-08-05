@@ -37,16 +37,17 @@ if __name__ == "__main__":
     loss_hist = []
     em_loss_hist = []
     betas = [np.inf]
-    run_id = 11
+    run_id = 41
 
-    lps = np.linspace(0.011, 0.015, 3)
+    lps = np.linspace(0.002, 0.015, 100)
     print(lps)
-    print(radsfasf)
-    for lp in lps:
+
+    for lp in lps[41:]:
+        print(len(lps[41:]))
         loss_hist = []
         em_loss_hist = []
         setting["lp_deviation"] = lp
         loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15,
-                                       opt="nlopt", eval=eval, full_bin=False, run_id=run_id,
+                                       opt="nlopt", eval=eval, run_id=run_id,
                                        load=f'/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_base.h5')
         run_id = run_id + 1
