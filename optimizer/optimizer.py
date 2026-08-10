@@ -45,6 +45,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
             grad_em_sim_f = jax.value_and_grad(objective, has_aux=True)
             value_em_sim, grad_em_sim = grad_em_sim_f(projection(x.detach().cpu().numpy().astype(np.float64)))
             em_hist.append(value_em_sim[1][0])
+            print(f"transmission: {value_em_sim[1][0][0]}\treflection: {value_em_sim[1][0][1]}")
             cur_eps.append(value_em_sim[1][1])
             # cur_field.append(value_em_sim[1][2])
             value_em_sim = value_em_sim[0]
