@@ -48,11 +48,20 @@ The final design is then obtained by another binarization, assigning values abov
 We use the final design to calculate the optical response of the material distribution. We also consider structural integrity and robustness in our figure of merit, making the design fully 3D printable and more robust against experimental variations.
 The optimization itself will start off at a low level of binarization and gets more and more binarized as we approach a local minimum. 
 
+
+The entire workflow can be seen in the following image a), as well as a small metalens designed using this workflow in b).
+<img width="1066" height="735" alt="first_pic" src="https://github.com/user-attachments/assets/e763ca9b-7eb5-48e5-9447-ddc80ffed2a3" />
+
+
 ## Results
 
+We want to show some structures we designed using the DLW-Method. The upper image always shows the writing pattern and the bottom image shows the resulting structure once it was sent through the DLW-Model, representing the "printed" design.
+<img width="2138" height="867" alt="structures" src="https://github.com/user-attachments/assets/354a1801-86d3-4994-a83e-5d69d5fd7e77" />
+
+
 ## Code Details
-I apologize for the (somewhat messy) and lengthy code, I try to refactor it bit by bit when I have time. But simply running the ```main.py``` file reproduces the small metalens on a GPU (CPU is also possible, but then the torch tensors need to casted onto the cpu properly, I will fix that later).
-Every optimization requires a "setting", which has to be put into ```settings/_setting_loader.py```, where the individual settings for the optimization are being specified (should ideally be a json, pull requests are always welcome for such an implementation).
+I apologize for the (somewhat messy) and lengthy code, I try to refactor it bit by bit when I have time. But simply running the ```main.py``` file reproduces the small metalens on a GPU (CPU is also possible, but then the torch tensors need to casted onto the CPU manually everywhere, I will fix that later).
+Every optimization requires a "setting", which has to be put into ```settings/_setting_loader.py```, where the individual settings for the optimization are being specified (should ideally be a json, pull requests are always welcome for such an implementation. Pull requests are welcome in general.).
 The setting can be used to set what kind of objective function should be optimized for, if Gauss filtering should be used, what projection should be used, if precompensation should be used or not, etc.
 Every setting itself represents a specific run for a specific optimization problem. Each optimization problem is defined in its own ```_run.py``` file, which is being pulled by the ```dispenser.py``` file.
 Technically speaking, one can set up their own ```_run.py``` file however they wish.
@@ -64,3 +73,5 @@ Extending all of the setups can be done by defining their own sub-routine and th
 
 Lastly, the optimizers are set up to take gradients from jax. So wrappers are required to convert the gradients obtained otherwise into jax. The wrapper for the torch-based DLW-Model is implemented explicitly in the optimizers.
 
+Since everything runs on a GPU, it is a bit difficult for me to get a definite requirement.yaml (or similar file) due to how things are set up on my working PC, but I will try to add one later.
+Most importantly, all the standard libraries such as numpy, matplotlib, etc. should be installed, as well as torch and jax. Furthermore cupy and sympy are needed for the heat solver (or just remove tofea from everywhere).
