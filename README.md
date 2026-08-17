@@ -60,7 +60,7 @@ We want to show some structures we designed using the DLW-Method. The upper imag
 
 
 ## Code Details
-I apologize for the (somewhat messy) and lengthy code, I try to refactor it bit by bit when I have time. But simply running the ```main.py``` file reproduces the small metalens on a GPU (CPU is also possible, but then the torch tensors need to casted onto the CPU manually everywhere, I will fix that later).
+I apologize for the somewhat messy and lengthy code, I try to refactor it bit by bit when I have time. But simply running the ```main.py``` file reproduces the small metalens on a GPU (CPU is also possible, but then the torch tensors need to casted onto the CPU manually everywhere, I will fix that later).
 Every optimization requires a "setting", which has to be put into ```settings/_setting_loader.py```, where the individual settings for the optimization are being specified (should ideally be a json, pull requests are always welcome for such an implementation. Pull requests are welcome in general.).
 The setting can be used to set what kind of objective function should be optimized for, if Gauss filtering should be used, what projection should be used, if precompensation should be used or not, etc.
 Every setting itself represents a specific run for a specific optimization problem. Each optimization problem is defined in its own ```_run.py``` file, which is being pulled by the ```dispenser.py``` file.
