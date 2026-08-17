@@ -34,13 +34,13 @@ However, we want to obtain a writing pattern as an intermediate step (which can 
 This writing pattern serves as our starting point, which we (and the 3D laser-nanoprinting machine) will convert into a printed design.
 To obtain the writing pattern, we simply binarize the density. We can omit all other requirements and constraints we would have, since only the printed design needs to abide to such restrictions.
 
-### Dose Accumulation $D(\mathbf{r})
+### Dose Accumulation $D(\mathbf{r})$
 We model the dose accumulation in the photoresist $D(\mathbf{r})$ given the relative laser power $P_\text{laser}$, the writing pattern $\sigma(\mathbf{r})$ and the intensity of the PSF $I_\text{PSF}(\mathbf{r})$ as
 $D(\mathbf{r}) = P^2_\text{laser} \cdot \sigma(\mathbf{r}) \cdot I^2_\text{PSF}(\mathbf{r})$.
 Our controllable hyperparameter in the optimization is simply the relative laser power, taking over a similar role as the minimum feature size.
 
-### Degree of polymerization $\tilde{\sigma}$ and final design
-Finally, we convert the accumulated dose into the degree of polymerization $\hat{\sigma}(\mathbf{r})$ using a maximum degree of polymerization $\sigma_0$ and an experimental prefactor $c$
+### Degree of polymerization $\tilde{\sigma}$ and final design $\hat{\tilde{\sigma}}$
+Finally, we convert the accumulated dose into the degree of polymerization $\tilde{\sigma}(\mathbf{r})$ using a maximum degree of polymerization $\sigma_0$ and an experimental prefactor $c$:
 $\tilde{\sigma} = \sigma_0 \cdot ( 1 - \exp(-c\cdot D(\mathbf{r}))$.
 The final design is then obtained by another binarization, assigning values above a polymerization threshold as material and as void otherwise.
 
