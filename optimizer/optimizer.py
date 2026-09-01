@@ -43,7 +43,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         @staticmethod
         def forward(ctx, x):
             grad_em_sim_f = jax.value_and_grad(objective, has_aux=True)
-            value_em_sim, grad_em_sim = grad_em_sim_f(projection(x.detach().cpu().numpy().astype(np.float64)))
+            value_em_sim, grad_em_sim = grad_em_sim_f(x.detach().cpu().numpy().astype(np.float64))
             em_hist.append(value_em_sim[1][0])
             print(f"transmission: {value_em_sim[1][0][0]}\treflection: {value_em_sim[1][0][1]}")
             cur_eps.append(value_em_sim[1][1])
@@ -160,7 +160,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
         @staticmethod
         def forward(ctx, x):
             grad_em_sim_f = jax.value_and_grad(objective, has_aux=True)
-            value_em_sim, grad_em_sim = grad_em_sim_f(projection(x.detach().cpu().numpy().astype(np.float64)))
+            value_em_sim, grad_em_sim = grad_em_sim_f(x.detach().cpu().numpy().astype(np.float64))
             em_hist.append(value_em_sim[1][0])
             cur_eps.append(value_em_sim[1][1])
             ctx.save_for_backward(torch.tensor(np.array(grad_em_sim), device='cuda', requires_grad=True))
@@ -177,7 +177,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
         rho_init = np.array(init_projection(rho) * mask)
         if mode == "jax":
             rho_final = filter(rho_init)
-            value_em_sim, grad_em_sim = jax.value_and_grad(objective, has_aux=True)(projection(rho_final))
+            value_em_sim, grad_em_sim = jax.value_and_grad(objective, has_aux=True)(rho_final)
             value = float(value_em_sim[0])  # Requires np float and not jax.numpy float
             value_em = float(value_em_sim[1][0])
             em_hist.append(value_em_sim[1][0])

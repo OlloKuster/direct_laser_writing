@@ -7,7 +7,7 @@ from problems.metalens.simulation.simulation import em_simulation, heat_simulati
 from utility.helper import relu
 
 
-def objective_em_f(currents, resolution, init_value):
+def objective_em_f(projection, currents, resolution, init_value):
     """
     Generates the pure EM-objective function.
     :param currents: Source currents of the simulation.
@@ -22,7 +22,7 @@ def objective_em_f(currents, resolution, init_value):
         :param rho: Density (design variable) of the problem [0, 1].
         :return: Field enhancement at the focal spot of the x-component of E.
         """
-        E, eps = em_simulation(rho, currents, resolution)
+        E, eps = em_simulation(projection(rho), currents, resolution)
         focal_spot = E[0][
             E[0].shape[0] // 2, E[0].shape[1] // 2, int(jnp.ceil(ConfigSim.location_focal_spot * resolution))]
         return jnp.abs(focal_spot) / init_value, (jnp.abs(focal_spot) / init_value, eps)
@@ -48,7 +48,7 @@ def objective_heat_f():
     return objective_heat
 
 
-def objective_em_heat_f(currents, resolution, init_values):
+def objective_em_heat_f(projection, currents, resolution, init_values):
     """
     Generates the (softmax) connectivity-objective function.
     :param currents: Source currents of the simulation.
@@ -64,7 +64,7 @@ def objective_em_heat_f(currents, resolution, init_values):
         :param rho: Density (design variable) of the problem [0, 1].
         :return: Field enhancement at the focal spot of the x-component of E.
         """
-        E, eps = em_simulation(rho, currents, resolution)
+        E, eps = em_simulation(projection(rho), currents, resolution)
         focal_spot = E[0][
             E[0].shape[0] // 2, E[0].shape[1] // 2, int(jnp.ceil(ConfigSim.location_focal_spot * resolution))]
         return jnp.abs(focal_spot) / init_values[0], eps
@@ -75,7 +75,7 @@ def objective_em_heat_f(currents, resolution, init_values):
         :param rho: Density (design variable) of the problem [0, 1].
         :return: Tuple of material and void heat_eval.
         """
-        T_mat, T_void, _ = heat_simulation(rho, ConfigSim.resize_factor, resolution)
+        T_mat, T_void, _ = heat_simulation(projection(rho), ConfigSim.resize_factor, resolution)
         return T_mat, T_void
 
     def objective_softplus(rho_0):
@@ -110,7 +110,7 @@ def objective_em_heat_f(currents, resolution, init_values):
     return objective_softplus
 
 
-def objective_robust_em_heat_f(currents, resolution, init_values):
+def objective_robust_em_heat_f(projection, currents, resolution, init_values):
     """
     Generates the (softmax) connectivity-objective function. A dlw optimization is done by averaging over three
     different structures (eroded, normal and dialted).
@@ -127,7 +127,7 @@ def objective_robust_em_heat_f(currents, resolution, init_values):
         :param rho: Density (design variable) of the problem [0, 1].
         :return: Field enhancement at the focal spot of the x-component of E.
         """
-        E, eps = em_simulation(rho, currents, resolution)
+        E, eps = em_simulation(projection(rho), currents, resolution)
         focal_spot = E[0][
             E[0].shape[0] // 2, E[0].shape[1] // 2, int(jnp.ceil(ConfigSim.location_focal_spot * resolution))]
         return jnp.abs(focal_spot) / init_values[0], eps
@@ -138,7 +138,7 @@ def objective_robust_em_heat_f(currents, resolution, init_values):
         :param rho: Density (design variable) of the problem [0, 1].
         :return: Tuple of material and void heat_eval.
         """
-        T_mat, T_void, _ = heat_simulation(rho, ConfigSim.resize_factor, resolution)
+        T_mat, T_void, _ = heat_simulation(projection(rho), ConfigSim.resize_factor, resolution)
         return T_mat, T_void
 
     def objective_softplus(rho):

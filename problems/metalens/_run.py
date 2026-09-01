@@ -73,7 +73,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     filter_0 = filter_loader(filters, filter_values, lp_deviation)
     projection_0 = projection_loader(projections, projection_values, betas[0], resolution)
 
-    objective_em = objective_loader(setting["init_em"], currents, resolution, 1, 1, 1)
+    objective_em = objective_loader(setting["init_em"], projection_0,  currents, resolution, 1, 1, 1)
     init_val_em, _ = objective_em(jnp.ones_like(rho_0))
     objective_heat = objective_loader(setting["init_heat"])
 
@@ -102,11 +102,11 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     for i in range(len(betas)):
         print(f"beta: {betas[i]}")
 
-        objective = objective_loader(objectives, currents, resolution, init_val_em, init_val_mat, init_val_void)
-
         filter = filter_loader(filters, filter_values, lp_deviation)
         projection = projection_loader(projections, projection_values, betas[i], resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
+
+        objective = objective_loader(objectives, projection, currents, resolution, init_val_em, init_val_mat, init_val_void)
 
         if opt == "optax":
             rho_0, loss, em_loss, grads = optimizer_optax(rho_0, objective, mask, filter, projection, init_projection,

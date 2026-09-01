@@ -29,7 +29,7 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
 
 if __name__ == "__main__":
-    # setting_init = setting_loader("metalens", "no_filter")
+    setting_init = setting_loader("metalens", "no_filter")
     setting_final = setting_loader("frequency_filter", "dlw_em_only")
     eval = True
     resolution = 6
@@ -38,5 +38,7 @@ if __name__ == "__main__":
     betas_init = [8, 16]
     betas_final = [np.inf]
 
-    loss_hist, em_loss_hist = main(resolution, betas_init, setting_final, loss_hist, em_loss_hist, max_evals=50, opt="optax",
+    loss_hist, em_loss_hist = main(resolution, betas_init, setting_init, loss_hist, em_loss_hist, max_evals=20, opt="nlopt",
+                                   eval=eval, run_id=0)
+    loss_hist, em_loss_hist = main(resolution, betas_final, setting_final, loss_hist, em_loss_hist, max_evals=20, opt="nlopt",
                                    eval=eval, run_id=1)
