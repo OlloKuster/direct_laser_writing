@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pyvista as pv
 
+from global_config import ConfigG
+
 
 def metalens_regular_intermediate_plot():
     """
@@ -24,7 +26,7 @@ def metalens_regular_intermediate_plot():
         ax[2].imshow(cur_eps[cur_eps.shape[0] // 2].T, origin='lower', cmap='binary')
         ax[2].set_xlabel(r"x ($\mathrm{\mu}$m)", fontsize=12)
         ax[2].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
-        plt.savefig(f"problems/metalens/plots/progression/rho_{i:03d}.png")
+        plt.savefig(f"{ConfigG.PATH}progression/rho_{i:03d}.png")
         plt.close()
 
         rho_init = np.concatenate((rho_init, np.flip(rho_init, axis=0)), axis=0)
@@ -38,10 +40,10 @@ def metalens_regular_intermediate_plot():
         p.camera.azimuth = 45
         p.remove_scalar_bar()
         p.camera.zoom(1.3)
-        p.show(screenshot=f"problems/metalens/plots/progression/eps_{i:03d}.png")
+        p.show(screenshot=f"{ConfigG.PATH}progression/eps_{i:03d}.png")
         p.close()
 
-        pv.plot(np.array(cur_eps), off_screen=True, screenshot=f"problems/metalens/plots/progression/eps_density_{i:03d}.png", cmap='binary')
+        pv.plot(np.array(cur_eps), off_screen=True, screenshot=f"{ConfigG.PATH}progression/eps_density_{i:03d}.png", cmap='binary')
 
     return plotter
 
@@ -58,19 +60,19 @@ def metalens_regular_final_plot():
             plt.plot(loss_hist)
             # plt.yscale('log')
             plt.savefig(
-                f"problems/metalens/plots/loss_{run_id}_{beta}.png")
+                f"{ConfigG.PATH}loss_{run_id}_{beta}.png")
             plt.close()
 
         if beta is not None:
             plt.plot(em_loss_hist)
             plt.savefig(
-                f"problems/metalens/plots/em_loss_{run_id}_{beta}.png")
+                f"{ConfigG.PATH}em_loss_{run_id}_{beta}.png")
             plt.close()
 
         if grads is not None:
             plt.plot(grads)
             plt.savefig(
-                f"problems/metalens/plots/grads_{run_id}_{beta}.png")
+                f"{ConfigG.PATH}grads_{run_id}_{beta}.png")
             plt.xlabel("Iteration")
             plt.ylabel("Gradient")
             plt.close()
@@ -83,7 +85,7 @@ def metalens_regular_final_plot():
             plt.xlabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
             plt.ylabel(r"z ($\mathrm{\mu}$m)", fontsize=12)
             plt.savefig(
-                f"problems/metalens/plots/eps_and_e_{run_id}_{beta}.png")
+                f"{ConfigG.PATH}eps_and_e_{run_id}_{beta}.png")
             plt.close()
         if eps is not None:
             plt.imshow(eps[eps.shape[0] // 2].T, origin='lower', cmap='binary',
@@ -91,12 +93,12 @@ def metalens_regular_final_plot():
             plt.xlabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
             plt.ylabel(r"z ($\mathrm{\mu}$m)", fontsize=12)
             plt.savefig(
-                f"problems/metalens/plots/eps_{run_id}_{beta}.png")
+                f"{ConfigG.PATH}eps_{run_id}_{beta}.png")
             plt.close()
 
         if save:
             with h5py.File(
-                    f"problems/metalens/plots/data_{run_id}_{beta}.h5",
+                    f"{ConfigG.PATH}data_{run_id}_{beta}.h5",
                     'w') as f:
                 grp = f.create_group("lens_3d")
                 grp.create_dataset("E", data=E)
@@ -145,7 +147,7 @@ def metalens_robust_intermediate_plot():
         # rho_f_dilated = np.concatenate((rho_f_dilated, np.flip(rho_f_dilated, axis=1)), axis=1)
         ax[1, 2].imshow(rho_f_dilated[rho_f_dilated.shape[0] // 2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
 
-        plt.savefig(f"problems/metalens/plots/progression/rho_{i:03d}.png")
+        plt.savefig(f"{ConfigG.PATH}progression/rho_{i:03d}.png")
         plt.close()
 
         p = pv.Plotter(off_screen=True)
@@ -156,11 +158,11 @@ def metalens_robust_intermediate_plot():
         p.camera.azimuth = - 45
         p.remove_scalar_bar()
         p.camera.zoom(1.3)
-        p.show(screenshot=f"problems/metalens/plots/progression/eps_{i:03d}.png")
+        p.show(screenshot=f"{ConfigG.PATH}progression/eps_{i:03d}.png")
         p.close()
 
         pv.plot(np.array(cur_eps), off_screen=True,
-                screenshot=f"problems/metalens/plots/progression/eps_density_{i:03d}.png", cmap='binary')
+                screenshot=f"{ConfigG.PATH}progression/eps_density_{i:03d}.png", cmap='binary')
 
     return plotter
 
@@ -178,7 +180,7 @@ def metalens_robust_final_plot():
             plt.legend()
             # plt.yscale('log')
             plt.savefig(
-                f"problems/metalens/plots/loss_{run_id}_{beta}.png")
+                f"{ConfigG.PATH}loss_{run_id}_{beta}.png")
             plt.close()
 
         if em_loss_hist is not None:
@@ -194,13 +196,13 @@ def metalens_robust_final_plot():
             plt.plot(em_dil, label='dilated')
             plt.legend()
             plt.savefig(
-                f"problems/metalens/plots/em_loss_{run_id}_{beta}.png")
+                f"{ConfigG.PATH}em_loss_{run_id}_{beta}.png")
             plt.close()
 
         if grads is not None:
             plt.plot(grads)
             plt.savefig(
-                f"problems/metalens/plots/grads_{run_id}_{beta}.png")
+                f"{ConfigG.PATH}grads_{run_id}_{beta}.png")
             plt.xlabel("Iteration")
             plt.ylabel("Gradient")
             plt.close()
@@ -224,7 +226,7 @@ def metalens_robust_final_plot():
                           extent=(0, extent[0], 0, extent[1]))
 
             plt.savefig(
-                f"problems/metalens/plots/eps_and_e_{run_id}_{beta}.png")
+                f"{ConfigG.PATH}eps_and_e_{run_id}_{beta}.png")
             plt.close()
 
         if eps is not None:
@@ -239,12 +241,12 @@ def metalens_robust_final_plot():
             axs[2].imshow(eps[2][eps[0].shape[0] // 2].T, origin='lower', cmap='binary',
                           extent=(0, extent[0], 0, extent[1]))
             plt.savefig(
-                f"problems/metalens/plots/eps_{run_id}_{beta}.png")
+                f"{ConfigG.PATH}eps_{run_id}_{beta}.png")
             plt.close()
 
         if save:
             with h5py.File(
-                    f"problems/metalens/plots/data_{run_id}_{beta}.h5",
+                    f"{ConfigG.PATH}data_{run_id}_{beta}.h5",
                     'w') as f:
                 grp = f.create_group("lens_3d")
                 grp.create_dataset("E_erosion", data=E[0])
