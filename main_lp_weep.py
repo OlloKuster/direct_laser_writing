@@ -36,18 +36,19 @@ if __name__ == "__main__":
     resolution = 14
     loss_hist = []
     em_loss_hist = []
-    betas = [np.inf]
-    run_id = 41
+    betas = [8, 16, np.inf]
+    run_id = 0
 
-    lps = np.linspace(0.002, 0.015, 100)
+    zeros = np.array([0.001, 0.5])
+    lps = np.linspace(1, 5, 20)
+    lps = np.concat([zeros, lps])
     print(lps)
 
-    for lp in lps[41:]:
-        print(len(lps[41:]))
+    base_lp = setting["lp_deviation"]
+    for factor in lps:
         loss_hist = []
         em_loss_hist = []
-        setting["lp_deviation"] = lp
+        setting["lp_deviation"] = factor * base_lp
         loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15,
-                                       opt="nlopt", eval=eval, run_id=run_id,
-                                       load=f'/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_base.h5')
+                                       opt="nlopt", eval=eval, run_id=run_id)
         run_id = run_id + 1
