@@ -14,10 +14,11 @@ from projection._projection_loader import projection_loader
 def test(seed):
     np.random.seed(seed)
     resolution = 14
-    for factor in np.linspace(0.001, 0.01, 51):
-        size_lat = int(np.ceil(0.4*resolution))
-        size_ax = int(np.ceil(0.9*resolution))
+    for factor in np.linspace(0.002, 0.03, 101):
+        size_lat = int(np.ceil(0.4*resolution)) // 2
+        size_ax = int(np.ceil(0.9*resolution)) // 2
         rho_0 = np.zeros((5*resolution, 5*resolution, 5*resolution))
+        # rho_0[rho_0.shape[0]//2, rho_0.shape[1]//2, rho_0.shape[2]//2] = 1
         rho_0[rho_0.shape[0]//2-size_lat:-rho_0.shape[0]//2+size_lat, rho_0.shape[1]//2-size_lat:-rho_0.shape[1]//2+size_lat,  rho_0.shape[2]//2-size_ax:-rho_0.shape[2]//2+size_ax] = 1
         #
         # rho_0[rho_0.shape[0]//2, rho_0.shape[1]//2-4, rho_0.shape[2]//4:-rho_0.shape[2]//4] = 1
@@ -31,7 +32,7 @@ def test(seed):
 
         rho_0_torch = torch.tensor(rho_0, device='cuda', requires_grad=True)
         dose_filter = filter_loader("dose_conv", resolution, factor)
-        proj = projection_loader("ssp_jax", 0.5, np.inf, resolution)
+        proj = projection_loader("ssp_jax", 0.5, 8, resolution)
 
         rho_filt = dose_filter(rho_0_torch)
         result = rho_filt.detach().cpu().numpy().squeeze()

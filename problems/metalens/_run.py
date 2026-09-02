@@ -1,6 +1,7 @@
 import numpy as np
 import jax
 import jax.numpy as jnp
+import scipy
 import torch
 import h5py
 
@@ -56,6 +57,13 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
                      int(np.ceil((ConfigSim.rho_shape[1] + ConfigSim.buffer_side) * resolution)),
                      int(np.ceil(ConfigSim.rho_shape[2] * resolution)))) * init_value
 
+    #rho_0[rho_0.shape[0]//2, rho_0.shape[1]//2, rho_0.shape[2]//2] = 0.5
+    # rho_0 = np.random.rand(int(np.ceil((ConfigSim.rho_shape[0] + ConfigSim.buffer_side) * resolution)),
+    #                        int(np.ceil((ConfigSim.rho_shape[1] + ConfigSim.buffer_side) * resolution)),
+    #                        int(np.ceil(ConfigSim.rho_shape[2] * resolution)))
+    #
+    # rho_0 = scipy.ndimage.gaussian_filter(rho_0, sigma=2)
+    # rho_0 = np.where(rho_0 < 0.5, 0, 1)
     # Mask for forcing sides to be 0
     mask = np.ones_like(rho_0)
     mask[:int(ConfigSim.buffer_side * resolution)] = 0

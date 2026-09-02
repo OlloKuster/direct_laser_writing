@@ -20,7 +20,7 @@ class DoseMSBPM(torch.nn.Module):
             dtype: Datatype, recommended torch.float64
         """
         self.rho_0_GT = rho_0_GT.to(device).to(dtype)
-        self.intensity_nonlinear = psf.to(device).to(dtype)
+        self.psf = psf.to(device).to(dtype)
 
         self.nonlinearity = nonlinearity.to(device).to(dtype)
         self.factor_in_exp = print_params[0] * print_params[1] * (
@@ -42,7 +42,7 @@ class DoseMSBPMFull3D(DoseMSBPM):
         :param lp: Laser Power.
         :return: Accumulated power in the resist as a density.
         '''
-        conv = torch.nn.functional.conv3d(obj[None, None], torch.pow(self.intensity_nonlinear, 2), padding='same')
+        conv = torch.nn.functional.conv3d(obj[None, None], torch.pow(self.psf, self.nonlinearity), padding='same')
         rho = self.rho_0_GT * (1 - torch.exp(
             - self.factor_in_exp * self.correction_factor * conv * lp[:, :, None, None, None] ** self.nonlinearity))
 

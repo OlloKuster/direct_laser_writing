@@ -1,5 +1,6 @@
 import jax
 import numpy as np
+import pyvista as pv
 
 from settings._setting_loader import setting_loader
 
@@ -21,6 +22,7 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
     :return: Loss and EM loss history.
     """
     jax.config.update("jax_enable_x64", True)
+    pv.global_theme.allow_empty_mesh = True
 
     run = setting["run"]
 
@@ -30,15 +32,15 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
 if __name__ == "__main__":
     setting_init = setting_loader("metalens", "no_filter")
-    setting_final = setting_loader("frequency_filter", "dlw_em_only")
+    setting_final = setting_loader("metalens", "dlw_regular")
     eval = True
-    resolution = 6
+    resolution = 14
     loss_hist = []
     em_loss_hist = []
     betas_init = [8, 16]
-    betas_final = [np.inf]
-
-    loss_hist, em_loss_hist = main(resolution, betas_init, setting_init, loss_hist, em_loss_hist, max_evals=20, opt="nlopt",
-                                   eval=eval, run_id=0)
-    loss_hist, em_loss_hist = main(resolution, betas_final, setting_final, loss_hist, em_loss_hist, max_evals=20, opt="nlopt",
+    betas_final = [8, 16, np.inf]
+    #
+    # loss_hist, em_loss_hist = main(resolution, betas_init, setting_init, loss_hist, em_loss_hist, max_evals=10, opt="nlopt",
+    #                                eval=eval, run_id=0)
+    loss_hist, em_loss_hist = main(resolution, betas_final, setting_final, loss_hist, em_loss_hist, max_evals=15, opt="nlopt",
                                    eval=eval, run_id=1)

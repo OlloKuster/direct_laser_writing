@@ -45,7 +45,6 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
             grad_em_sim_f = jax.value_and_grad(objective, has_aux=True)
             value_em_sim, grad_em_sim = grad_em_sim_f(x.detach().cpu().numpy().astype(np.float64))
             em_hist.append(value_em_sim[1][0])
-            print(f"transmission: {value_em_sim[1][0][0]}\treflection: {value_em_sim[1][0][1]}")
             cur_eps.append(value_em_sim[1][1])
             # cur_field.append(value_em_sim[1][2])
             value_em_sim = value_em_sim[0]
@@ -80,7 +79,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         end = time.time()
         print(f"time: {end - start}")
         if eval:
-            plotter(x, rho_final.detach().cpu().numpy(), cur_eps[-1], projection, config.cur_it)
+            plotter(rho_0.detach().cpu().numpy(), rho_final.detach().cpu().numpy(), cur_eps[-1], projection, config.cur_it)
         return value
 
     def f_jax(x, g):
@@ -218,7 +217,7 @@ def optimizer_optax(rho, objective, mask, filter, projection, init_projection, p
         updates, opt_state = optimizer.update(-grad, opt_state, rho_0)
 
         rho[:] = optax.apply_updates(rho_0, updates)
-        rho = np.clip(rho, 0, 1)
+        np.clip(rho, 0.0, 1.0, out=rho)
 
         if value > best_val:
             rho_opt = rho.copy()

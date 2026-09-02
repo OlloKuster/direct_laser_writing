@@ -16,7 +16,7 @@ def test(seed):
     jax.config.update("jax_enable_x64", True)
 
     np.random.seed(seed)
-    resolution = 8
+    resolution = 6
     ConfigPrint.lp = ConfigPrint.lp
     rho_0 = np.ones((5*resolution, 5*resolution, 5*resolution))
     rho_0 = np.round(scipy.ndimage.gaussian_filter(np.random.rand(rho_0.shape[0],
