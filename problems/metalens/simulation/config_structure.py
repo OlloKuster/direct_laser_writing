@@ -29,3 +29,7 @@ class ConfigSim:
     TARGET_EM = 30  # Target EM Performance. Given in field enhancement at the focal spot
     TARGET_MATERIAL = 1.6  # Normalizes the target heat_eval for the material. The initial value is 1-TARGET_MATERIAL.
     TARGET_VOID = 1.6  # Normalizes the target heat_eval for the void. The initial value is 1-TARGET_VOID.
+
+
+    PATH = "problems/metalens/plots/"
+    # "/scratch/local/okuster/data/dlw_metalens"

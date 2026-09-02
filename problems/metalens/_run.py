@@ -143,15 +143,17 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
             E_erosion, eps_erosion = em_simulation(jnp.array(rho_opt_proj[0]), currents, resolution)
             E_normal, eps_normal = em_simulation(jnp.array(rho_opt_proj[1]), currents, resolution)
             E_dilation, eps_dilation = em_simulation(jnp.array(rho_opt_proj[2]), currents, resolution)
+            _, eps_writing_pattern = em_simulation(jnp.array(rho_proj_init), currents, resolution)
             E = (E_erosion, E_normal, E_dilation)
             eps = (eps_erosion, eps_normal, eps_dilation)
         else:
             E, eps = em_simulation(jnp.array(rho_opt_proj), currents, resolution)
+            _, eps_writing_pattern = em_simulation(jnp.array(rho_proj_init), currents, resolution)
 
         if True:
             plotter_final(extent=(ConfigSim.simulation_domain_shape[1], ConfigSim.simulation_domain_shape[2]),
                           rho_0=rho_0,
-                          rho_precomp=rho_precomp,
+                          rho_precomp=eps_writing_pattern,
                           loss_hist=loss_hist,
                           beta=betas[i],
                           em_loss_hist=em_loss_hist,
