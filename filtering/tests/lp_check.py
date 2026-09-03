@@ -14,7 +14,7 @@ from projection._projection_loader import projection_loader
 def test(seed):
     np.random.seed(seed)
     resolution = 14
-    for factor in np.linspace(0.002, 0.03, 101):
+    for factor in np.linspace(0.001, 0.009, 101):
         size_lat = int(np.ceil(0.4*resolution)) // 2
         size_ax = int(np.ceil(0.9*resolution)) // 2
         rho_0 = np.zeros((5*resolution, 5*resolution, 5*resolution))
@@ -56,9 +56,9 @@ def test(seed):
         # # p.remove_scalar_bar()
         # p.camera.zoom(1.3)
         # p.show()
-        if result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2] >= 0.5:
-            print(factor)
-            break
+        # if result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2] >= 0.5:
+            # print(factor)
+            # break
         print(f"lp: {factor}")
         print(f"bin_value: {result_bin[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2]}")
         print(f"actual_value: {result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2]}")
