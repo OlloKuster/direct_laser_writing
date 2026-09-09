@@ -1,4 +1,5 @@
 import jax
+import torch
 import numpy as np
 
 from dispenser import Dispenser
@@ -24,7 +25,8 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
     """
     jax.config.update("jax_enable_x64", True)
 
-    run = Dispenser.LENS3D
+    run = setting["run"]
+
     return run(resolution, betas, setting, loss_hist, em_loss_hist, opt=opt, max_evals=max_evals, load=load, eval=eval,
                run_id=run_id)
 
@@ -32,23 +34,28 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 if __name__ == "__main__":
     setting = setting_loader("metalens", "dlw_em_only")
     eval = False
-    device_id = 0
     resolution = 14
     loss_hist = []
     em_loss_hist = []
     betas = [8, 16, np.inf]
-    run_id = 0
 
-    zeros = np.array([0.001, 0.5])
-    lps = np.linspace(1, 5, 20)
-    lps = np.concat([zeros, lps])
+    lps = np.linspace(1, 5, 33)
+
+    lps = np.concatenate(([0.001, 0.5, 0.75], lps))
+
+    run_id = len(lps[:lps.shape[0]//2])
+
+    # lps = lps[:lps.shape[0]//2]
+    lps = lps[lps.shape[0]//2:]
     print(lps)
+    print(run_id)
 
     base_lp = setting["lp_deviation"]
     for factor in lps:
         loss_hist = []
         em_loss_hist = []
-        setting["lp_deviation"] = factor * base_lp
-        loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15,
+        setting["lp_deviation"] = factor * base_lp / 2
+        print(setting["lp_deviation"])
+        loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=20,
                                        opt="nlopt", eval=eval, run_id=run_id)
         run_id = run_id + 1
