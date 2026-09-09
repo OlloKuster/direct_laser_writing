@@ -73,8 +73,8 @@ def setting_loader(system: str, setup: str):
                 "lp_deviation": 0.125,
                 "plotter_eval": "eval_robust",
                 "plotter_final": "final_robust",
-                "projection": "robust_ssp_jax",
-                "projection_values": [0.5, 0.5, 0.5],
+                "projection": "ssp_jax",
+                "projection_values": ConfigPrint.rho_th_GT,  # Threshold value used in projection.
                 "init_projection": "ssp_jax",
                 "init_projection_values": 0.5,
                 "optimizers": "torch_jax",

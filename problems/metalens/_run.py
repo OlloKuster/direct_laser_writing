@@ -79,7 +79,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
 
     # Calculating initial L_heat/void
     filter_0 = filter_loader(filters, filter_values, lp_deviation)
-    projection_0 = projection_loader(projections, projection_values, betas[0], resolution)
+    projection_0 = projection_loader(init_projections, 0.5, betas[0], resolution)
 
     objective_em = objective_loader(setting["init_em"], projection_0,  currents, resolution, 1, 1, 1)
     init_val_em, _ = objective_em(jnp.ones_like(rho_0))
@@ -139,7 +139,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         rho_opt_filtered = filter(rho_proj_init)
         rho_opt_filtered = convert_to(rho_opt_filtered, backconversions)
         rho_opt_proj = projection(jnp.array(rho_opt_filtered))
-        if type(rho_opt_proj) is tuple:
+        if "robust" in setting["objectives"]:
             E_erosion, eps_erosion = em_simulation(jnp.array(rho_opt_proj[0]), currents, resolution)
             E_normal, eps_normal = em_simulation(jnp.array(rho_opt_proj[1]), currents, resolution)
             E_dilation, eps_dilation = em_simulation(jnp.array(rho_opt_proj[2]), currents, resolution)
