@@ -36,7 +36,7 @@ if __name__ == "__main__":
     resolution = 14
     loss_hist = []
     em_loss_hist = []
-    betas = [np.inf]
+    betas = [8, 16, np.inf]
     run_id = 0
 
     target_material = [-0.99, -0.8, -0.6, -0.4, -0.2]
@@ -47,7 +47,7 @@ if __name__ == "__main__":
             em_loss_hist = []
             setting["target_material"] = mat
             setting["target_void"] = void
-            loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15,
-                                           opt="nlopt", eval=eval, run_id=run_id,
-                                           load=f'/scratch/local/okuster/Code/00_Main_Projects/dlw_params/evaluate/data/base/data_base_no_filter.h5')
+            print(setting["target_material"], setting["target_void"])
+            loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=20,
+                                           opt="nlopt", eval=eval, run_id=run_id)
             run_id = run_id + 1

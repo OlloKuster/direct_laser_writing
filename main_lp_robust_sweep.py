@@ -30,12 +30,12 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
 if __name__ == "__main__":
     setting = setting_loader("metalens", "dlw_robust")
-    eval = True
+    eval = False
     device_id = 0
     resolution = 14
     loss_hist = []
     em_loss_hist = []
-    betas = [np.inf]
+    betas = [8, 16, np.inf]
     run_id = 1
 
     lps = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.6]
@@ -45,5 +45,5 @@ if __name__ == "__main__":
         setting["lp_deviation"] = lp
         loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=20,
                                        opt="nlopt", eval=eval, full_bin=False, run_id=run_id,
-                                       load=f'/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/data_base.h5')
+                                       )
         run_id = run_id + 1
