@@ -40,5 +40,5 @@ if __name__ == "__main__":
     #
     # loss_hist, em_loss_hist = main(resolution, betas_init, setting_init, loss_hist, em_loss_hist, max_evals=10, opt="nlopt",
     #                                eval=eval, run_id=0)
-    loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15, opt="nlopt",
+    loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=20, opt="nlopt",
                                    eval=eval, run_id=0)
