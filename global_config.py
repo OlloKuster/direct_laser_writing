@@ -4,4 +4,4 @@ import jax.numpy as jnp
 
 @dataclass
 class ConfigG:
-    PATH = "/scratch/local/okuster/Code/00_Main_Projects/dlw_params/problems/metalens/plots/"
+    PATH = "/scratch/local/okuster/data/dlw_metalens/plots_small_focusing_element/"
