@@ -39,8 +39,8 @@ if __name__ == "__main__":
     betas = [8, 16, np.inf]
     run_id = 0
 
-    target_material = [-0.99, -0.8, -0.6, -0.4, -0.2]
-    target_void = [-0.99, -0.8, -0.6, -0.4, -0.2]
+    target_material = [-0.1, 0.0, 0.1, 0.2, 0.3]
+    target_void = [-0.1, 0.0, 0.1, 0.2, 0.3]
     for mat in target_material:
         for void in target_void:
             loss_hist = []
