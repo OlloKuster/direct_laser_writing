@@ -41,7 +41,6 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     init_projection_values = setting["init_projection_values"]
     plotter_eval_name = setting["plotter_eval"]
     plotter_final_name = setting["plotter_final"]
-    optimizers = setting["optimizers"]
 
     target_material = setting["target_material"]
     target_void = setting["target_void"]
@@ -113,7 +112,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         objective = objective_loader(objectives, init_projection, filter, projection, currents, resolution, init_val_em, init_val_mat, init_val_void)
 
         rho_0, loss, em_loss, grads = optimizer_nlopt(rho_0, objective, mask, filter, projection, init_projection,
-                                                      plotter_eval, optimizers, max_evals,
+                                                      plotter_eval, max_evals,
                                                       eval=eval)
 
 

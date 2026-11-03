@@ -41,7 +41,7 @@ def relu(x):
     :param x: Input value(s)
     :return: ReLu of x.
     """
-    return jax.nn.relu6(x)
+    return jax.nn.relu(x)
 
 
 def convert_to(x, package):
