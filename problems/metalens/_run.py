@@ -6,6 +6,7 @@ import torch
 import h5py
 
 from filtering._filter_loader import filter_loader
+from filtering.dose_model.utils_dose_sim import calc_psf_GT
 from optimizer.optimizer import optimizer_nlopt, optimizer_optax
 from plotter._plot_loader import plot_loader
 from problems.metalens.simulation._objective_loader import objective_loader
@@ -77,8 +78,11 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
 
     currents = jnp.ones(size_currents, jnp.complex128)
 
+    # PSF of the dlw dose filter, only calculated once
+    psf_GT = calc_psf_GT(filter_values) if filters.startswith("dose_conv") else None
+
     # Calculating initial L_heat/void
-    filter_0 = filter_loader(filters, filter_values, lp_deviation)
+    filter_0 = filter_loader(filters, filter_values, lp_deviation, psf_GT)
     projection_0 = projection_loader(init_projections, 0.5, betas[0], resolution)
 
     objective_em = objective_loader(setting["init_em"], projection_0,  currents, resolution, 1, 1, 1)
@@ -110,7 +114,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     for i in range(len(betas)):
         print(f"beta: {betas[i]}")
 
-        filter = filter_loader(filters, filter_values, lp_deviation)
+        filter = filter_loader(filters, filter_values, lp_deviation, psf_GT)
         projection = projection_loader(projections, projection_values, betas[i], resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
 

@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-import torch
 import numpy as np
 
 
@@ -9,24 +8,22 @@ class ConfigPrint():
     Parameters for the dlw-model. Most of them are based on experimental data.
     Threhold and initial values for rho are normalized and the inital power is 1.
     """
-    device = 'cuda'
-
     power = 1.
 
-    n_monomer = torch.tensor(1.516)
+    n_monomer = 1.516
 
-    h = torch.tensor(6.626e-34, device=device, dtype=torch.float64)
-    c = torch.tensor(2.99792458e8, device=device, dtype=torch.float64)
+    h = 6.626e-34
+    c = 2.99792458e8
 
-    lam = torch.tensor(7.8e-7) # 6.3
-    NA = torch.tensor(1.4) # 1.2
-    t_p = torch.tensor(100e-15)
-    r_p = torch.tensor(80e6)
+    lam = 7.8e-7 # 6.3
+    NA = 1.4 # 1.2
+    t_p = 100e-15
+    r_p = 80e6
 
     r_r = 4e-7
     r_z = 9e-7
 
-    w0 = lam / (torch.pi * NA) * torch.sqrt(n_monomer ** 2 - NA ** 2)
+    w0 = lam / (np.pi * NA) * np.sqrt(n_monomer ** 2 - NA ** 2)
 
     velocity = 0.01  # in nm/s, Schreibgeschwindigkeit
     VD = (velocity / 4) * 10 ** (-9)  # Voxeldistance m
@@ -34,8 +31,8 @@ class ConfigPrint():
     vs = VD * freq  # writing speed in m/s
 
     sig_2_r_GT = 3.98107171e-68 # 8e-711.12883789e-71
-    sig_2_r_base = torch.tensor(sig_2_r_GT / (10 ** np.floor(np.log10(sig_2_r_GT))))
-    sig_2_r_exp = torch.tensor(np.floor(np.log10(sig_2_r_GT)))
+    sig_2_r_base = sig_2_r_GT / (10 ** np.floor(np.log10(sig_2_r_GT)))
+    sig_2_r_exp = np.floor(np.log10(sig_2_r_GT))
     # sig_2_r_base * 10 ** sig_2_r_exp
 
     x_fwhm = .415995  # um
@@ -51,12 +48,11 @@ class ConfigPrint():
     # size_ax = int(np.ceil(17 / 10 * resolution))
 
     rho_0_GT = 1.
-    # sig_2_r = torch.tensor(2.51188643e-67)
-    sig_2_r = torch.tensor(sig_2_r_base * 10 ** sig_2_r_exp)
+    # sig_2_r = 2.51188643e-67
+    sig_2_r = sig_2_r_base * 10 ** sig_2_r_exp
     # time_exposure = w0 / (vs / res_lat)
     intensity_without_power = (
-            1 / (torch.pi * w0 ** 2 * c / lam * h * r_p * t_p) * 2 * torch.exp(
-        torch.tensor(2)) / (torch.exp(torch.tensor(2)) - 1)
+            1 / (np.pi * w0 ** 2 * c / lam * h * r_p * t_p) * 2 * np.exp(2) / (np.exp(2) - 1)
     )
     correction_factor = 1.
     nonlinearity = 2.0

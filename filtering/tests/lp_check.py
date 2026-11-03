@@ -1,19 +1,22 @@
 import numpy as np
 import scipy.ndimage
-import torch
+import jax
 import matplotlib.pyplot as plt
 import scipy
 
 from filtering._filter_loader import filter_loader
 from filtering.dose_model._dose_filter import dose_filter_f
 from filtering.dose_model.config_print import ConfigPrint
+from filtering.dose_model.utils_dose_sim import calc_psf_GT
 from projection.SSP.subpixel_smoothed_projection import ssp_proj_jax_f
 from projection._projection_loader import projection_loader
 
 
 def test(seed):
+    jax.config.update("jax_enable_x64", True)
     np.random.seed(seed)
     resolution = 14
+    psf = calc_psf_GT(resolution)
     for factor in np.linspace(0.001, 0.009, 101):
         size_lat = int(np.ceil(0.4*resolution)) // 2
         size_ax = int(np.ceil(0.9*resolution)) // 2
@@ -30,12 +33,11 @@ def test(seed):
         # rho_0[rho_0.shape[0]//2, rho_0.shape[1]//2+4, rho_0.shape[2]//4:-rho_0.shape[2]//4] = 1
 
 
-        rho_0_torch = torch.tensor(rho_0, device='cuda', requires_grad=True)
-        dose_filter = filter_loader("dose_conv", resolution, factor)
+        dose_filter = filter_loader("dose_conv", resolution, factor, psf)
         proj = projection_loader("ssp_jax", 0.5, 8, resolution)
 
-        rho_filt = dose_filter(rho_0_torch)
-        result = rho_filt.detach().cpu().numpy().squeeze()
+        rho_filt = dose_filter(rho_0)
+        result = np.array(rho_filt).squeeze()
         result = proj(result)
         result_bin = np.where(result > ConfigPrint.rho_th_GT, 1, 0)
         f, ax = plt.subplots(1, 3)

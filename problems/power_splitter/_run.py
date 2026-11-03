@@ -7,6 +7,7 @@ import tidy3d as td
 
 from filtering._filter_loader import filter_loader
 from filtering.dose_model.config_print import ConfigPrint
+from filtering.dose_model.utils_dose_sim import calc_psf_GT
 from optimizer.optimizer import optimizer_nlopt, optimizer_optax
 from plotter._plot_loader import plot_loader
 from problems.power_splitter.simulation._objective_loader import objective_loader
@@ -59,8 +60,11 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     mask[:, :, :int(np.ceil(ConfigSim.buffer_top * resolution))] = 0
     mask[:, :, -int(np.ceil(ConfigSim.buffer_top * resolution)):] = 0
 
+    # PSF of the dlw dose filter, only calculated once
+    psf_GT = calc_psf_GT(filter_values) if filters.startswith("dose_conv") else None
+
     # Calculating initial L_heat/void
-    filter_0 = filter_loader(filters, filter_values, lp_deviation)
+    filter_0 = filter_loader(filters, filter_values, lp_deviation, psf_GT)
     projection_0 = projection_loader(projections, projection_values, betas[0], resolution)
 
     objective_heat = objective_loader(setting["init_heat"])
@@ -90,7 +94,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         print(f"beta: {betas[i]}")
         objective = objective_loader(objectives, init_val_mat, init_val_void)
 
-        filter = filter_loader(filters, filter_values, lp_deviation)
+        filter = filter_loader(filters, filter_values, lp_deviation, psf_GT)
         projection = projection_loader(projections, projection_values, betas[i], resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
 

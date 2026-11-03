@@ -8,6 +8,8 @@ from scipy.ndimage import rotate
 from scipy.stats import multivariate_normal
 import matplotlib.pyplot as plt
 
+from filtering.dose_model.config_print import ConfigPrint
+
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
@@ -269,6 +271,30 @@ def calc_laser_intensity(lam: torch.Tensor = torch.tensor(780e-9), n: torch.Tens
         intensity = intensity / intensity[idx, intensity.shape[1] // 2, intensity.shape[2] // 2]
 
     return intensity
+
+
+def calc_psf_GT(resolution, torch_device: str = 'cuda') -> np.ndarray:
+    """
+    Calculates the PSF used by the dose filter (filtering.dose_model._dose_filter) for a given resolution.
+    :param resolution: Resolution of the simulation [px/um].
+    :param torch_device: torch device the PSF is calculated on.
+    :return: PSF intensity profile [kx, ky, kz] as a numpy array.
+    """
+    res_lat = 1 / resolution * 10 ** (-6)  # hatching
+    res_ax = 1 / resolution * 10 ** (-6)  # slicing
+
+    psf_GT = calc_laser_intensity(lam=torch.tensor(ConfigPrint.lam),
+                                  NA=torch.tensor(ConfigPrint.NA),
+                                  M=torch.tensor(64.),
+                                  r_r=torch.tensor(ConfigPrint.r_r),
+                                  r_z=torch.tensor(ConfigPrint.r_z),
+                                  res_ax=res_ax,
+                                  res_lat=res_lat,
+                                  n_monomer=ConfigPrint.n_monomer,
+                                  torch_device=torch_device,
+                                  )
+
+    return psf_GT.detach().cpu().numpy()
 
 
 def calc_laser_intensity_OLD(lam: float = 780e-9, n: float = 1.483, NA: float = 0.8,

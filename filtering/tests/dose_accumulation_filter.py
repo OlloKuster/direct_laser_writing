@@ -1,11 +1,14 @@
 import numpy as np
-import torch
+import jax
 import matplotlib.pyplot as plt
 
 from filtering._filter_loader import filter_loader
+from filtering.dose_model.config_print import ConfigPrint
+from filtering.dose_model.utils_dose_sim import calc_psf_GT
 
 
 def test(seed):
+    jax.config.update("jax_enable_x64", True)
     np.random.seed(seed)
     resolution = 10
     # rho_0_init = np.random.random((10*resolution, 10*resolution, 5*resolution))
@@ -13,13 +16,12 @@ def test(seed):
     # rho_0 = np.round(rho_0_g)
     rho_0 = np.zeros((5*resolution, 5*resolution, 5*resolution))
     rho_0[:rho_0.shape[0]//4, :rho_0.shape[1]//4, :rho_0.shape[2]//4] = 1
-    rho_0_torch = torch.tensor(rho_0, device='cuda', requires_grad=True)
-    dose_filter = filter_loader("dose_conv", resolution)
+    dose_filter = filter_loader("dose_conv", resolution, ConfigPrint.lp, calc_psf_GT(resolution))
 
-    rho_filt = dose_filter(rho_0_torch)
+    rho_filt = dose_filter(rho_0)
     rho_filt_tmp = rho_filt
     # rho_filt_np = rho_filt > 0.5
-    rho_filt_np = rho_filt.detach().cpu().numpy()
+    rho_filt_np = np.array(rho_filt)
 
     fig, ax = plt.subplots(2, 2)
     ax[0, 0].imshow(rho_0[rho_0.shape[0]//6].T, origin='lower', cmap='binary', extent=(0, 10, 0, 5))

@@ -1,49 +1,43 @@
-import torch
+import numpy as np
+import jax.numpy as jnp
+from jax.lax import conv_general_dilated
 
 
-class DoseMSBPM(torch.nn.Module):
+def dose_msbpm_jax_f(rho_0_GT, psf, print_params, nonlinearity):
     """
-    Base class for the dlw model.
+    Creates the dlw dose model.
+    :param rho_0_GT: Saturation density of the resist.
+    :param psf: Point Spread Function intensity profile [kx, ky, kz].
+    :param print_params: (sig_2_r, time_exposure, intensity_without_power, correction_factor) List the parameters
+                         relevant to the print.
+    :param nonlinearity: Power exponent of the nonlinearity.
+    :return: (accumulated_dose, dose_to_rho) Convolution of the density with the PSF^n and the conversion of the
+             convolved dose into a density for a given laser power.
     """
-    def __init__(self, rho_0_GT: torch.Tensor, psf: torch.Tensor,
-                 print_params: list, nonlinearity: torch.Tensor,
-                 device='cpu', dtype=torch.float64):
+    sig_2_r, time_exposure, intensity_without_power, correction_factor = print_params
+    kernel = jnp.asarray(np.asarray(psf, dtype=np.float64) ** nonlinearity)[None, None]  # [O, I, kx, ky, kz]
+    # Computed on the host in float64, intensity_without_power ** nonlinearity exceeds the float32 range
+    prefactor = float(np.float64(sig_2_r) * time_exposure * np.float64(intensity_without_power) ** nonlinearity
+                      * correction_factor)
+
+    def accumulated_dose(obj):
         """
-
-        Args:
-            rho_0: Initial structure/power lines [batch_size, 1, nx, ny, nz]
-            psf: Point Spread Function intensity profile
-            print_params: (sig_2_r, time_exposure, intensity_without_power, correction_factor) List the parameters
-                            relevant to the print.
-            nonlinearity: Power exponent of the nonlinearity.
-            device: Device which the simulation is run on, options: cuda or cpu.
-            dtype: Datatype, recommended torch.float64
+        Convolution of the density with the PSF^n (cross-correlation with 'same' padding, like torch conv3d).
+        :param obj: Input density [nx, ny, nz].
+        :return: Convolved dose [nx, ny, nz].
         """
-        self.rho_0_GT = rho_0_GT.to(device).to(dtype)
-        self.psf = psf.to(device).to(dtype)
+        obj = jnp.asarray(obj)
+        return conv_general_dilated(obj[None, None], kernel.astype(obj.dtype),
+                                    window_strides=(1, 1, 1), padding='SAME',
+                                    dimension_numbers=('NCHWD', 'OIHWD', 'NCHWD'))[0, 0]
 
-        self.nonlinearity = nonlinearity.to(device).to(dtype)
-        self.factor_in_exp = print_params[0] * print_params[1] * (
-                print_params[2] ** nonlinearity).to(device).to(dtype)
-        self.correction_factor = print_params[3]
-
-        super().__init__()
-
-
-class DoseMSBPMFull3D(DoseMSBPM):
-    '''
-    Defines the convolution of hte density with the PSF.
-    '''
-    def forward(self, obj: torch.Tensor,
-                lp: torch.Tensor = torch.tensor([[0.020]])) -> torch.Tensor:
-        '''
-        Convolution of the density with the PSF. Returns the accumulated power of the structure.
-        :param obj: Input density.
+    def dose_to_rho(conv, lp):
+        """
+        Converts the convolved dose into the accumulated power in the resist as a density.
+        :param conv: Output of accumulated_dose.
         :param lp: Laser Power.
         :return: Accumulated power in the resist as a density.
-        '''
-        conv = torch.nn.functional.conv3d(obj[None, None], torch.pow(self.psf, self.nonlinearity), padding='same')
-        rho = self.rho_0_GT * (1 - torch.exp(
-            - self.factor_in_exp * self.correction_factor * conv * lp[:, :, None, None, None] ** self.nonlinearity))
+        """
+        return rho_0_GT * (1. - jnp.exp(-prefactor * conv * lp ** nonlinearity))
 
-        return rho
+    return accumulated_dose, dose_to_rho
