@@ -7,6 +7,19 @@ from tofea.fea3d import FEA3D_T
 from utility.helper import f2param, split_int
 
 
+def preprocess(rho, resolution):
+    """
+    Crops the side buffer (located at the lens center after mirroring) and sets the bottom 0.5um to material, so the
+    lens is attached to the substrate.
+    :param rho: Projected density including the side buffer.
+    :param resolution: Resolution of the simulation [px/um].
+    :return: Density of the size rho_shape * resolution.
+    """
+    buffer = int(ConfigSim.buffer_side * resolution)
+    rho_p = jnp.asarray(rho)[:-buffer, :-buffer]
+    rho_p = rho_p.at[:, :, :int(jnp.ceil(0.5 * resolution))].set(1)
+    return rho_p
+
 
 def em_simulation(rho, init_proj, filter, proj, currents, resolution):
     """
@@ -25,7 +38,7 @@ def em_simulation(rho, init_proj, filter, proj, currents, resolution):
                 int(jnp.ceil(ConfigSim.rho_shape[2] * resolution)))
 
     omega = 2 * jnp.pi / (ConfigSim.wavelength * resolution)
-    rho_p = proj(filter(init_proj(rho)))
+    rho_p = preprocess(proj(filter(init_proj(rho))), resolution)
     eps = f2param(rho_p, ConfigSim.epsilon)
 
     eps = jnp.concatenate((eps, jnp.flip(eps, axis=0)), axis=0)
