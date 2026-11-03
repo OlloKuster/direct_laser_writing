@@ -7,12 +7,8 @@ from tofea.fea3d import FEA3D_T
 from utility.helper import f2param, split_int
 
 
-def preprocess(rho, resolution):
-    rho_p = rho.at[:, :, :int(jnp.ceil(0.5 * resolution))].set(1)
-    return rho_p
 
-
-def em_simulation(rho, currents, resolution):
+def em_simulation(rho, init_proj, filter, proj, currents, resolution):
     """
     Simulates the metalens problem given a density and source currents.
     :param rho: Input density of the problem (design variable) [0, 1].
@@ -29,7 +25,7 @@ def em_simulation(rho, currents, resolution):
                 int(jnp.ceil(ConfigSim.rho_shape[2] * resolution)))
 
     omega = 2 * jnp.pi / (ConfigSim.wavelength * resolution)
-    rho_p = preprocess(rho[:-ConfigSim.buffer_side * resolution, :-ConfigSim.buffer_side*resolution], resolution)
+    rho_p = proj(filter(init_proj(rho)))
     eps = f2param(rho_p, ConfigSim.epsilon)
 
     eps = jnp.concatenate((eps, jnp.flip(eps, axis=0)), axis=0)
@@ -80,7 +76,7 @@ def em_simulation(rho, currents, resolution):
     return E, eps
 
 
-def heat_simulation(rho, resize_factor, resolution):
+def heat_simulation(rho, init_proj, filter, proj, resolution):
     """
     Heat simulation given an input density. Material/void is seen as heat_eval sources. The heat_eval sinks are the
     points where the material/void should connect to.
@@ -89,17 +85,15 @@ def heat_simulation(rho, resize_factor, resolution):
     :return: (Heat of the material, Heat of the void.
     """
 
-    rho_p = preprocess(jnp.array(rho[:-ConfigSim.buffer_side * resolution, :-ConfigSim.buffer_side*resolution]), resolution)
-    rho_n_shape = (rho_p.shape[0] // resize_factor, rho_p.shape[1] // resize_factor, rho_p.shape[2] // resize_factor)
-    rho_n = jax.image.resize(rho_p, rho_n_shape, 'bicubic', antialias=False)
 
-    heat_sinks_matter = jnp.zeros((rho_n_shape[0] + 1,
-                                   rho_n_shape[1] + 1,
-                                   rho_n_shape[2] + 1), dtype='?')
+    rho_p = proj(filter(init_proj(rho)))
+    heat_sinks_matter = jnp.zeros((rho_p[0] + 1,
+                                   rho_p[1] + 1,
+                                   rho_p[2] + 1), dtype='?')
     heat_sinks_matter = heat_sinks_matter.at[..., 0].set(True)
-    kappa_r_matter = f2param(rho_n, ConfigSim.kappa)
+    kappa_r_matter = f2param(rho_p, ConfigSim.kappa)
     fem_matter = FEA3D_T(heat_sinks_matter)
-    src_matter = jnp.pad(rho_n, [(0, 1), (0, 1), (0, 1)], mode='constant', constant_values=0)
+    src_matter = jnp.pad(rho_p, [(0, 1), (0, 1), (0, 1)], mode='constant', constant_values=0)
     T_matter = fem_matter.temperature(kappa_r_matter, src_matter)
 
     heat_sinks_void = jnp.zeros_like(heat_sinks_matter)
@@ -108,9 +102,9 @@ def heat_simulation(rho, resize_factor, resolution):
     heat_sinks_void = heat_sinks_void.at[:, 0].set(True)
     heat_sinks_void = heat_sinks_void.at[:, -1].set(True)
     heat_sinks_void = heat_sinks_void.at[..., -1].set(True)
-    kappa_r_void = f2param(1 - rho_n, ConfigSim.kappa)
+    kappa_r_void = f2param(1 - rho_p, ConfigSim.kappa)
     fem_void = FEA3D_T(heat_sinks_void)
-    src_void = jnp.pad(1 - rho_n, [(0, 1), (0, 1), (0, 1)], mode='constant', constant_values=0)
+    src_void = jnp.pad(1 - rho_p, [(0, 1), (0, 1), (0, 1)], mode='constant', constant_values=0)
     T_void = fem_void.temperature(kappa_r_void, src_void)
 
     return jnp.sum(T_matter) / T_matter.size, jnp.sum(T_void) / T_void.size, kappa_r_matter
