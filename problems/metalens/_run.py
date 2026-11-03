@@ -83,15 +83,16 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
 
     # Calculating initial L_heat/void
     filter_0 = filter_loader(filters, filter_values, lp_deviation, psf_GT)
-    projection_0 = projection_loader(init_projections, 0.5, betas[0], resolution)
+    init_projection_0 = projection_loader(init_projections, 0.5, betas[0], resolution)
+    projection_0 = projection_loader(projections, projection_values, betas[0], resolution)
 
-    # Both are evaluated on the nominal (middle) variant
-    rho_0_em = printed(jnp.ones_like(rho_0), projection_0, filter_0, projection_0)
+    # Both are evaluated on the nominal (middle) variant, with the same chain as in the optimization
+    rho_0_em = printed(jnp.ones_like(rho_0), init_projection_0, filter_0, projection_0)
     E_0, _ = em_simulation(rho_0_em[len(rho_0_em) // 2], currents, resolution)
     init_val_em = focal_spot(E_0, resolution, 1)
 
     rho_0_init_bin = np.array(np.ones_like(rho_0)*init_value) * mask
-    rho_0_bin = printed(rho_0_init_bin, lambda x: x, filter_0, projection_0)
+    rho_0_bin = printed(rho_0_init_bin, init_projection_0, filter_0, projection_0)
     init_T_mat, init_T_void, _ = heat_simulation(rho_0_bin[len(rho_0_bin) // 2])
 
 
