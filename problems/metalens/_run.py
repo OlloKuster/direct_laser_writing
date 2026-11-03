@@ -11,9 +11,8 @@ from optimizer.optimizer import optimizer_nlopt
 from plotter._plot_loader import plot_loader
 from problems.metalens.simulation._objective_loader import objective_loader
 from problems.metalens.simulation.config_structure import ConfigSim
-from problems.metalens.simulation.simulation import em_simulation
+from problems.metalens.simulation.simulation import build_eps, solve_em
 from projection._projection_loader import projection_loader
-from utility.helper import convert_to
 
 
 def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_evals, load=None, eval=False, run_id=0):
@@ -42,8 +41,6 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     plotter_eval_name = setting["plotter_eval"]
     plotter_final_name = setting["plotter_final"]
     optimizers = setting["optimizers"]
-    conversions = setting["conversions"]
-    backconversions = setting["backconversions"]
 
     target_material = setting["target_material"]
     target_void = setting["target_void"]
@@ -126,23 +123,15 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         em_loss_hist += em_loss
 
         # Final manipulations to save the relevant details.
-        rho_precomp = (
-        init_projection((rho_0) * mask)[:-ConfigSim.buffer_side * resolution, :-ConfigSim.buffer_side * resolution])
-        rho_proj_init = init_projection(rho_0) * mask
-        rho_proj_init = convert_to(rho_proj_init, conversions)
-        rho_opt_filtered = filter(rho_proj_init)
-        rho_opt_filtered = convert_to(rho_opt_filtered, backconversions)
-        rho_opt_proj = projection(jnp.array(rho_opt_filtered))
+        rho_written = init_projection(rho_0 * mask)  # Same order as in the optimizer
+        rho_printed = projection(filter(rho_written))
+        eps_writing_pattern = build_eps(rho_written, resolution)  # Only the permittivity is needed, no solve
         if "robust" in setting["objectives"]:
-            E_erosion, eps_erosion = em_simulation(jnp.array(rho_opt_proj[0]), currents, resolution)
-            E_normal, eps_normal = em_simulation(jnp.array(rho_opt_proj[1]), currents, resolution)
-            E_dilation, eps_dilation = em_simulation(jnp.array(rho_opt_proj[2]), currents, resolution)
-            _, eps_writing_pattern = em_simulation(jnp.array(rho_proj_init), currents, resolution)
-            E = (E_erosion, E_normal, E_dilation)
-            eps = (eps_erosion, eps_normal, eps_dilation)
+            eps = tuple(build_eps(r, resolution) for r in rho_printed)  # (eroded, normal, dilated)
+            E = tuple(solve_em(e, currents, resolution) for e in eps)
         else:
-            E, eps = em_simulation(jnp.array(rho_opt_proj), currents, resolution)
-            _, eps_writing_pattern = em_simulation(jnp.array(rho_proj_init), currents, resolution)
+            eps = build_eps(rho_printed, resolution)
+            E = solve_em(eps, currents, resolution)
 
         if True:
             plotter_final(extent=(ConfigSim.simulation_domain_shape[1], ConfigSim.simulation_domain_shape[2]),

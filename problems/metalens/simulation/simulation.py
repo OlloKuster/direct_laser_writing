@@ -21,25 +21,31 @@ def preprocess(rho, resolution):
     return rho_p
 
 
-def em_simulation(rho, init_proj, filter, proj, currents, resolution):
+def _simulation_domain(resolution):
     """
-    Simulates the metalens problem given a density and source currents.
-    :param rho: Input density of the problem (design variable) [0, 1].
-    :param currents: Source currents of the simulation.
     :param resolution: Resolution of the simulation [px/um].
-    :return: (Electric field, permittivity of the entire simulation).
+    :return: Shape of the entire simulation domain [px].
+    """
+    return (int(jnp.ceil(ConfigSim.simulation_domain_shape[0] * resolution)),
+            int(jnp.ceil(ConfigSim.simulation_domain_shape[1] * resolution)),
+            int(jnp.ceil(ConfigSim.simulation_domain_shape[2] * resolution)))
+
+
+def build_eps(rho_p, resolution):
+    """
+    Builds the permittivity of the entire simulation from a (printed) density. The density is cropped, mirrored and
+    padded with the substrate and the space above the lens.
+    :param rho_p: Printed density including the side buffer [0, 1].
+    :param resolution: Resolution of the simulation [px/um].
+    :return: Permittivity of the entire simulation.
     """
 
-    simulation_domain = (int(jnp.ceil(ConfigSim.simulation_domain_shape[0] * resolution)),
-                         int(jnp.ceil(ConfigSim.simulation_domain_shape[1] * resolution)),
-                         int(jnp.ceil(ConfigSim.simulation_domain_shape[2] * resolution)))
+    simulation_domain = _simulation_domain(resolution)
     size_rho = (int(jnp.ceil(2 * ConfigSim.rho_shape[0] * resolution)),
                 int(jnp.ceil(2 * ConfigSim.rho_shape[1] * resolution)),
                 int(jnp.ceil(ConfigSim.rho_shape[2] * resolution)))
 
-    omega = 2 * jnp.pi / (ConfigSim.wavelength * resolution)
-    rho_p = preprocess(proj(filter(init_proj(rho))), resolution)
-    eps = f2param(rho_p, ConfigSim.epsilon)
+    eps = f2param(preprocess(rho_p, resolution), ConfigSim.epsilon)
 
     eps = jnp.concatenate((eps, jnp.flip(eps, axis=0)), axis=0)
     eps = jnp.concatenate((eps, jnp.flip(eps, axis=1)), axis=1)
@@ -55,6 +61,20 @@ def em_simulation(rho, init_proj, filter, proj, currents, resolution):
                   mode='constant',
                   constant_values=ConfigSim.epsilon[1])
 
+    return eps
+
+
+def solve_em(eps, currents, resolution):
+    """
+    Solves the metalens problem for a given permittivity and source currents.
+    :param eps: Permittivity of the entire simulation, e.g. from build_eps.
+    :param currents: Source currents of the simulation.
+    :param resolution: Resolution of the simulation [px/um].
+    :return: Electric field.
+    """
+
+    simulation_domain = _simulation_domain(resolution)
+    omega = 2 * jnp.pi / (ConfigSim.wavelength * resolution)
 
     size_currents = (int(jnp.ceil(ConfigSim.currents_shape[0] * resolution)),
                      int(jnp.ceil(ConfigSim.currents_shape[1] * resolution)),
@@ -86,7 +106,19 @@ def em_simulation(rho, init_proj, filter, proj, currents, resolution):
 
     E, _ = jaxwell.solve(params, z, b)
 
-    return E, eps
+    return E
+
+
+def em_simulation(rho, init_proj, filter, proj, currents, resolution):
+    """
+    Simulates the metalens problem given a density and source currents.
+    :param rho: Input density of the problem (design variable) [0, 1].
+    :param currents: Source currents of the simulation.
+    :param resolution: Resolution of the simulation [px/um].
+    :return: (Electric field, permittivity of the entire simulation).
+    """
+    eps = build_eps(proj(filter(init_proj(rho))), resolution)
+    return solve_em(eps, currents, resolution), eps
 
 
 def heat_simulation(rho, init_proj, filter, proj):
