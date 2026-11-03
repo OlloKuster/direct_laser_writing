@@ -17,7 +17,6 @@ def preprocess(rho, resolution):
     """
     buffer = int(ConfigSim.buffer_side * resolution)
     rho_p = jnp.asarray(rho)[:-buffer, :-buffer]
-    rho_p = rho_p.at[:, :, :int(jnp.ceil(0.5 * resolution))].set(1)
     return rho_p
 
 
