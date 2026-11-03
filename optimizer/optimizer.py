@@ -49,7 +49,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         end = time.time()
         print(f"time: {end - start}")
         if eval:
-            plotter(x, _, cur_eps[-1], projection, config.cur_it)
+            plotter(x, projection(filter(init_projection(x))), cur_eps[-1], projection, config.cur_it)
         return value
 
     f = f_jax
