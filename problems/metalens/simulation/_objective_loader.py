@@ -17,18 +17,19 @@ def objective_loader(objective: str, *args):
     :return: The objective function with rho -> L(rho)
     """
     if objective == "em_only":
-        projection, currents, resolution, init_value, _, _ = args
-        return objective_em_f(projection, currents, resolution, init_value)
+        init_projection, filter, projection, currents, resolution, init_value, _, _ = args
+        return objective_em_f(init_projection, filter, projection, currents, resolution, init_value)
 
     if objective == "heat_only":
-        return objective_heat_f()
+        init_projection, filter, projection = args
+        return objective_heat_f(init_projection, filter, projection)
 
     if objective == "em_heat":
-        projection, currents, resolution, init_value_em, init_value_mat, init_value_void = args
-        return objective_em_heat_f(projection, currents, resolution, (init_value_em, init_value_mat, init_value_void))
+        init_projection, filter, projection, currents, resolution, init_value_em, init_value_mat, init_value_void = args
+        return objective_em_heat_f(init_projection, filter, projection, currents, resolution, (init_value_em, init_value_mat, init_value_void))
 
     if objective == "robust_em_heat":
-        projection, currents, resolution, init_value_em, init_value_mat, init_value_void = args
-        return objective_robust_em_heat_f(projection, currents, resolution, (init_value_em, init_value_mat, init_value_void))
+        init_projection, filter, projection, currents, resolution, init_value_em, init_value_mat, init_value_void = args
+        return objective_robust_em_heat_f(init_projection, filter, projection, currents, resolution, (init_value_em, init_value_mat, init_value_void))
     return None
 

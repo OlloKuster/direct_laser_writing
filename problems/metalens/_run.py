@@ -7,7 +7,7 @@ import h5py
 
 from filtering._filter_loader import filter_loader
 from filtering.dose_model.utils_dose_sim import calc_psf_GT
-from optimizer.optimizer import optimizer_nlopt, optimizer_optax
+from optimizer.optimizer import optimizer_nlopt
 from plotter._plot_loader import plot_loader
 from problems.metalens.simulation._objective_loader import objective_loader
 from problems.metalens.simulation.config_structure import ConfigSim
@@ -85,15 +85,12 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     filter_0 = filter_loader(filters, filter_values, lp_deviation, psf_GT)
     projection_0 = projection_loader(init_projections, 0.5, betas[0], resolution)
 
-    objective_em = objective_loader(setting["init_em"], projection_0,  currents, resolution, 1, 1, 1)
+    objective_em = objective_loader(setting["init_em"], projection_0, filter_0, projection_0,  currents, resolution, 1, 1, 1)
     init_val_em, _ = objective_em(jnp.ones_like(rho_0))
-    objective_heat = objective_loader(setting["init_heat"])
+    objective_heat = objective_loader(setting["init_heat"],projection_0, filter_0, projection_0)
 
     rho_0_init_bin = np.array(np.ones_like(rho_0)*init_value) * mask
-    if optimizers == 'torch_jax':
-        rho_0_init = filter_0((torch.tensor(rho_0_init_bin, device='cuda', requires_grad=True))).detach().cpu().numpy()
-    if optimizers == "jax":
-        rho_0_init = filter_0(rho_0_init_bin)
+    rho_0_init = filter_0(rho_0_init_bin)
     rho_0_bin = projection_0(rho_0_init)
     if len(rho_0_bin) == 3:
         init_T_mat, init_T_void = objective_heat(rho_0_bin[1], resolution)
@@ -118,19 +115,12 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
         projection = projection_loader(projections, projection_values, betas[i], resolution)
         init_projection = projection_loader(init_projections, init_projection_values, betas[i], resolution)
 
-        objective = objective_loader(objectives, projection, currents, resolution, init_val_em, init_val_mat, init_val_void)
+        objective = objective_loader(objectives, init_projection, filter, projection, currents, resolution, init_val_em, init_val_mat, init_val_void)
 
-        if opt == "optax":
-            rho_0, loss, em_loss, grads = optimizer_optax(rho_0, objective, mask, filter, projection, init_projection,
-                                                          plotter_eval, optimizers, max_evals,
-                                                          eval=eval)
-        elif opt == "nlopt":
-            rho_0, loss, em_loss, grads = optimizer_nlopt(rho_0, objective, mask, filter, projection, init_projection,
-                                                          plotter_eval, optimizers, max_evals,
-                                                          eval=eval)
-        else:
-            print("no valid optimizer chosen")
-            return
+        rho_0, loss, em_loss, grads = optimizer_nlopt(rho_0, objective, mask, filter, projection, init_projection,
+                                                      plotter_eval, optimizers, max_evals,
+                                                      eval=eval)
+
 
         loss_hist += loss
         em_loss_hist += em_loss

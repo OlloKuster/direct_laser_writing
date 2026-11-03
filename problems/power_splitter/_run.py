@@ -8,7 +8,7 @@ import tidy3d as td
 from filtering._filter_loader import filter_loader
 from filtering.dose_model.config_print import ConfigPrint
 from filtering.dose_model.utils_dose_sim import calc_psf_GT
-from optimizer.optimizer import optimizer_nlopt, optimizer_optax
+from optimizer.optimizer import optimizer_nlopt
 from plotter._plot_loader import plot_loader
 from problems.power_splitter.simulation._objective_loader import objective_loader
 from problems.power_splitter.simulation.config_structure import ConfigSim

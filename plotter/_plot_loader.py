@@ -2,7 +2,6 @@ from plotter.plotting_metalens import metalens_regular_intermediate_plot, metale
     metalens_regular_final_plot, metalens_robust_final_plot
 from plotter.plotting_power_splitter import power_splitter_regular_intermediate_plot, power_splitter_regular_final_plot, \
     power_splitter_robust_intermediate_plot, power_splitter_robust_final_plot
-from plotter.plotting_frequency_filter import frequency_filter_regular_intermediate_plot, frequency_filter_regular_final_plot, frequency_filter_robust_final_plot, frequency_filter_robust_intermediate_plot
 
 
 def plot_loader(plot: str, *args):
@@ -36,8 +35,3 @@ def plot_loader(plot: str, *args):
         return power_splitter_robust_intermediate_plot()
     if plot == "power_splitter_robust_final":
         return power_splitter_robust_final_plot()
-
-    if plot == "frequency_filter_regular":
-        return frequency_filter_regular_intermediate_plot()
-    if plot == "frequency_filter_regular_final":
-        return frequency_filter_regular_final_plot()
