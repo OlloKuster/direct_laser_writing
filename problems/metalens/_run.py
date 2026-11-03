@@ -11,7 +11,8 @@ from optimizer.optimizer import optimizer_nlopt
 from plotter._plot_loader import plot_loader
 from problems.metalens.simulation._objective_loader import objective_loader
 from problems.metalens.simulation.config_structure import ConfigSim
-from problems.metalens.simulation.simulation import build_eps, solve_em
+from problems.metalens.simulation.objective import focal_spot
+from problems.metalens.simulation.simulation import build_eps, solve_em, printed, em_simulation, heat_simulation
 from projection._projection_loader import projection_loader
 
 
@@ -82,17 +83,14 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     filter_0 = filter_loader(filters, filter_values, lp_deviation, psf_GT)
     projection_0 = projection_loader(init_projections, 0.5, betas[0], resolution)
 
-    objective_em = objective_loader(setting["init_em"], projection_0, filter_0, projection_0,  currents, resolution, 1, 1, 1)
-    init_val_em, _ = objective_em(jnp.ones_like(rho_0))
-    objective_heat = objective_loader(setting["init_heat"],projection_0, filter_0, projection_0)
+    # Both are evaluated on the nominal (middle) variant
+    rho_0_em = printed(jnp.ones_like(rho_0), projection_0, filter_0, projection_0)
+    E_0, _ = em_simulation(rho_0_em[len(rho_0_em) // 2], currents, resolution)
+    init_val_em = focal_spot(E_0, resolution, 1)
 
     rho_0_init_bin = np.array(np.ones_like(rho_0)*init_value) * mask
-    rho_0_init = filter_0(rho_0_init_bin)
-    rho_0_bin = projection_0(rho_0_init)
-    if len(rho_0_bin) == 3:
-        init_T_mat, init_T_void = objective_heat(rho_0_bin[1], resolution)
-    else:
-        init_T_mat, init_T_void = objective_heat(rho_0_bin, resolution)
+    rho_0_bin = printed(rho_0_init_bin, lambda x: x, filter_0, projection_0)
+    init_T_mat, init_T_void, _ = heat_simulation(rho_0_bin[len(rho_0_bin) // 2])
 
 
     init_val_mat = (init_T_mat + 1e-3) / (1 + target_material)  # Small offset to avoid singularities
@@ -124,14 +122,12 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
 
         # Final manipulations to save the relevant details.
         rho_written = init_projection(rho_0 * mask)  # Same order as in the optimizer
-        rho_printed = projection(filter(rho_written))
+        rho_printed = printed(rho_written, lambda x: x, filter, projection)
         eps_writing_pattern = build_eps(rho_written, resolution)  # Only the permittivity is needed, no solve
-        if "robust" in setting["objectives"]:
-            eps = tuple(build_eps(r, resolution) for r in rho_printed)  # (eroded, normal, dilated)
-            E = tuple(solve_em(e, currents, resolution) for e in eps)
-        else:
-            eps = build_eps(rho_printed, resolution)
-            E = solve_em(eps, currents, resolution)
+        eps = [build_eps(r, resolution) for r in rho_printed]  # (eroded, normal, dilated) for the robust filter
+        E = [solve_em(e, currents, resolution) for e in eps]
+        if len(eps) == 1:  # The regular plotters take a single structure
+            eps, E = eps[0], E[0]
 
         if True:
             plotter_final(extent=(ConfigSim.simulation_domain_shape[1], ConfigSim.simulation_domain_shape[2]),

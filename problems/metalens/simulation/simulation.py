@@ -109,29 +109,39 @@ def solve_em(eps, currents, resolution):
     return E
 
 
-def em_simulation(rho, init_proj, filter, proj, currents, resolution):
+def printed(rho, init_proj, filter, proj):
     """
-    Simulates the metalens problem given a density and source currents.
+    Printed structures of all process variants. A regular filter gives a single variant, the robust filter an eroded,
+    normal and dilated one.
     :param rho: Input density of the problem (design variable) [0, 1].
+    :return: Printed densities [V, nx, ny, nz].
+    """
+    rho_f = filter(init_proj(rho))
+    if rho_f.ndim == 3:
+        rho_f = rho_f[None]
+    return jnp.stack([proj(r) for r in rho_f])
+
+
+def em_simulation(rho_p, currents, resolution):
+    """
+    Simulates the metalens problem given a printed density and source currents.
+    :param rho_p: Printed density including the side buffer [0, 1], one variant of printed.
     :param currents: Source currents of the simulation.
     :param resolution: Resolution of the simulation [px/um].
     :return: (Electric field, permittivity of the entire simulation).
     """
-    eps = build_eps(proj(filter(init_proj(rho))), resolution)
+    eps = build_eps(rho_p, resolution)
     return solve_em(eps, currents, resolution), eps
 
 
-def heat_simulation(rho, init_proj, filter, proj):
+def heat_simulation(rho_p):
     """
-    Heat simulation given an input density. Material/void is seen as heat_eval sources. The heat_eval sinks are the
+    Heat simulation given a printed density. Material/void is seen as heat_eval sources. The heat_eval sinks are the
     points where the material/void should connect to.
-    :param rho: Input density of the problem (design variable) [0, 1].
-    :param resize_factor: Resizes the density in case the FEM-simulation is too big for the memory.
-    :return: (Heat of the material, Heat of the void.
+    :param rho_p: Printed density including the side buffer [0, 1], one variant of printed.
+    :return: (Heat of the material, Heat of the void, thermal conductivity of the material).
     """
 
-
-    rho_p = proj(filter(init_proj(rho)))
     heat_sinks_matter = jnp.zeros((rho_p.shape[0] + 1,
                                    rho_p.shape[1] + 1,
                                    rho_p.shape[2] + 1), dtype='?')
