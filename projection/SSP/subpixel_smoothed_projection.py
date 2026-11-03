@@ -1,4 +1,5 @@
 import jax.numpy as jnp
+import numpy as np
 
 from projection.tanh.tanh_projection import tanh_filter_jax_f
 
@@ -7,32 +8,35 @@ def f2bin_smooth(rho, alpha, resolution, f2bin):
     """
     Implements the subpixel-smoothed projection.
     https://doi.org/10.1364/OE.563512
-    :param rho: Input density (design variable).
+    The smoothing kernel is an ellipsoid with the semi-axes 0.55 * (dx, dy, ...), i.e. 0.55 voxels along every axis.
+    For a cubic grid this is the ball of radius 0.55 * dx of the paper. Since the radius scales with the voxel size,
+    the result only depends on the differences between neighbouring voxels and not on the resolution itself, also
+    for anisotropic voxels like the writing lattice.
+    :param rho: Input density (design variable), any number of dimensions.
     :param alpha: Threshold value.
-    :param resolution: Resolution of the problem [px/um].
+    :param resolution: Resolution of the problem [px/um], a scalar or one value per axis.
     :param f2bin: Binarization function.
     :return: Subpixel-smoothed density.
     """
-    dx = dy = dz = 1 / resolution
-    R_smoothing = 0.55 * dx
+    spacing = 1 / np.broadcast_to(np.asarray(resolution, dtype=float), (rho.ndim,))
     rho_proj = f2bin(rho)
-    rho_grad = jnp.gradient(rho)
-    rho_grad_norm2 = (rho_grad[0] / dx) ** 2 + (rho_grad[1] / dy) ** 2 + (rho_grad[2] / dz)**2
-    nonzero_norm = jnp.abs(rho_grad_norm2) > 0
-    rho_grad_norm = jnp.sqrt(jnp.where(nonzero_norm,
-                                       rho_grad_norm2, 1))
-    rho_grad_norm_eff = jnp.where(nonzero_norm, rho_grad_norm, 1)
-    d = (alpha - rho) / rho_grad_norm_eff
-    needs_smoothing = nonzero_norm & (jnp.abs(d) < R_smoothing)
-    d_R = d / R_smoothing
+    rho_grad = jnp.gradient(rho, *spacing)
+    if rho.ndim == 1:
+        rho_grad = [rho_grad]
+    # Change of rho across the smoothing radius along the gradient: R * |grad rho| with R = 0.55 * |n * spacing|
+    delta2 = sum((0.55 * g * dx) ** 2 for g, dx in zip(rho_grad, spacing))
+    nonzero_norm = delta2 > 0
+    delta = jnp.sqrt(jnp.where(nonzero_norm, delta2, 1))
+    d_R = (alpha - rho) / delta
+    needs_smoothing = nonzero_norm & (jnp.abs(d_R) < 1)
     F = jnp.where(needs_smoothing,
                   0.5 - 15 / 16 * d_R + 5 / 8 * d_R ** 3 - 3 / 16 * d_R ** 5,
                   1.0)
     F_minus = jnp.where(needs_smoothing,
                         0.5 + 15 / 16 * d_R - 5 / 8 * d_R ** 3 + 3 / 16 * d_R ** 5,
                         1.0)
-    rho_minus = rho - R_smoothing * rho_grad_norm_eff * F
-    rho_plus = rho + R_smoothing * rho_grad_norm_eff * F_minus
+    rho_minus = rho - delta * F
+    rho_plus = rho + delta * F_minus
     rho_minus_eff_proj = f2bin(rho_minus)
     rho_plus_eff_proj = f2bin(rho_plus)
     rho_proj_smoothed = (1 - F) * rho_minus_eff_proj + F * rho_plus_eff_proj
