@@ -1,36 +1,8 @@
 import jax.numpy as jnp
 
+from filtering.dose_model.config_print import ConfigPrint
 
-def lattice_steps(hatching, slicing, resolution):
-    """
-    Hatching and slicing distance in voxels of the simulation grid.
-    :param hatching: Distance between the lines [um].
-    :param slicing: Distance between the layers [um].
-    :param resolution: Resolution of the simulation [px/um].
-    :return: (m_y, m_z) Voxels from one line to the next and from one layer to the next.
-    """
-    m_y, m_z = hatching * resolution, slicing * resolution
-    if abs(m_y - round(m_y)) > 1e-6 or abs(m_z - round(m_z)) > 1e-6:
-        raise ValueError(f"Hatching ({hatching} um) and slicing ({slicing} um) must be multiples of the voxel size "
-                         f"1/{resolution} um.")
-    return round(m_y), round(m_z)
-
-
-def lattice_shape(grid_shape, m_y, m_z, offset=(0, 0)):
-    """
-    Shape of the design variable on the writing lattice, one value per exposure position.
-    :param grid_shape: Shape of the simulation grid.
-    :param m_y: Voxels between two lines, see lattice_steps.
-    :param m_z: Voxels between two layers, see lattice_steps.
-    :param offset: Grid index of the first line and the first layer.
-    :return: (nx, number of lines, number of layers).
-    """
-    return (grid_shape[0],
-            len(range(offset[0], grid_shape[1], m_y)),
-            len(range(offset[1], grid_shape[2], m_z)))
-
-
-def lattice_proj_jax_f(f2bin, grid_shape, m_y, m_z, offset=(0, 0)):
+def lattice_proj_jax_f(f2bin, resolution, offset=(0, 0)):
     """
     Generates the initial projection onto the writing lattice. The scan runs along x and is sampled at every voxel,
     the lines are m_y voxels apart in y and the layers m_z voxels apart in z.
@@ -51,6 +23,24 @@ def lattice_proj_jax_f(f2bin, grid_shape, m_y, m_z, offset=(0, 0)):
         :return: Written pattern on the simulation grid [nx, ny, nz].
         """
         written = f2bin(rho)
-        return jnp.zeros(grid_shape, written.dtype).at[:, o_y::m_y, o_z::m_z].set(written)
+        m_y, m_z = round(ConfigPrint.hatching * resolution), round(ConfigPrint.slicing * resolution)
+
+        return written.at[:, o_y::m_y, o_z::m_z].set(0)
 
     return lattice_proj
+
+
+if __name__ == '__main__':
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    f2bin = lambda x: x
+
+    lattice_proj = lattice_proj_jax_f(f2bin,  20)
+
+    rho = jnp.array(np.random.rand(50, 50, 50))
+
+    proj = lattice_proj(rho)
+
+    plt.imshow(proj[0].T, origin='lower')
+    plt.show()

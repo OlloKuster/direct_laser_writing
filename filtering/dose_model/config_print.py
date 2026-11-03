@@ -61,5 +61,5 @@ class ConfigPrint():
     rho_th_GT = 0.5 #1 / 6.2525
 
     # Writing lattice, used by the "lattice_*" initial projections. Must be multiples of the voxel size 1/resolution.
-    hatching = 0.15  # Distance between the lines in y [um]
+    hatching = 0.2  # Distance between the lines in y [um]
     slicing = 0.3  # Distance between the layers in z [um]

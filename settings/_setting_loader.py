@@ -22,7 +22,7 @@ def setting_loader(system: str, setup: str):
                 "plotter_final": "final_regular",  # Which plotting function is used for the final plotting.
                 "projection": "ssp_jax",  # Projection used for the optimization.
                 "projection_values": ConfigPrint.rho_th_GT,  # Threshold value used in projection.
-                "init_projection": "ssp_jax",  # Initial projection used for the "precompensated" structure.
+                "init_projection": "lattice_ssp_jax",  # Initial projection used for the "precompensated" structure.
                 "init_projection_values": 0.5,  # Threshold value for the inital projection.
 
                 "target_material": -0.8,

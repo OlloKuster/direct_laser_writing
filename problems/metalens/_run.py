@@ -6,6 +6,7 @@ import torch
 import h5py
 
 from filtering._filter_loader import filter_loader
+from filtering.dose_model.config_print import ConfigPrint
 from filtering.dose_model.utils_dose_sim import calc_psf_GT
 from optimizer.optimizer import optimizer_nlopt
 from plotter._plot_loader import plot_loader
@@ -14,6 +15,7 @@ from problems.metalens.simulation.config_structure import ConfigSim
 from problems.metalens.simulation.objective import focal_spot
 from problems.metalens.simulation.simulation import build_eps, solve_em, printed, em_simulation, heat_simulation
 from projection._projection_loader import projection_loader
+from projection.lattice.lattice_projection import lattice_steps
 
 
 def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_evals, load=None, eval=False, run_id=0):
@@ -67,6 +69,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     mask[:int(ConfigSim.buffer_side * resolution)] = 0
     mask[:, :int(ConfigSim.buffer_side * resolution)] = 0
     mask[:, :, -int(ConfigSim.buffer_top * resolution):] = 0
+
 
     # Input current terms (Plane Wave)
     size_currents = (ConfigSim.currents_shape[0] * resolution,

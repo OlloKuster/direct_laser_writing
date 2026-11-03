@@ -34,11 +34,8 @@ def projection_loader(projection: str, *args, grid_shape=None):
         return ssp_robust_proj_jax_f(alpha, beta, resolution)
     if projection in ("lattice_tanh_jax", "lattice_ssp_jax"):
         alpha, beta, resolution = args
-        if grid_shape is None:
-            raise ValueError(f"Projection '{projection}' needs the shape of the simulation grid (grid_shape).")
-        m_y, m_z = lattice_steps(ConfigPrint.hatching, ConfigPrint.slicing, resolution)
         if projection == "lattice_tanh_jax":
             f2bin = tanh_filter_jax_f(alpha, beta)
         else:
-            f2bin = ssp_proj_jax_f(alpha, beta, (resolution, resolution / m_y, resolution / m_z))
-        return lattice_proj_jax_f(f2bin, grid_shape, m_y, m_z)
+            f2bin = ssp_proj_jax_f(alpha, beta, (resolution, resolution, resolution))
+        return lattice_proj_jax_f(f2bin, resolution)
