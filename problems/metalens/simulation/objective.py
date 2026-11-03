@@ -42,7 +42,7 @@ def objective_heat_f(init_projection, filter, projection):
         :param rho: Density (design variable) of the problem [0, 1].
         :return: Tuple of material and void heat_eval.
         """
-        T_mat, T_void, _ = heat_simulation(rho, init_projection, filter, projection, resolution)
+        T_mat, T_void, _ = heat_simulation(rho, init_projection, filter, projection)
         return T_mat, T_void
 
     return objective_heat
@@ -75,7 +75,7 @@ def objective_em_heat_f(init_projection, filter, projection, currents, resolutio
         :param rho: Density (design variable) of the problem [0, 1].
         :return: Tuple of material and void heat_eval.
         """
-        T_mat, T_void, _ = heat_simulation(rho, init_projection, filter, projection, resolution)
+        T_mat, T_void, _ = heat_simulation(rho, init_projection, filter, projection)
         return T_mat, T_void
 
     def objective_softplus(rho_0):
@@ -138,7 +138,7 @@ def objective_robust_em_heat_f(init_projection, filter, projection, currents, re
         :param rho: Density (design variable) of the problem [0, 1].
         :return: Tuple of material and void heat_eval.
         """
-        T_mat, T_void, _ = heat_simulation(rho, init_projection, filter, projection, resolution)
+        T_mat, T_void, _ = heat_simulation(rho, init_projection, filter, projection)
         return T_mat, T_void
 
     def objective_softplus(rho):

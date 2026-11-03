@@ -89,7 +89,7 @@ def em_simulation(rho, init_proj, filter, proj, currents, resolution):
     return E, eps
 
 
-def heat_simulation(rho, init_proj, filter, proj, resolution):
+def heat_simulation(rho, init_proj, filter, proj):
     """
     Heat simulation given an input density. Material/void is seen as heat_eval sources. The heat_eval sinks are the
     points where the material/void should connect to.
@@ -100,9 +100,9 @@ def heat_simulation(rho, init_proj, filter, proj, resolution):
 
 
     rho_p = proj(filter(init_proj(rho)))
-    heat_sinks_matter = jnp.zeros((rho_p[0] + 1,
-                                   rho_p[1] + 1,
-                                   rho_p[2] + 1), dtype='?')
+    heat_sinks_matter = jnp.zeros((rho_p.shape[0] + 1,
+                                   rho_p.shape[1] + 1,
+                                   rho_p.shape[2] + 1), dtype='?')
     heat_sinks_matter = heat_sinks_matter.at[..., 0].set(True)
     kappa_r_matter = f2param(rho_p, ConfigSim.kappa)
     fem_matter = FEA3D_T(heat_sinks_matter)
