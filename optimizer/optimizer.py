@@ -6,7 +6,7 @@ import time
 from optimizer import config
 
 
-def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, plotter, mode, max_evals, eval=False):
+def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, plotter, max_evals, eval=False):
     """
     NLOpt based optimizer for non-linear, gradient based optimization.
     The density is first put through init_projection to give a "precomensated" density. Then it is put
@@ -28,7 +28,6 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
     loss_hist = []
     em_hist = []
     grad_hist = []
-    cur_eps = []
 
 
     def f_jax(x, g):
@@ -36,9 +35,9 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         x = np.reshape(x, rho.shape)
         x = np.array(x * mask)
         value_em_sim, grad = jax.value_and_grad(objective, has_aux=True)(x)
+        grad = grad * mask
         value = float(value_em_sim[0])  # Requires np float and not jax.numpy float
         em_hist.append(value_em_sim[1][0])
-        cur_eps.append(value_em_sim[1][1])
         print(f"value: {value}")
         print(f"grad: {np.mean(grad)}")
         print(f"iteration: {config.cur_it + 1}")
@@ -49,7 +48,7 @@ def optimizer_nlopt(rho, objective, mask, filter, projection, init_projection, p
         end = time.time()
         print(f"time: {end - start}")
         if eval:
-            plotter(x, projection(filter(init_projection(x))), cur_eps[-1], projection, config.cur_it)
+            plotter(x, projection(filter(init_projection(x))), value_em_sim[1][1], projection, config.cur_it)
         return value
 
     f = f_jax
