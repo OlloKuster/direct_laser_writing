@@ -102,7 +102,7 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
     if load is not None:
         f = h5py.File(load)
         grp = f["lens_3d"]
-        rho_0 = grp["rho"][:]
+        rho_0 = grp["rho_design"][:] if "rho_design" in grp else grp["rho"][:]  # Older files saved the design as "rho"
         f.close()
 
     # Main Optimization loop
@@ -115,8 +115,11 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
 
         objective = objective_loader(objectives, init_projection, filter, projection, currents, resolution, init_val_em, init_val_mat, init_val_void)
 
+        # The intermediate plots show the written structure (after the initial projection) instead of the design variable
+        plotter_eval_written = lambda x, *args: plotter_eval(init_projection(x), *args)
+
         rho_0, loss, em_loss, grads = optimizer_nlopt(rho_0, objective, mask, filter, projection, init_projection,
-                                                      plotter_eval, max_evals,
+                                                      plotter_eval_written, max_evals,
                                                       eval=eval)
 
 
@@ -134,7 +137,8 @@ def run(resolution, betas, setting: dict, loss_hist, em_loss_hist, opt, max_eval
 
         if True:
             plotter_final(extent=(ConfigSim.simulation_domain_shape[1], ConfigSim.simulation_domain_shape[2]),
-                          rho_0=rho_0,
+                          rho_written=rho_written,
+                          rho_design=rho_0,
                           rho_precomp=eps_writing_pattern,
                           loss_hist=loss_hist,
                           beta=betas[i],

@@ -52,8 +52,8 @@ def metalens_regular_final_plot():
     Creates the plotting function used for the final evaluation of the structures.
     :return: Final Plotter function.
     """
-    def plotter(extent, rho_0=None, rho_precomp=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None, run_id=0,
-                save=False):
+    def plotter(extent, rho_written=None, rho_design=None, rho_precomp=None, loss_hist=None, beta=None, em_loss_hist=None,
+                grads=None, eps=None, E=None, run_id=0, save=False):
 
         if loss_hist is not None:
             plt.plot(loss_hist)
@@ -102,7 +102,8 @@ def metalens_regular_final_plot():
                 grp = f.create_group("lens_3d")
                 grp.create_dataset("E", data=E)
                 grp.create_dataset("eps", data=eps)
-                grp.create_dataset("rho", data=rho_0)
+                grp.create_dataset("rho", data=rho_written)  # Structure after the initial projection
+                grp.create_dataset("rho_design", data=rho_design)  # Design variable, needed to load a run
                 grp.create_dataset("rho_precomp", data=rho_precomp)
                 grp.create_dataset("loss", data=loss_hist)
                 grp.create_dataset("em_loss", data=em_loss_hist)
@@ -171,8 +172,8 @@ def metalens_robust_final_plot():
     Creates the plotting function used for the final evaluation of the dlw (3) designed structures.
     :return: Final Plotter function.
     """
-    def plotter(extent, rho_0=None, rho_precomp=None, loss_hist=None, beta=None, em_loss_hist=None, grads=None, eps=None, E=None, run_id=0,
-                save=False):
+    def plotter(extent, rho_written=None, rho_design=None, rho_precomp=None, loss_hist=None, beta=None, em_loss_hist=None,
+                grads=None, eps=None, E=None, run_id=0, save=False):
 
         if loss_hist is not None:
             plt.plot(loss_hist, label='eroded')
@@ -254,7 +255,8 @@ def metalens_robust_final_plot():
                 grp.create_dataset("eps_erosion", data=eps[0])
                 grp.create_dataset("eps_normal", data=eps[1])
                 grp.create_dataset("eps_dilation", data=eps[2])
-                grp.create_dataset("rho", data=rho_0)
+                grp.create_dataset("rho", data=rho_written)  # Structure after the initial projection
+                grp.create_dataset("rho_design", data=rho_design)  # Design variable, needed to load a run
                 grp.create_dataset("rho_precomp", data=rho_precomp)
                 grp.create_dataset("loss", data=loss_hist)
                 grp.create_dataset("em_loss", data=em_loss_hist)
