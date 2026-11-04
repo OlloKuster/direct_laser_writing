@@ -25,8 +25,8 @@ def setting_loader(system: str, setup: str):
                 "init_projection": "lattice_ssp_jax",  # Initial projection used for the "precompensated" structure.
                 "init_projection_values": 0.5,  # Threshold value for the inital projection.
 
-                "target_material": -0.8,
-                "target_void": -0.8,
+                "target_material": -0.2,
+                "target_void": -0.2,
 
                 "init_em": "em_only",  # Initial EM-objective function.
                 "init_heat": "heat_only"  # Initial heat_eval-objective function.

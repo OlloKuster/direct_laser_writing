@@ -15,7 +15,6 @@ def metalens_regular_intermediate_plot():
         fig, ax = plt.subplots(3, 1, sharex=True)
         # rho_init = np.concatenate((rho_init, np.flip(rho_init, axis=0)), axis=0)
         # rho_init = np.concatenate((rho_init, np.flip(rho_init, axis=1)), axis=1)
-        rho_init = np.where(rho_init>=0.5, 1, 0)
         ax[0].imshow(rho_init[rho_init.shape[0] // 2].T, origin='lower', cmap='binary', vmin=0, vmax=1)
         ax[0].set_ylabel(r"y ($\mathrm{\mu}$m)", fontsize=12)
         # rho_final = np.concatenate((rho_final, np.flip(rho_final, axis=0)), axis=0)

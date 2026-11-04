@@ -57,7 +57,7 @@ class ConfigPrint():
     correction_factor = 1.
     nonlinearity = 2.0
 
-    lp = 2*0.00284  # between 22-25-ish percent  ~0.05W
+    lp = 2*0.00844  # between 22-25-ish percent  ~0.05W
     rho_th_GT = 0.5 #1 / 6.2525
 
     # Writing lattice, used by the "lattice_*" initial projections. Must be multiples of the voxel size 1/resolution.

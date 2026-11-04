@@ -13,9 +13,6 @@ def lattice_steps(hatching, slicing, resolution):
     :return: (m_y, m_z) Voxels from one line to the next and from one layer to the next.
     """
     m_y, m_z = hatching * resolution, slicing * resolution
-    if abs(m_y - round(m_y)) > 1e-6 or abs(m_z - round(m_z)) > 1e-6:
-        raise ValueError(f"Hatching ({hatching} um) and slicing ({slicing} um) must be multiples of the voxel size "
-                         f"1/{resolution} um.")
     return round(m_y), round(m_z)
 
 
@@ -52,9 +49,9 @@ if __name__ == '__main__':
 
     lattice_proj = lattice_proj_jax_f(f2bin,  20)
 
-    rho = jnp.array(np.random.rand(50, 50, 50))
+    rho = jnp.array(np.random.rand(100, 100, 100))
 
     proj = lattice_proj(rho)
 
-    plt.imshow(proj[0].T, origin='lower')
+    plt.imshow(proj[:, :, 0].T, origin='lower', extent=(0, 5, 0, 5))
     plt.show()

@@ -10,6 +10,7 @@ from filtering.dose_model.config_print import ConfigPrint
 from filtering.dose_model.utils_dose_sim import calc_psf_GT
 from projection.SSP.subpixel_smoothed_projection import ssp_proj_jax_f
 from projection._projection_loader import projection_loader
+from projection.lattice.lattice_projection import lattice_steps
 
 
 def test(seed):
@@ -18,11 +19,20 @@ def test(seed):
     resolution = 14
     psf = calc_psf_GT(resolution)
     for factor in np.linspace(0.001, 0.009, 101):
-        size_lat = int(np.ceil(0.4*resolution)) // 2
-        size_ax = int(np.ceil(0.9*resolution)) // 2
+        size_lat = int(np.ceil(resolution)) // 2
+        size_ax = int(np.ceil(resolution)) // 2
         rho_0 = np.zeros((5*resolution, 5*resolution, 5*resolution))
         # rho_0[rho_0.shape[0]//2, rho_0.shape[1]//2, rho_0.shape[2]//2] = 1
         rho_0[rho_0.shape[0]//2-size_lat:-rho_0.shape[0]//2+size_lat, rho_0.shape[1]//2-size_lat:-rho_0.shape[1]//2+size_lat,  rho_0.shape[2]//2-size_ax:-rho_0.shape[2]//2+size_ax] = 1
+
+
+        m_y, m_z = lattice_steps(ConfigPrint.hatching, ConfigPrint.slicing, resolution)
+
+        on_lattice = np.zeros(rho_0.shape, dtype=bool)  # Static, only depends on the shape
+        on_lattice[:, ::m_y, ::m_z] = True
+        rho_0 = np.where(on_lattice, np.round(rho_0), 0.)
+
+        # rho_0[:, rho_0.shape[1]//2, rho_0.shape[2]//2] = 1
         #
         # rho_0[rho_0.shape[0]//2, rho_0.shape[1]//2-4, rho_0.shape[2]//4:-rho_0.shape[2]//4] = 1
         # # rho_0[rho_0.shape[0]//2, rho_0.shape[1]//2, rho_0.shape[2]//4:-rho_0.shape[2]//4] = 1
