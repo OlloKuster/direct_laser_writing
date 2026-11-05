@@ -43,4 +43,5 @@ if __name__ == "__main__":
         setting["objectives"] = "em_only"
         setting["filter_factor"] = feature_size / np.sqrt(3)
         loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15, opt="nlopt",
-                                       eval=eval, run_id=0)
+                                       eval=eval, run_id=run_id)
+        run_id = run_id + 1
