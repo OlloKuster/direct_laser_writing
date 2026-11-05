@@ -33,12 +33,14 @@ if __name__ == "__main__":
     setting = setting_loader("metalens", "gauss_em_only")
     eval = True
     resolution = 14
-    loss_hist = []
-    em_loss_hist = []
     betas = [8, 16, np.inf]
     run_id = 0
 
     feature_size_factor = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
     for fact in feature_size_factor:
+        loss_hist = []
+        em_loss_hist = []
+        setting["objectives"] = "em_only"
+        setting["filter_factor"] = fact
         loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15, opt="nlopt",
                                        eval=eval, run_id=0)
