@@ -33,7 +33,7 @@ def main(resolution, betas, setting, loss_hist, em_loss_hist, opt, max_evals, lo
 
 if __name__ == "__main__":
     setting = setting_loader("metalens", "dlw_em_only")
-    eval = False
+    eval = True
     resolution = 14
     loss_hist = []
     em_loss_hist = []
@@ -43,11 +43,13 @@ if __name__ == "__main__":
 
     lps = np.concatenate(([0.001, 0.5, 0.75], lps))
 
-    run_id = len(lps[:lps.shape[0]//2])
+    run_id = 0
+
+    # run_id = len(lps[:lps.shape[0]//2])
 
     # lps = lps[:lps.shape[0]//2]
-    lps = lps[lps.shape[0]//2:]
-    print(lps)
+    # lps = lps[lps.shape[0]//2:]
+
     print(run_id)
 
     base_lp = setting["lp_deviation"]
@@ -56,6 +58,6 @@ if __name__ == "__main__":
         em_loss_hist = []
         setting["lp_deviation"] = factor * base_lp / 2
         print(setting["lp_deviation"])
-        loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=20,
+        loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15,
                                        opt="nlopt", eval=eval, run_id=run_id)
         run_id = run_id + 1

@@ -18,10 +18,10 @@ def test(seed):
     np.random.seed(seed)
     resolution = 14
     psf = calc_psf_GT(resolution)
-    for factor in np.linspace(0.001, 0.009, 101):
-        size_lat = int(np.ceil(resolution)) // 2
-        size_ax = int(np.ceil(resolution)) // 2
-        rho_0 = np.zeros((5*resolution, 5*resolution, 5*resolution))
+    for factor in np.linspace(0.007960000000000002, 0.009, 20):
+        size_lat = int(np.ceil(5*resolution)) // 2
+        size_ax = int(np.ceil(5*resolution)) // 2
+        rho_0 = np.zeros((8*resolution, 8*resolution, 8*resolution))
         # rho_0[rho_0.shape[0]//2, rho_0.shape[1]//2, rho_0.shape[2]//2] = 1
         rho_0[rho_0.shape[0]//2-size_lat:-rho_0.shape[0]//2+size_lat, rho_0.shape[1]//2-size_lat:-rho_0.shape[1]//2+size_lat,  rho_0.shape[2]//2-size_ax:-rho_0.shape[2]//2+size_ax] = 1
 
@@ -68,9 +68,9 @@ def test(seed):
         # # p.remove_scalar_bar()
         # p.camera.zoom(1.3)
         # p.show()
-        if result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2] >= 0.5:
-            print(factor)
-            break
+        # if result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2] >= 0.5:
+        #     print(factor)
+        #     break
         print(f"lp: {factor}")
         print(f"bin_value: {result_bin[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2]}")
         print(f"actual_value: {result[result.shape[0]//2, result.shape[1]//2, result.shape[2]//2]}")

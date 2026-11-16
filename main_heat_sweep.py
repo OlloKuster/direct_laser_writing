@@ -39,8 +39,10 @@ if __name__ == "__main__":
     betas = [8, 16, np.inf]
     run_id = 0
 
-    target_material = [-0.1, 0.0, 0.1, 0.2, 0.3]
-    target_void = [-0.1, 0.0, 0.1, 0.2, 0.3]
+    target_material = [-0.2, -0.4, -0.6]
+    target_void = [-0.2, -0.4, -0.6]
+    # target_material = [0.0, 0.2, 0.4, 0.6]
+    # target_void = [0.0, 0.2, 0.4, 0.6]
     for mat in target_material:
         for void in target_void:
             loss_hist = []
@@ -48,6 +50,6 @@ if __name__ == "__main__":
             setting["target_material"] = mat
             setting["target_void"] = void
             print(setting["target_material"], setting["target_void"])
-            loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=20,
+            loss_hist, em_loss_hist = main(resolution, betas, setting, loss_hist, em_loss_hist, max_evals=15,
                                            opt="nlopt", eval=eval, run_id=run_id)
             run_id = run_id + 1

@@ -10,7 +10,7 @@ class ConfigPrint():
     """
     power = 1.
 
-    n_monomer = 1.516
+    n_monomer = 1.512
 
     h = 6.626e-34
     c = 2.99792458e8
@@ -57,7 +57,7 @@ class ConfigPrint():
     correction_factor = 1.
     nonlinearity = 2.0
 
-    lp = 2*0.008440  # between 22-25-ish percent  ~0.05W
+    lp = 2*0.00812 # between 22-25-ish percent  ~0.05W
     rho_th_GT = 0.5 #1 / 6.2525
 
     # Writing lattice, used by the "lattice_*" initial projections. Must be multiples of the voxel size 1/resolution.
