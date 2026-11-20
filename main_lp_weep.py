@@ -1,6 +1,7 @@
 import jax
 import torch
 import numpy as np
+import os
 
 from dispenser import Dispenser
 from settings._setting_loader import setting_loader
@@ -54,6 +55,10 @@ if __name__ == "__main__":
 
     base_lp = setting["lp_deviation"]
     for factor in lps:
+        if os.path.isfile(f"/scratch/local/okuster/data/dlw_metalens/plots_lp_sweep/data_{run_id}_inf.h5"):
+            print(f"Skipping {run_id}")
+            run_id = run_id + 1
+            continue
         loss_hist = []
         em_loss_hist = []
         setting["lp_deviation"] = factor * base_lp / 2

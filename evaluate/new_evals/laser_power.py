@@ -13,7 +13,7 @@ font = {'family': 'arial',
 matplotlib.rc('font', **font)
 
 # Sweep through the laser powers
-path_lp = "/scratch/local/okuster/data/dlw_metalens/feature_size_old/plots_lp_sweep/"
+path_lp = "/scratch/local/okuster/data/dlw_metalens/plots_lp_sweep/"
 
 
 lps = np.linspace(1, 5, 33)
@@ -39,7 +39,7 @@ for i in inds_lp:
 # Sweep through the feature sizes
 
 
-path_feature_size = "/scratch/local/okuster/data/dlw_metalens/feature_size_old/plots_feature_size_sweep/"
+path_feature_size = "/scratch/local/okuster/data/dlw_metalens/plots_feature_size_sweep/"
 
 feature_size_factor = [1., 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
 feature_sizes = np.array(feature_size_factor) / np.sqrt(3)
@@ -66,10 +66,12 @@ ax1.set_xlabel(r"Relative laser power$\,$", fontsize=16)
 ax1.set_ylabel(r"Electromagnetic FoM", fontsize=16)
 ax1.set_xlim(lps[0], lps[-1])
 ax2 = ax1.twiny()
-lns2 = ax2.plot(feature_size_factor, em_loss_list_fs, '--s', color='gray', label='Feature size')
+lns2 = ax2.plot(feature_sizes, em_loss_list_fs, '--s', color='gray', label='Feature size')
 ax2.set_xlabel(r"Feature size ($\mathrm{\mu}$m)", fontsize=16)
-ax2.set_xlim(min(feature_size_factor), max(feature_size_factor))
+ax2.set_xlim(min(feature_sizes), max(feature_sizes))
 ax1.legend(lns1 + lns2, [l.get_label() for l in lns1 + lns2])
 plt.tight_layout()
 plt.savefig("laser_power/laser_power_comparison.png")
 plt.close()
+
+print(np.max(em_loss_list_fs))

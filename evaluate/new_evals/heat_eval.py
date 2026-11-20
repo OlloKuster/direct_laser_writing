@@ -11,13 +11,12 @@ font = {'family': 'arial',
 
 matplotlib.rc('font', **font)
 
-path_heat = "/scratch/local/okuster/data/dlw_after_mistakes_fixed/plots_heat/"
+path_heat = "/scratch/local/okuster/data/dlw_metalens/heat_sweep_old/plots_heat_sweep/"
 
-inds = np.linspace(0, 24, 25)
+inds = np.linspace(0, 14, 15)
 
-target_material = [-0.99, -0.8, -0.6, -0.4, -0.2]
-target_void = [-0.99, -0.8, -0.6, -0.4, -0.2]
-
+target_material = [0.0, 0.2, 0.4, 0.6]
+target_void = [0.0, 0.2, 0.4, 0.6]
 
 em_loss_matrix = np.zeros(25)
 loss_matrix = np.zeros_like(em_loss_matrix)
